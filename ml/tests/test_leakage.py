@@ -16,7 +16,8 @@ Properties enforced:
 4. "Open at the snapshot" is a timestamp test, not a status test (contract v0.3.1).
 5. ``first_response_hours`` is gated on ``first_response_at <= snapshot_date``, so a
    ``contacted`` lead scored at creation carries no response duration; a recorded
-   ``leads.first_response_at`` wins over the ``created_at + hours`` derivation.
+   ``leads.first_response_at`` wins over the ``created_at + hours`` derivation, and one test
+   builds from a schema without that column so the derivation is not dead code.
 6. A record's own outcome never enters its own features: ``owner_win_rate_180d`` excludes
    the scored lead's own closure, tested by flipping that outcome.
 7. The rebuild is atomic: a forced insert failure leaves the previous table intact on both
@@ -154,22 +155,69 @@ _OUTCOMES = [
 ]
 
 
-def _seeded_connection(isolation_level: str | None = "") -> sqlite3.Connection:
-    conn = sqlite3.connect(":memory:", isolation_level=isolation_level)
-    conn.row_factory = sqlite3.Row
-    conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+# Recorded response instants for the leads that were answered before their snapshot
+# (created_at + first_response_hours, which is what a consistent generator writes).
+# L-0 and L-3 are deliberately absent: their column is NULL while a duration is recorded,
+# so the fixture also exercises the fallback branch when the column exists but is NULL --
+# L-0's derived instant falls before its snapshot and is kept, L-3's falls after it and is
+# gated away (a contacted lead scored at creation has not been answered yet).
+_LEAD_RESPONSE_AT = {
+    "L-1": "2024-01-01T04:00:00",
+    "L-2": "2024-06-01T02:30:00",
+    "L-4": "2023-09-01T03:00:00",
+    "L-5": "2024-01-20T06:00:00",
+    "L-8": "2023-12-01T05:00:00",
+}
 
-    conn.executemany(
-        "INSERT INTO companies (id, name, vat_number, region, city, industry, employees, "
-        "created_at, owner_rep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        _COMPANIES,
-    )
+
+def _seed_leads(conn: sqlite3.Connection) -> None:
+    """Insert the leads and, when the schema carries it, their recorded response instants.
+
+    ``data/schema.sql`` declares ``leads.first_response_at``; populating it here means the
+    normal fixture exercises the precedence path (recorded column wins over the derivation).
+    """
     conn.executemany(
         "INSERT INTO leads (id, company_id, created_at, status, source, owner_rep, "
         "first_response_hours, qualified_at, proposal_at, closed_at, lost_reason, "
         "amount_arr, discount_pct) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         _LEADS,
     )
+    lead_columns = {row[1] for row in conn.execute("PRAGMA table_info(leads)")}
+    if "first_response_at" in lead_columns:
+        conn.executemany(
+            "UPDATE leads SET first_response_at = ? WHERE id = ?",
+            [(recorded, lead_id) for lead_id, recorded in _LEAD_RESPONSE_AT.items()],
+        )
+
+
+def _schema_without_lead_response_column() -> str:
+    """``data/schema.sql`` with ``leads.first_response_at`` removed, for the fallback test."""
+    schema = SCHEMA_PATH.read_text(encoding="utf-8")
+    start = schema.index("CREATE TABLE leads (")
+    end = schema.index(");", start)
+    block = schema[start:end]
+    stripped = "\n".join(
+        line for line in block.splitlines() if "first_response_at" not in line
+    )
+    return schema[:start] + stripped + schema[end:]
+
+
+def _seeded_connection(
+    isolation_level: str | None = "",
+    schema_text: str | None = None,
+) -> sqlite3.Connection:
+    conn = sqlite3.connect(":memory:", isolation_level=isolation_level)
+    conn.row_factory = sqlite3.Row
+    conn.executescript(
+        SCHEMA_PATH.read_text(encoding="utf-8") if schema_text is None else schema_text
+    )
+
+    conn.executemany(
+        "INSERT INTO companies (id, name, vat_number, region, city, industry, employees, "
+        "created_at, owner_rep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        _COMPANIES,
+    )
+    _seed_leads(conn)
     conn.executemany(
         "INSERT INTO tickets (id, company_id, opened_at, closed_at, severity, "
         "resolution_hours) VALUES (?, ?, ?, ?, ?, ?)",
@@ -721,29 +769,59 @@ def test_measured_zero_is_not_null() -> None:
 # --------------------------------------------------------------------------------------
 
 
-def test_explicit_first_response_timestamp_wins_over_the_derived_instant() -> None:
+def test_recorded_first_response_timestamp_wins_over_the_derived_instant() -> None:
     conn = _seeded_connection()
-    # data/schema.sql declares first_response_at on lead_features; the generator is adding
-    # the source column to leads.  Add it here to pin the precedence rule either way.
-    conn.execute("ALTER TABLE leads ADD COLUMN first_response_at TEXT")
-    # Explicit instant later than created+hours (L-5 is created 2024-01-20, 6h recorded).
+
+    # The normal fixture carries leads.first_response_at; the feature row reports it and
+    # measures the duration to it.
+    rows = _build(conn)
+    assert rows["L-1"]["first_response_at"] == "2024-01-01T04:00:00"
+    assert rows["L-1"]["first_response_hours"] == 4.0
+
+    # Change only the recorded instant (the duration column still says 6.0): the column wins,
+    # because it is the source of truth for when the response happened.
     conn.execute(
         "UPDATE leads SET first_response_at = '2024-01-20T18:00:00' WHERE id = 'L-5'"
     )
-    # Explicit instant after the snapshot: not knowable there.
+    conn.commit()
+    rows = _build(conn)
+    assert rows["L-5"]["first_response_at"] == "2024-01-20T18:00:00"
+    assert rows["L-5"]["first_response_hours"] == 18.0
+
+    # A recorded instant after the snapshot is not knowable there.
     conn.execute(
         "UPDATE leads SET first_response_at = '2024-02-01T00:00:00' WHERE id = 'L-6'"
     )
     conn.commit()
-
     rows = _build(conn)
-    assert rows["L-5"]["first_response_at"] == "2024-01-20T18:00:00"
-    assert rows["L-5"]["first_response_hours"] == 18.0  # measured to the chosen instant
     assert rows["L-6"]["first_response_at"] is None
     assert rows["L-6"]["first_response_hours"] is None
-    # A lead with no recorded timestamp still uses the derived instant.
+
+
+def test_derived_response_instant_when_the_source_column_is_absent() -> None:
+    """The PRAGMA fallback is a real path, not dead code: build from a schema without it."""
+    schema_without = _schema_without_lead_response_column()
+    assert schema_without != SCHEMA_PATH.read_text(encoding="utf-8")
+    conn = _seeded_connection(schema_text=schema_without)
+    assert "first_response_at" not in {
+        row[1] for row in conn.execute("PRAGMA table_info(leads)")
+    }
+    # the materialised table still records the instant the row actually used
+    assert "first_response_at" in {
+        row[1] for row in conn.execute("PRAGMA table_info(lead_features)")
+    }
+
+    rows = _build(conn)
+    # derived as created_at + first_response_hours
     assert rows["L-1"]["first_response_at"] == "2024-01-01T04:00:00"
     assert rows["L-1"]["first_response_hours"] == 4.0
+    assert rows["L-5"]["first_response_at"] == "2024-01-20T06:00:00"
+    assert rows["L-5"]["first_response_hours"] == 6.0
+    # and the snapshot gate still nulls a response that has not happened yet
+    assert rows["L-3"]["first_response_at"] is None
+    assert rows["L-3"]["first_response_hours"] is None
+    assert rows["L-6"]["first_response_at"] is None
+    assert rows["L-6"]["first_response_hours"] is None
 
 
 # --------------------------------------------------------------------------------------
