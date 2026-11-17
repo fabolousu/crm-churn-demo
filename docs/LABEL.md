@@ -120,9 +120,11 @@ more human variance. Anyone who claims 0.95 on this task is measuring their own 
 2. **Open at the snapshot is a timestamp test**, never a status test. A lead that was open at
    `S` and closed later still counts at `S`; a lead whose close date changes must not change
    a historical row.
-3. **A feature may only use an event that has happened by the snapshot.** `first_response_at`
-   exists precisely so this is decidable; a duration with no timestamp is unverifiable. This
-   was a real defect caught on PR #1.
+3. **A feature may only use an event that has happened by the snapshot.** `leads.first_response_at`
+   is the source of truth for when a response happened; `lead_features.first_response_at` records
+   the instant the feature row actually used, and `first_response_hours` is NULL whenever that
+   instant is after the snapshot. A duration with no timestamp is unverifiable — this was a real
+   defect caught on PR #1.
 4. **Never let a record's own outcome enter its features.** `owner_win_rate_180d` excludes the
    scored lead, and company-level history excludes it too. Self-inclusion is leakage that
    looks like a strong model.
