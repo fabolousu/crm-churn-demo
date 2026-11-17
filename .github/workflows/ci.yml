@@ -28,37 +28,57 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt
 
+      # Gates activate with the code they guard. A branch that only touches docs must not
+      # be blocked by a model artifact that does not exist yet — but code without tests,
+      # or a training lane without its metrics, must never pass.
       - name: Tests
         run: |
-          if [ -d tests ] || [ -d ml/tests ] || [ -d api/tests ]; then
+          set -e
+          has_tests=0
+          for d in tests ml/tests api/tests data/tests; do
+            if [ -d "$d" ]; then has_tests=1; fi
+          done
+          has_code=0
+          if find data ml api -name '*.py' -print -quit 2>/dev/null | grep -q .; then has_code=1; fi
+          if [ "$has_code" = "1" ] && [ "$has_tests" = "0" ]; then
+            echo "Python code is present but no test directory exists"; exit 1
+          fi
+          if [ "$has_tests" = "1" ]; then
             python -m pytest -q
           else
-            echo "no test directories yet — failing rather than skipping"
-            exit 1
+            echo "no Python code or tests yet — nothing to run"
           fi
 
       - name: Model quality gate
         run: |
-          if [ -f ml/artifacts/metrics.json ]; then
+          set -e
+          if [ -f ml/train.py ]; then
+            if [ ! -f ml/artifacts/metrics.json ]; then
+              echo "ml/train.py exists but ml/artifacts/metrics.json is missing"; exit 1
+            fi
             python tools/check_metrics.py
           else
-            echo "ml/artifacts/metrics.json missing — the demo's numbers cannot be checked"
-            exit 1
+            echo "training lane has not landed — model gate inactive"
           fi
 
       - name: Leakage guard
         run: |
+          set -e
+          if [ ! -f ml/features.py ]; then
+            echo "no feature pipeline yet — guard inactive"
+            exit 0
+          fi
           if grep -rn "_outcomes" ml/features.py 2>/dev/null; then
-            echo "features.py reads the label table"
-            exit 1
+            echo "features.py reads the label table"; exit 1
           fi
           echo "leakage guard ok"
 
       - name: Contract drift
         run: |
-          if [ -f api/openapi.yaml ] && [ -d api/tests ]; then
+          set -e
+          if [ -d api/tests ]; then
             python -m pytest api/tests -q -k contract
           else
             echo "contract tests not present yet"
