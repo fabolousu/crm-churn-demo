@@ -87,3 +87,10 @@ Contract-first: P0 is written by the lead alone. Then lanes run concurrently aga
 
 P3 wiring and P4 review are serialized — they are the integration points, and that is
 where multi-agent builds fail.
+
+### One writer per table
+
+`lead_features` is materialised **only** by `ml/features.py`. The generator produces raw
+tables plus `lead_outcomes` and leaves `lead_features` empty — asserted by a generator
+test. Two producers of one table diverge silently, and a generator that pre-computes
+features would let the demo show a table that nothing in the pipeline computed.
