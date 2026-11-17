@@ -21,9 +21,9 @@ Three claims, each proved by a screen, not by a bullet:
 | 0:00 | Title, one sentence | "Your CRM knows everything about the past and nothing about next quarter." |
 | 0:30 | **Today's queue** | "This is what a rep sees first. Not accounts. €18.4M of revenue at risk, ordered by what's worth saving." |
 | 1:30 | **Account 360** | Click the top account. "71% likely to be gone in six months. Three reasons: renewal in 43 days, seven support tickets, usage down 34%." |
-| 2:30 | **Why / counterfactual** | Move the lever. "Resolve the two open tickets and get one exec meeting: 71% drops to 34%. Now the call has a purpose." |
+| 2:30 | **Why / counterfactual** | Move the lever. "Log one qualified lead today and resolve the two open tickets: 71% drops to 34%. The CRM's own records move the prediction." |
 | 3:30 | **Act, then re-score** | Click. "Task created, score updated, and it's out of the queue until the task closes. The loop closes." |
-| 4:20 | **Portfolio** | "Across three business units — and the model is calibrated, which means the 71% means 71%, not just 'high'." |
+| 4:20 | **Portfolio** | "Five Italian regions, one calibrated model — so the 71% means 71%, not just 'high'." |
 | 4:50 | Close | "The model is the easy part. The rethink is that these four screens replace the record-first CRUD that everyone else still ships." |
 
 ## Three numbers to have ready

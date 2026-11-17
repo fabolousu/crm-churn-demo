@@ -1,17 +1,55 @@
 -- Data contract for crm-churn-demo. SQLite dialect, Postgres-portable.
+--
+-- Entity model: a COMPANY is the master record; LEADS are the CRM's activity
+-- records against that company; a won lead creates an ACCOUNT (the customer
+-- relationship). Churn is a property of the ACCOUNT, and lead history is a
+-- first-class predictor of it.
+--
+-- Pilot scope: Italy only, five macro-regions.
 -- Snapshot date t0 is fixed at 2026-01-01 for the generated world.
 -- Features may only be derived from rows with *_at <= t0. Labels live apart in
 -- account_outcomes and must never be read by feature code.
 
 PRAGMA foreign_keys = ON;
 
-CREATE TABLE accounts (
+CREATE TABLE companies (
   id              TEXT PRIMARY KEY,
   name            TEXT NOT NULL,
-  bu              TEXT NOT NULL CHECK (bu IN ('north', 'south', 'emea')),
-  region          TEXT NOT NULL,
+  vat_number      TEXT NOT NULL,              -- synthetic, format-plausible IT VAT
+  region          TEXT NOT NULL CHECK (region IN
+                    ('nord-ovest', 'nord-est', 'centro', 'sud', 'isole')),
+  city            TEXT NOT NULL,
   industry        TEXT NOT NULL,
+  employees       INTEGER NOT NULL,
   created_at      TEXT NOT NULL,              -- ISO date
+  owner_rep       TEXT NOT NULL
+);
+
+-- The CRM's primary activity record. Status is the lead's success state.
+CREATE TABLE leads (
+  id              TEXT PRIMARY KEY,
+  company_id      TEXT NOT NULL REFERENCES companies(id),
+  created_at      TEXT NOT NULL,
+  status          TEXT NOT NULL CHECK (status IN
+                    ('new', 'contacted', 'qualified', 'proposal', 'won', 'lost')),
+  source          TEXT NOT NULL CHECK (source IN
+                    ('inbound', 'outbound', 'referral', 'partner', 'event')),
+  owner_rep       TEXT NOT NULL,
+  first_response_hours REAL,
+  qualified_at    TEXT,
+  proposal_at     TEXT,
+  closed_at       TEXT,
+  lost_reason     TEXT CHECK (lost_reason IS NULL OR lost_reason IN
+                    ('price', 'no_budget', 'competitor', 'no_fit', 'timing', 'silent')),
+  amount_arr      REAL
+);
+
+-- A customer relationship, created by a won lead.
+CREATE TABLE accounts (
+  id              TEXT PRIMARY KEY,
+  company_id      TEXT NOT NULL REFERENCES companies(id),
+  lead_id         TEXT NOT NULL REFERENCES leads(id),   -- the won lead that created it
+  started_at      TEXT NOT NULL,
   arr             REAL NOT NULL,
   seats           INTEGER NOT NULL,
   seats_active    INTEGER NOT NULL,
@@ -63,25 +101,42 @@ CREATE TABLE interactions (
 );
 
 -- Materialised at t0 by ml/features.py. One row per account.
+-- Lead-derived columns are the CRM's own success signals.
 CREATE TABLE features (
   account_id      TEXT PRIMARY KEY REFERENCES accounts(id),
   snapshot_date   TEXT NOT NULL,
+
+  -- commercial state
   tenure_days     INTEGER NOT NULL,
   arr             REAL NOT NULL,
   seats           INTEGER NOT NULL,
   seats_active_ratio REAL NOT NULL,
-  usage_events_90d INTEGER NOT NULL,
-  usage_trend_slope REAL NOT NULL,
-  tickets_90d     INTEGER NOT NULL,
-  tickets_sev_high_90d INTEGER NOT NULL,
-  last_login_days_ago INTEGER NOT NULL,
+  discount_pct    REAL NOT NULL,
   renewal_days_left INTEGER NOT NULL,
   is_renewal_within_60d INTEGER NOT NULL,
-  discount_pct    REAL NOT NULL,
-  payment_delay_days_avg_180d REAL NOT NULL,
+  region          TEXT NOT NULL,
+
+  -- product and service
+  usage_events_90d INTEGER NOT NULL,
+  usage_trend_slope REAL NOT NULL,
+  last_login_days_ago INTEGER NOT NULL,
+  tickets_90d     INTEGER NOT NULL,
+  tickets_sev_high_90d INTEGER NOT NULL,
+
+  -- relationship
   nps_last        INTEGER NOT NULL,
   meetings_90d    INTEGER NOT NULL,
-  emails_90d      INTEGER NOT NULL
+  emails_90d      INTEGER NOT NULL,
+  payment_delay_days_avg_180d REAL NOT NULL,
+
+  -- lead pipeline health (the CRM's own records)
+  leads_created_90d INTEGER NOT NULL,
+  leads_won_90d   INTEGER NOT NULL,
+  leads_lost_90d  INTEGER NOT NULL,
+  days_since_last_lead INTEGER NOT NULL,
+  median_first_response_hours_90d REAL NOT NULL,
+  open_pipeline_arr REAL NOT NULL,
+  win_rate_180d   REAL NOT NULL
 );
 
 -- Ground truth. Written once by the generator, never read by feature or training
@@ -108,7 +163,8 @@ CREATE TABLE risk_scores (
 CREATE TABLE actions (
   id              TEXT PRIMARY KEY,
   account_id      TEXT NOT NULL REFERENCES accounts(id),
-  kind            TEXT NOT NULL CHECK (kind IN ('call','exec_meeting','discount_review','support_escalation')),
+  kind            TEXT NOT NULL CHECK (kind IN
+                    ('call','exec_meeting','discount_review','support_escalation')),
   note            TEXT,
   created_at      TEXT NOT NULL,
   created_by      TEXT NOT NULL,
@@ -122,6 +178,9 @@ CREATE TABLE model_runs (
   artifact_path   TEXT NOT NULL
 );
 
+CREATE INDEX idx_leads_company      ON leads(company_id, created_at);
+CREATE INDEX idx_leads_status       ON leads(status, closed_at);
+CREATE INDEX idx_accounts_company   ON accounts(company_id);
 CREATE INDEX idx_tickets_account_opened ON tickets(account_id, opened_at);
 CREATE INDEX idx_invoices_account_due   ON invoices(account_id, due_at);
 CREATE INDEX idx_interactions_account   ON interactions(account_id, occurred_at);

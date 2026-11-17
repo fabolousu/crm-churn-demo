@@ -1,11 +1,15 @@
 openapi: 3.1.0
 info:
   title: crm-churn-demo API
-  version: 0.1.0
+  version: 0.2.0
   description: |
     Contract for the pitch demo. Lanes C (service) and D (UI) both code against this
     file; neither may add a field unilaterally. Scores come from the LightGBM model in
     ml/artifacts, drivers from SHAP, counterfactuals from re-scoring the same model.
+
+    Entity model: company -> leads -> account (customer). Churn is a property of the
+    account; lead-pipeline health is a first-class predictor. Pilot scope is Italy,
+    five macro-regions.
 servers:
   - url: http://localhost:8000
 
@@ -32,7 +36,7 @@ paths:
       operationId: getQueue
       summary: Accounts ranked by revenue at risk (probability x ARR)
       parameters:
-        - { name: bu, in: query, schema: { $ref: '#/components/schemas/Bu' } }
+        - { name: region, in: query, schema: { $ref: '#/components/schemas/Region' } }
         - name: limit
           in: query
           schema: { type: integer, minimum: 1, maximum: 200, default: 25 }
@@ -56,7 +60,7 @@ paths:
   /api/accounts/{account_id}:
     get:
       operationId: getAccount
-      summary: Account 360 with score, drivers, and open actions
+      summary: Account 360 with company, score, drivers, and open actions
       parameters:
         - { name: account_id, in: path, required: true, schema: { type: string } }
       responses:
@@ -88,6 +92,24 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/TrendPoint' }
+
+  /api/accounts/{account_id}/leads:
+    get:
+      operationId: getLeads
+      summary: The company's leads — the CRM records that drive the pipeline-health drivers
+      parameters:
+        - { name: account_id, in: path, required: true, schema: { type: string } }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: Leads, most recent first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Lead' }
 
   /api/accounts/{account_id}/counterfactual:
     post:
@@ -133,7 +155,7 @@ paths:
   /api/portfolio:
     get:
       operationId: getPortfolio
-      summary: Executive view — risk by BU, calibration, drift
+      summary: Executive view — risk by region, calibration, drift
       responses:
         '200':
           description: Portfolio aggregates
@@ -143,9 +165,10 @@ paths:
 
 components:
   schemas:
-    Bu:
+    Region:
       type: string
-      enum: [north, south, emea]
+      description: Italian macro-region of the customer's company
+      enum: [nord-ovest, nord-est, centro, sud, isole]
 
     Band:
       type: string
@@ -158,16 +181,34 @@ components:
         feature: { type: string }
         label: { type: string, description: Human-readable, executive-safe wording }
         contribution: { type: number, description: SHAP value in log-odds }
-        value: { type: string, description: Rendered current value, e.g. "7 tickets" }
+        value: { type: string, description: Rendered current value, e.g. "94 days since last lead" }
         direction: { type: string, enum: [increases, decreases] }
+
+    Lead:
+      type: object
+      required: [id, status, created_at, source]
+      properties:
+        id: { type: string }
+        status:
+          type: string
+          enum: [new, contacted, qualified, proposal, won, lost]
+        source:
+          type: string
+          enum: [inbound, outbound, referral, partner, event]
+        created_at: { type: string, format: date }
+        closed_at: { type: [string, 'null'], format: date }
+        amount_arr: { type: [number, 'null'] }
+        lost_reason:
+          type: [string, 'null']
+          enum: [price, no_budget, competitor, no_fit, timing, silent, null]
 
     QueueItem:
       type: object
-      required: [account_id, name, bu, arr, probability, band, arr_at_risk, top_driver]
+      required: [account_id, company_name, region, arr, probability, band, arr_at_risk, top_driver]
       properties:
         account_id: { type: string }
-        name: { type: string }
-        bu: { $ref: '#/components/schemas/Bu' }
+        company_name: { type: string }
+        region: { $ref: '#/components/schemas/Region' }
         arr: { type: number }
         probability: { type: number }
         band: { $ref: '#/components/schemas/Band' }
@@ -180,12 +221,12 @@ components:
       properties:
         account:
           type: object
-          required: [id, name, bu, region, industry, arr, seats, renewal_date, owner_rep]
+          required: [id, company_id, company_name, region, industry, arr, seats, renewal_date, owner_rep]
           properties:
             id: { type: string }
-            name: { type: string }
-            bu: { $ref: '#/components/schemas/Bu' }
-            region: { type: string }
+            company_id: { type: string }
+            company_name: { type: string }
+            region: { $ref: '#/components/schemas/Region' }
             industry: { type: string }
             arr: { type: number }
             seats: { type: integer }
@@ -219,12 +260,16 @@ components:
 
     CounterfactualRequest:
       type: object
-      description: Only these levers are accepted; each maps to a feature change.
+      description: |
+        Only these levers are accepted; each maps to a feature change and is re-scored by
+        the same model. `new_lead_logged` is the demo's strongest lever: the CRM's own
+        record-keeping moves the prediction.
       properties:
         tickets_resolved: { type: integer, minimum: 0, maximum: 50 }
         usage_recovery_pct: { type: number, minimum: 0, maximum: 100 }
         discount_reduction_pct: { type: number, minimum: 0, maximum: 100 }
         executive_meeting: { type: boolean }
+        new_lead_logged: { type: boolean }
       additionalProperties: false
 
     CounterfactualResponse:
@@ -267,16 +312,16 @@ components:
 
     Portfolio:
       type: object
-      required: [total_arr_at_risk, by_bu, calibration, drift]
+      required: [total_arr_at_risk, by_region, calibration, drift]
       properties:
         total_arr_at_risk: { type: number }
-        by_bu:
+        by_region:
           type: array
           items:
             type: object
-            required: [bu, accounts, churn_rate, arr_at_risk]
+            required: [region, accounts, churn_rate, arr_at_risk]
             properties:
-              bu: { $ref: '#/components/schemas/Bu' }
+              region: { $ref: '#/components/schemas/Region' }
               accounts: { type: integer }
               churn_rate: { type: number }
               arr_at_risk: { type: number }

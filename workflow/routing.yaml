@@ -29,7 +29,7 @@ tasks:
     agent: data-engineer
     model: openai
     reviewer: pr-reviewer
-    gate: "prevalence 18-22%, BU base rates plausibly ordered, no NaN"
+    gate: "prevalence 18-22%, regional base rates plausibly ordered, no NaN"
     parallel_group: 1
     why: "statistics correctness; failures are silent and poison everything downstream"
 
