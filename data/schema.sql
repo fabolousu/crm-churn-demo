@@ -36,6 +36,7 @@ CREATE TABLE leads (
                     ('inbound', 'outbound', 'referral', 'partner', 'event')),
   owner_rep       TEXT NOT NULL,
   first_response_hours REAL,
+  first_response_at TEXT,                     -- when the first response happened; NULL if never
   qualified_at    TEXT,
   proposal_at     TEXT,
   closed_at       TEXT,
