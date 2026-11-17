@@ -27,7 +27,7 @@ tasks:
   - id: T2-generator
     scope: "data/generator.py, data/seed.py, data/tests/"
     agent: data-engineer
-    model: google
+    model: deepseek
     reviewer: pr-reviewer
     gate: "win prevalence 25-30%, regional base rates plausibly ordered, no NaN"
     parallel_group: 1
@@ -36,7 +36,7 @@ tasks:
   - id: T3-features
     scope: "ml/features.py, ml/tests/test_leakage.py"
     agent: ml-engineer
-    model: google
+    model: deepseek
     reviewer: pr-reviewer
     gate: "leakage test green; snapshot discipline proven by test"
     parallel_group: 1
@@ -45,7 +45,7 @@ tasks:
   - id: T4-training
     scope: "ml/train.py, ml/explain.py, ml/artifacts/"
     agent: ml-engineer
-    model: google
+    model: deepseek
     reviewer: pr-reviewer
     gate: "AUC in [0.75, 0.90] (above = leakage), calibration < 0.05"
     parallel_group: 2
@@ -112,3 +112,9 @@ escalation:
     action: "escalate one tier: deepseek -> openai -> lead; record it in the scoreboard"
   - trigger: "gate fails three times"
     action: "stop; the spec is wrong. Fix the contract, then restart the task"
+
+# NOTE 2026-11-17: T2/T3/T4 were mapped to `google`, but the Gemini route is unusable right
+# now with the installed key: the catalog model gemini-2.5-flash is retired for new users
+# (HTTP 404 -> use gemini-3.8-flash), gemini-3.8-flash timed out twice at 120s, and
+# gemini-3.1-pro-preview returned 429 quota. Until a Gemini call succeeds end to end, the
+# ML lanes run on deepseek and the reviewer stays on anthropic so vendors still differ.

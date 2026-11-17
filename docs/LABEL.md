@@ -96,21 +96,38 @@ more human variance. Anyone who claims 0.95 on this task is measuring their own 
 | `age_days_at_scoring` | Days from `created_at` to scoring | int |
 | `amount_arr` | Proposed initiative value, EUR | float |
 | `discount_pct` | Proposed discount | float |
-| `first_response_hours` | Hours to first response; NULL if unanswered | float |
+| `first_response_hours` | Hours to first response, but **only when `first_response_at <= snapshot_date`**; otherwise NULL. A `contacted` lead scored at creation has not been answered yet | float |
 | `region` | Company macro-region | text |
 | `industry`, `employees` | Company firmographics | text, int |
 | `company_age_days` | Days since `companies.created_at` | int |
 | `prior_won_initiatives` | Won initiatives before this one | int |
 | `prior_lost_initiatives` | Lost initiatives before this one | int |
-| `days_since_last_initiative` | Days since the company's previous lead | int |
+| `days_since_last_initiative` | **Snapshot-relative**: days from the scoring point back to the previous lead's `created_at`. Not creation-to-creation | int |
 | `lifetime_won_arr` | Total ARR won from this company | float |
-| `open_initiatives_count` | Other open leads at scoring | int |
+| `open_initiatives_count` | Leads **open at the snapshot**: `created_at <= snapshot AND (closed_at IS NULL OR closed_at > snapshot)`, excluding the scored lead. Not "currently open" | int |
 | `usage_trend_slope` | OLS slope of weekly usage, 90 days | float |
 | `tickets_90d` | Support tickets, last 90 days | int |
 | `nps_last` | Most recent NPS (−100…100) | int |
 | `payment_delay_days_avg_180d` | Mean days late on invoices | float |
 | `meetings_before_scoring` | Meetings on this lead so far | int |
-| `owner_win_rate_180d` | Win rate of the assigned rep | float |
+| `owner_win_rate_180d` | Win rate of the assigned rep over the 180 days before the snapshot, **excluding the scored lead's own closure** | float |
+
+### Conventions that must not drift
+
+1. **Snapshot-relative, not record-relative.** `days_since_last_initiative` measures from the
+   scoring point. The generator and the feature pipeline must use the same convention, or the
+   model learns a signal the demo cannot explain.
+2. **Open at the snapshot is a timestamp test**, never a status test. A lead that was open at
+   `S` and closed later still counts at `S`; a lead whose close date changes must not change
+   a historical row.
+3. **A feature may only use an event that has happened by the snapshot.** `first_response_at`
+   exists precisely so this is decidable; a duration with no timestamp is unverifiable. This
+   was a real defect caught on PR #1.
+4. **Never let a record's own outcome enter its features.** `owner_win_rate_180d` excludes the
+   scored lead, and company-level history excludes it too. Self-inclusion is leakage that
+   looks like a strong model.
+5. **`NULL` means "not measured"; `0.0` means "measured zero".** Do not conflate them: these
+   columns are z-scored, and a sentinel zero silently shifts the distribution.
 
 ## Counterfactual levers
 

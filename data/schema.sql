@@ -101,6 +101,7 @@ CREATE TABLE lead_features (
   amount_arr      REAL NOT NULL,
   discount_pct    REAL NOT NULL,
   first_response_hours REAL,                  -- NULL if never answered
+  first_response_at TEXT,                     -- when the first response happened; NULL if never
 
   -- company context
   region          TEXT NOT NULL,
