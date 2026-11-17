@@ -54,9 +54,13 @@ docker compose up -d && curl -fsS localhost:8080/api/health   # when api/ or web
 # blocking findings present
 gh pr review <n> --request-changes --body-file review.md
 
-# no blocking findings
-gh pr review <n> --approve --body-file review.md
+# no blocking findings — comment, never approve
+gh pr review <n> --comment --body-file review.md
 ```
+
+**You never run `--approve`.** You review under the same GitHub account as the human, so
+an approval from you is indistinguishable from theirs and would silently satisfy the
+required-approval rule. Your verdict lives in the comment body; the human clicks Approve.
 
 The body format:
 

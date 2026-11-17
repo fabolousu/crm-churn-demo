@@ -43,7 +43,10 @@ lane agent ──► branch ──► gh pr create ──► CI + CodeRabbit ─
 
 ## Rules
 
-- **No agent merges to `main`.** Merging is the human gate; agents may only approve.
+- **No agent merges to `main`.** Merging is the human gate.
+- **No agent approves either.** The reviewer posts `--request-changes` or `--comment`,
+  never `--approve`: it runs under the human's GitHub token, so its approval would satisfy
+  branch protection while proving nothing. Your click is the approval.
 - **No self-review.** The reviewer never reviews a branch authored in the same session.
 - **Findings must be reproducible.** Every blocking comment names a file:line and the
   command that exposed it.
