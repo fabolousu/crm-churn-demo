@@ -71,6 +71,17 @@ Ports: API `8000`, web dev `5173`, composed demo `8080`.
 | CodeRabbit CLI installed; `coderabbit doctor` clean | You | P4 gate only |
 | Demo laptop OS (macOS / Windows) | You | `compose.yaml` details only |
 
+## Known limitations (accepted, not fixed)
+
+These were found by the gates and deliberately not fixed. Recording them is the point: an
+accepted limitation is engineering, an unrecorded one is a surprise.
+
+| Limitation | Why accepted |
+|---|---|
+| Derived response instants truncate fractional seconds (`ml/features.py`, fallback path only) | The generator writes integral seconds and `leads.first_response_at` is the preferred source, so the fallback only runs on legacy data; the discrepancy is sub-second |
+| The PR reviewer cannot formally "request changes" from GitHub | It authenticates as the repository owner, who is also the PR author, so GitHub rejects it; it posts `--comment` instead, and the human's approval remains the only approval |
+| CodeRabbit's GitHub App is not installed | The CLI gate runs locally and is what `tools/review.ps1` enforces; the app would add automatic PR comments, which is cosmetic for a demo |
+
 ## How the harness builds this
 
 Contract-first: P0 is written by the lead alone. Then lanes run concurrently against
