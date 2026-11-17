@@ -26,28 +26,31 @@ Self-exclusion
     the lead too.  This matters when ``closed_at == qualified_at``: the lead's own won/lost
     result would otherwise sit inside its own feature.
 
-``first_response_at`` is the instant implied by ``created_at`` plus the recorded
-``first_response_hours`` -- the source schema stores a duration, not a timestamp -- and is
-materialised only when it is at or before ``snapshot_date``.  ``first_response_hours`` is
-NULL whenever that instant is missing or later, so a ``contacted`` lead scored at creation
-carries no response duration yet.
+``first_response_at`` prefers the recorded source column ``leads.first_response_at`` when
+the database exposes it (lane A's generator populates it), and otherwise derives the instant
+from ``created_at + first_response_hours`` -- the only other representation ``data/schema.sql``
+can express for a lead. Whichever instant is chosen, the duration is measured from
+``created_at`` to it, so the two materialised columns cannot disagree. Both are NULL when the
+instant is later than ``snapshot_date``: a ``contacted`` lead scored at creation carries no
+response duration yet.
 
 Every lead gets a row, including leads that never reached qualification: the pipeline
 screen scores whatever is open.  Deciding which rows carry a usable label is the trainer's
 job (``docs/LABEL.md`` excludes censored and never-qualified leads), not this module's.
 
-Degenerate cases are explicit rather than invented: ``amount_arr`` falls back to ``0.0``
-when the source column is NULL (the materialised column is NOT NULL); no survey yields
-``nps_last = 0``; no invoices yields ``0.0`` average delay; fewer than two usage weeks (or
-no variance in time) yields ``usage_trend_slope = 0.0``; a rep with no closed initiative in
-the window yields ``owner_win_rate_180d = 0.0``.  Those columns are NOT NULL in
-``data/schema.sql``, so 0.0 is the only representable value for "not measured" even though
-convention 5 in ``docs/LABEL.md`` prefers NULL; changing that needs a schema change.
-``prior_won_initiatives`` and ``prior_lost_initiatives`` count initiatives of the same
-company closed at or before the scoring point, never the lead itself.
-``days_since_last_initiative`` is snapshot-relative: the gap from the company's previous
-initiative ``created_at`` back to the scoring point, and to the company's ``created_at``
-when this is its first initiative.
+"Not measured" is NULL, never a sentinel zero (convention 5 in ``docs/LABEL.md``; the four
+signal columns are nullable in ``data/schema.sql`` for exactly that reason).  A slope is not
+estimable from fewer than two usage weeks, so ``usage_trend_slope`` is NULL there; a company
+that was never surveyed leaves ``nps_last`` NULL; no invoice in the window leaves
+``payment_delay_days_avg_180d`` NULL; and a rep with no closure in the window -- after the
+scored lead's own closure is excluded -- leaves ``owner_win_rate_180d`` NULL.  Measured zeros
+(on-time invoices, a 0 NPS score, flat usage, a rep at 0-for-1) stay 0.0.
+``amount_arr`` still falls back to 0.0 when the source column is NULL, because its own
+column is NOT NULL.  ``prior_won_initiatives`` and ``prior_lost_initiatives`` count
+initiatives of the same company closed at or before the scoring point, never the lead
+itself.  ``days_since_last_initiative`` is snapshot-relative: the gap from the company's
+previous initiative ``created_at`` back to the scoring point, and to the company's
+``created_at`` when this is its first initiative.
 
 The build replaces ``lead_features`` inside one explicit transaction, so a failure leaves
 the previous materialisation intact on both autocommit and default connections.
@@ -103,6 +106,7 @@ class _Lead(NamedTuple):
     amount_arr: float
     discount_pct: float
     first_response_hours: float | None
+    first_response_at: str | None
 
 
 @dataclass
@@ -304,28 +308,41 @@ def _scoring_point(lead: _Lead) -> tuple[str, float, str]:
 
 
 def _first_response(lead: _Lead, snapshot: float) -> tuple[str | None, float | None]:
-    """Resolve the response instant and gate the duration on it.
+    """Resolve the response instant and its duration, gated on the snapshot.
 
-    ``leads`` records only a duration, so the instant is ``created_at + hours``.  A response
-    that has not happened by the snapshot is not knowable there: both materialised columns
-    are NULL.  Returns ``(first_response_at, first_response_hours)``.
+    The recorded ``leads.first_response_at`` wins when the database carries that column;
+    otherwise the instant is derived from ``created_at + first_response_hours``.  A response
+    later than the snapshot is not knowable there, so both materialised columns are NULL.
+    The duration is always measured from ``created_at`` to the chosen instant, so the pair
+    cannot disagree.  Returns ``(first_response_at, first_response_hours)``.
     """
-    if lead.first_response_hours is None:
+    created = _parse_timestamp(lead.created_at)
+    if lead.first_response_at is not None:
+        moment = _parse_timestamp(lead.first_response_at)
+        text = lead.first_response_at
+    elif lead.first_response_hours is not None:
+        moment = created + timedelta(hours=lead.first_response_hours)
+        separator = "T" if "T" in lead.created_at else " "
+        text = moment.isoformat(sep=separator, timespec="seconds")
+    else:
         return None, None
-    moment = _parse_timestamp(lead.created_at) + timedelta(hours=lead.first_response_hours)
     if _moment_days(moment) > snapshot:
         return None, None
-    separator = "T" if "T" in lead.created_at else " "
-    return moment.isoformat(sep=separator, timespec="seconds"), lead.first_response_hours
+    hours = (moment - created).total_seconds() / 3600.0
+    return text, hours
 
 
-def _usage_trend_slope(world: _World, company_id: str, snapshot: float) -> float:
-    """OLS slope of weekly usage events per week over the 90 days before the snapshot."""
+def _usage_trend_slope(world: _World, company_id: str, snapshot: float) -> float | None:
+    """OLS slope of weekly usage events per week over the 90 days before the snapshot.
+
+    NULL when the window holds fewer than two weekly points: a slope is not estimable from
+    one observation, and "not measured" must not be encoded as a flat zero.
+    """
     entries = world.usage.get(company_id, [])
     start, end = _window(entries, snapshot, 90.0, key=lambda row: row[0])
     points = entries[start:end]
     if len(points) < 2:
-        return 0.0
+        return None
     origin = points[0][0]
     xs = [(point[0] - origin) / 7.0 for point in points]  # weeks since the first week
     ys = [float(point[1]) for point in points]
@@ -334,16 +351,17 @@ def _usage_trend_slope(world: _World, company_id: str, snapshot: float) -> float
     mean_y = sum(ys) / count
     sxx = sum((x - mean_x) ** 2 for x in xs)
     if sxx == 0.0:
-        return 0.0
+        return None
     sxy = sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys))
     return sxy / sxx
 
 
-def _payment_delay_days(world: _World, company_id: str, snapshot: float) -> float:
+def _payment_delay_days(world: _World, company_id: str, snapshot: float) -> float | None:
     """Mean days late on invoices issued in the 180 days before the snapshot.
 
     An invoice paid after the snapshot is treated as unpaid at the snapshot, so its delay
-    is the run-out from ``due_at`` to the snapshot rather than a future payment date.
+    is the run-out from ``due_at`` to the snapshot rather than a future payment date.  NULL
+    when no invoice fell in the window, because that is "not measured", not "always on time".
     """
     invoices = world.invoices.get(company_id, [])
     start, end = _window(invoices, snapshot, 180.0, key=lambda row: row[0])
@@ -353,7 +371,7 @@ def _payment_delay_days(world: _World, company_id: str, snapshot: float) -> floa
         elapsed = (paid_at_snapshot if paid_at_snapshot is not None else snapshot) - due
         delays.append(max(0.0, elapsed))
     if not delays:
-        return 0.0
+        return None
     return sum(delays) / len(delays)
 
 
@@ -371,10 +389,17 @@ def _load_world(conn: sqlite3.Connection) -> _World:
         world.companies[company_id] = (region, industry, int(employees))
         world.company_created[company_id] = _day_number(created_at)
 
+    # ``leads.first_response_at`` is the recorded response instant when the database carries
+    # it; a database built from a schema without the column simply has nothing to prefer.
+    lead_columns = {row[1] for row in conn.execute("PRAGMA table_info(leads)")}
+    response_column = (
+        "first_response_at" if "first_response_at" in lead_columns else "NULL"
+    )
+
     for row in conn.execute(
         "SELECT id, company_id, created_at, status, source, owner_rep, qualified_at, "
-        "proposal_at, closed_at, amount_arr, discount_pct, first_response_hours "
-        "FROM leads"
+        "proposal_at, closed_at, amount_arr, discount_pct, first_response_hours, "
+        f"{response_column} FROM leads"
     ):
         (
             lead_id,
@@ -389,6 +414,7 @@ def _load_world(conn: sqlite3.Connection) -> _World:
             amount_arr,
             discount_pct,
             first_response_hours,
+            first_response_at,
         ) = row
         created_days = _day_number(created_at)
         lead = _Lead(
@@ -407,6 +433,7 @@ def _load_world(conn: sqlite3.Connection) -> _World:
             first_response_hours=(
                 float(first_response_hours) if first_response_hours is not None else None
             ),
+            first_response_at=first_response_at,
         )
         world.leads.append(lead)
         world.lead_created[company_id].append(created_days)
@@ -565,7 +592,7 @@ def _feature_row(lead: _Lead, world: _World) -> tuple:
 
     survey_entries = world.nps.get(company_id, [])
     survey_until = _upper_bound(survey_entries, snapshot, key=lambda row: row[0])
-    nps_last = survey_entries[survey_until - 1][1] if survey_until else 0
+    nps_last = survey_entries[survey_until - 1][1] if survey_until else None
 
     rep_entries = world.rep_closed.get(lead.owner_rep, [])
     rep_start, rep_end = _window(rep_entries, snapshot, 180.0, key=lambda row: row[0])
@@ -581,7 +608,7 @@ def _feature_row(lead: _Lead, world: _World) -> tuple:
         # at its own qualification instant the closure would otherwise land in this window.
         rep_total -= 1
         rep_wins -= 1 if lead.status == "won" else 0
-    owner_win_rate_180d = rep_wins / rep_total if rep_total > 0 else 0.0
+    owner_win_rate_180d = rep_wins / rep_total if rep_total > 0 else None
 
     meeting_days = world.meetings.get(lead.lead_id, [])
     meetings_before_scoring = _upper_bound(meeting_days, snapshot, key=lambda d: d)

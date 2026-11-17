@@ -15,11 +15,14 @@ Properties enforced:
    dated before the snapshot *do* move it, so the assertions can fail.
 4. "Open at the snapshot" is a timestamp test, not a status test (contract v0.3.1).
 5. ``first_response_hours`` is gated on ``first_response_at <= snapshot_date``, so a
-   ``contacted`` lead scored at creation carries no response duration.
+   ``contacted`` lead scored at creation carries no response duration; a recorded
+   ``leads.first_response_at`` wins over the ``created_at + hours`` derivation.
 6. A record's own outcome never enters its own features: ``owner_win_rate_180d`` excludes
    the scored lead's own closure, tested by flipping that outcome.
 7. The rebuild is atomic: a forced insert failure leaves the previous table intact on both
    default and autocommit connections.
+8. "Not measured" is NULL, never a sentinel zero: one test per signal column, plus a
+   measured-zero test so the two states cannot be conflated.
 """
 
 from __future__ import annotations
@@ -457,7 +460,7 @@ def test_owner_win_rate_excludes_the_scored_leads_own_closure() -> None:
     # inside the 180-day window the feature measures.  Excluded, the rep has no closure at
     # all there; included, the value would be 1.0 and the model would be reading the label.
     assert before["L-4"]["snapshot_date"] == "2023-09-20T00:00:00"
-    assert before["L-4"]["owner_win_rate_180d"] == 0.0
+    assert before["L-4"]["owner_win_rate_180d"] is None  # no closure left in the window
     # the company aggregates exclude the lead itself on the same instant
     assert before["L-4"]["prior_won_initiatives"] == 0
     assert before["L-4"]["lifetime_won_arr"] == 0.0
@@ -603,20 +606,21 @@ def test_derived_features_for_an_open_lead() -> None:
     assert row["nps_last"] == 60  # 2024-05-01 survey; 2024-08-01 is later
     assert row["payment_delay_days_avg_180d"] == pytest.approx(54.5)  # (107 + 2) / 2
     assert row["meetings_before_scoring"] == 0  # nothing booked on L-2 yet
-    assert row["usage_trend_slope"] == 0.0  # no usage week in the 90-day window
+    assert row["usage_trend_slope"] is None  # no usage week in the 90-day window
     assert row["owner_win_rate_180d"] == pytest.approx(1.0)  # L-8 won, self is open
 
 
-def test_missing_history_yields_the_documented_defaults() -> None:
+def test_missing_history_is_null_for_signals_and_zero_for_counters() -> None:
     rows = _build(_seeded_connection())
 
     never_answered = rows["L-6"]  # lost without ever being answered
     assert never_answered["first_response_hours"] is None
     assert never_answered["first_response_at"] is None
     assert never_answered["tickets_90d"] == 0
-    assert never_answered["nps_last"] == 0
-    assert never_answered["payment_delay_days_avg_180d"] == 0.0
-    assert never_answered["usage_trend_slope"] == 0.0
+    # C-2 was never surveyed and has no invoices or usage weeks: not measured, so NULL
+    assert never_answered["nps_last"] is None
+    assert never_answered["payment_delay_days_avg_180d"] is None
+    assert never_answered["usage_trend_slope"] is None
     assert never_answered["open_initiatives_count"] == 0
     assert never_answered["lifetime_won_arr"] == 0.0
     assert never_answered["prior_won_initiatives"] == 0
@@ -636,6 +640,110 @@ def test_missing_history_yields_the_documented_defaults() -> None:
     assert brand_new["days_since_last_initiative"] == 9  # L-1, 2024-01-01
     assert brand_new["prior_won_initiatives"] == 2
     assert brand_new["open_initiatives_count"] == 2  # L-8 and L-1
+    # rep-marco has no closure in L-7's window: not measured, so NULL rather than 0.0
+    assert brand_new["owner_win_rate_180d"] is None
+
+
+# --------------------------------------------------------------------------------------
+# 10. NULL means "not measured"; 0.0 means "measured zero"
+# --------------------------------------------------------------------------------------
+
+
+def test_not_measured_signals_are_null() -> None:
+    rows = _build(_seeded_connection())
+
+    # owner_win_rate_180d: rep has no closure in the window (L-4's own close is excluded)
+    assert rows["L-4"]["owner_win_rate_180d"] is None
+    assert rows["L-3"]["owner_win_rate_180d"] is None  # rep-marco, nothing closed yet
+
+    # nps_last: the company was never surveyed at or before this snapshot
+    assert rows["L-0"]["nps_last"] is None  # first C-1 survey is 2023-12-01
+    assert rows["L-4"]["nps_last"] is None
+    assert rows["L-6"]["nps_last"] is None  # C-2 has no surveys at all
+
+    # payment_delay_days_avg_180d: no invoice issued inside the window
+    assert rows["L-0"]["payment_delay_days_avg_180d"] is None
+    assert rows["L-4"]["payment_delay_days_avg_180d"] is None
+    assert rows["L-6"]["payment_delay_days_avg_180d"] is None
+
+    # usage_trend_slope: fewer than two weekly points, so no slope is estimable
+    assert rows["L-0"]["usage_trend_slope"] is None  # one week in the window
+    assert rows["L-4"]["usage_trend_slope"] is None  # none in the window
+    assert rows["L-6"]["usage_trend_slope"] is None  # no usage rows at all
+
+    # signals that do exist stay measured, so the NULLs above are not a column-wide failure
+    assert rows["L-1"]["owner_win_rate_180d"] == pytest.approx(2.0 / 3.0)
+    assert rows["L-1"]["nps_last"] == 30
+    assert rows["L-1"]["payment_delay_days_avg_180d"] == pytest.approx(16.0 / 3.0)
+    assert rows["L-1"]["usage_trend_slope"] == pytest.approx(10.0)
+
+
+def test_measured_zero_is_not_null() -> None:
+    conn = _seeded_connection()
+
+    # An NPS score of 0 is a measurement, not an absence of one.
+    conn.execute(
+        "INSERT INTO nps_surveys (company_id, surveyed_at, score) "
+        "VALUES ('C-1', '2023-09-01T00:00:00', 0)"
+    )
+    # Paid exactly on the due date: zero days late, not "no invoices".
+    conn.execute(
+        "INSERT INTO invoices (id, company_id, issued_at, due_at, paid_at, amount) VALUES "
+        "('I-ON-TIME', 'C-1', '2023-08-01T00:00:00', '2023-08-20T00:00:00', "
+        "'2023-08-20T00:00:00', 500.0)"
+    )
+    # Flat usage across two weeks: an estimable slope of zero, not a missing slope.
+    conn.execute(
+        "INSERT INTO company_usage_weekly (company_id, week_start, events) VALUES "
+        "('C-1', '2023-07-03T00:00:00', 40), ('C-1', '2023-07-10T00:00:00', 40)"
+    )
+    # A rep at 0-for-1 in the window: a real zero win rate.
+    conn.execute(
+        "INSERT INTO leads (id, company_id, created_at, status, source, owner_rep, "
+        "first_response_hours, qualified_at, proposal_at, closed_at, lost_reason, "
+        "amount_arr, discount_pct) VALUES ('L-9', 'C-2', '2023-07-15T00:00:00', 'lost', "
+        "'event', 'rep-marco', 1.0, '2023-07-20T00:00:00', NULL, "
+        "'2023-08-01T00:00:00', 'timing', 2000.0, 0.0)"
+    )
+    conn.commit()
+
+    rows = _build(conn)
+    l4 = rows["L-4"]  # snapshot 2023-09-20, C-1
+    assert l4["nps_last"] == 0  # a survey score of zero, measured
+    assert l4["payment_delay_days_avg_180d"] == 0.0  # paid on the due date
+    assert l4["usage_trend_slope"] == 0.0  # flat weekly usage
+    # L-3's rep window (2023-07-19 .. 2024-01-15) holds one loss and no win
+    assert rows["L-3"]["owner_win_rate_180d"] == 0.0
+
+
+# --------------------------------------------------------------------------------------
+# 11. the recorded response timestamp beats the derived one
+# --------------------------------------------------------------------------------------
+
+
+def test_explicit_first_response_timestamp_wins_over_the_derived_instant() -> None:
+    conn = _seeded_connection()
+    # data/schema.sql declares first_response_at on lead_features; the generator is adding
+    # the source column to leads.  Add it here to pin the precedence rule either way.
+    conn.execute("ALTER TABLE leads ADD COLUMN first_response_at TEXT")
+    # Explicit instant later than created+hours (L-5 is created 2024-01-20, 6h recorded).
+    conn.execute(
+        "UPDATE leads SET first_response_at = '2024-01-20T18:00:00' WHERE id = 'L-5'"
+    )
+    # Explicit instant after the snapshot: not knowable there.
+    conn.execute(
+        "UPDATE leads SET first_response_at = '2024-02-01T00:00:00' WHERE id = 'L-6'"
+    )
+    conn.commit()
+
+    rows = _build(conn)
+    assert rows["L-5"]["first_response_at"] == "2024-01-20T18:00:00"
+    assert rows["L-5"]["first_response_hours"] == 18.0  # measured to the chosen instant
+    assert rows["L-6"]["first_response_at"] is None
+    assert rows["L-6"]["first_response_hours"] is None
+    # A lead with no recorded timestamp still uses the derived instant.
+    assert rows["L-1"]["first_response_at"] == "2024-01-01T04:00:00"
+    assert rows["L-1"]["first_response_hours"] == 4.0
 
 
 # --------------------------------------------------------------------------------------
