@@ -1,0 +1,4 @@
+# Dependencies for the demo. Lanes append their own; keep this list minimal.
+# Lane A / B1 used the standard library only, so this starts with the test runner.
+
+pytest>=8.0

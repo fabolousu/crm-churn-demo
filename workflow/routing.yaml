@@ -27,7 +27,7 @@ tasks:
   - id: T2-generator
     scope: "data/generator.py, data/seed.py, data/tests/"
     agent: data-engineer
-    model: openai
+    model: google
     reviewer: pr-reviewer
     gate: "win prevalence 25-30%, regional base rates plausibly ordered, no NaN"
     parallel_group: 1
@@ -36,7 +36,7 @@ tasks:
   - id: T3-features
     scope: "ml/features.py, ml/tests/test_leakage.py"
     agent: ml-engineer
-    model: openai
+    model: google
     reviewer: pr-reviewer
     gate: "leakage test green; snapshot discipline proven by test"
     parallel_group: 1
@@ -45,7 +45,7 @@ tasks:
   - id: T4-training
     scope: "ml/train.py, ml/explain.py, ml/artifacts/"
     agent: ml-engineer
-    model: openai
+    model: google
     reviewer: pr-reviewer
     gate: "AUC in [0.75, 0.90] (above = leakage), calibration < 0.05"
     parallel_group: 2
@@ -63,7 +63,7 @@ tasks:
   - id: T6-ui
     scope: "web/"
     agent: ui-engineer
-    model: openai
+    model: anthropic
     reviewer: human
     gate: "one screen reviewed by a human for legibility"
     parallel_group: 1
