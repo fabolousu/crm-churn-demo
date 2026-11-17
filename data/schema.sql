@@ -88,6 +88,8 @@ CREATE TABLE interactions (
 );
 
 -- Materialised at the scoring point by ml/features.py. One row per scored lead.
+-- A NULL in a signal column means NOT MEASURED; it never means zero. The model (LightGBM)
+-- handles missing values natively, and a sentinel 0.0 would distort the z-scored distribution.
 -- Every column must be knowable at `snapshot_date`; nothing may encode the outcome.
 CREATE TABLE lead_features (
   lead_id         TEXT PRIMARY KEY REFERENCES leads(id),
@@ -115,12 +117,12 @@ CREATE TABLE lead_features (
   open_initiatives_count INTEGER NOT NULL,
 
   -- relationship signals, measured before the scoring point
-  usage_trend_slope REAL NOT NULL,
+  usage_trend_slope REAL,                     -- NULL when usage history is too short to fit a slope
   tickets_90d     INTEGER NOT NULL,
-  nps_last        INTEGER NOT NULL,
-  payment_delay_days_avg_180d REAL NOT NULL,
+  nps_last        INTEGER,                    -- NULL when the company was never surveyed
+  payment_delay_days_avg_180d REAL,           -- NULL when no invoice fell in the window
   meetings_before_scoring INTEGER NOT NULL,
-  owner_win_rate_180d REAL NOT NULL
+  owner_win_rate_180d REAL                    -- NULL when the rep has no prior closures
 );
 
 -- Ground truth. Written once by the generator; never read by feature or training code.
