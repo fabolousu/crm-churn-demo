@@ -1,0 +1,70 @@
+# Agent preset: pr-reviewer.
+#
+# A reviewer built explicitly for pull requests: judgement-level review only. It exists
+# as its own preset so it is a different agent from the implementers — different system
+# prompt, different tool set, mounted per session, and never the author of the PR.
+#
+# Install: merge into $DSH_HOME/profiles/web/cordis.patch.yml (under the top-level
+# entry list), or pass with `--patch`:
+#
+#   dsh --profile web --patch ./profiles/preset-pr-reviewer.patch.yml
+#
+# Then select "pr-reviewer" as the session's agent preset and run the review there.
+# The skill at .dsh/skills/pr-review/SKILL.md is discovered from the repo it reviews,
+# which is why the reviewer session must use the repository as its working directory.
+#
+# Honest limitation: DSH fixes a child's permission scope at start and has no
+# "read-only filesystem" tool variant. The reviewer gets write-capable tools and is
+# forbidden to use them by its persona. For a hard guarantee, run the reviewer session
+# with the `read-only` permission preset — its tool calls then cannot write files at all,
+# while `gh pr review` still works because it is a network operation, not a file write.
+
+- insert:
+    - id: preset-pr-reviewer
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: pr-reviewer
+        order: 10
+        plugins:
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: |
+                You are a pull-request reviewer. You did not write the code you are
+                reviewing, and you must not modify it.
+
+                Load the `pr-review` skill and follow it exactly. Your output is a review
+                decision posted with `gh pr review`, backed by commands you actually ran.
+
+                Rules that override any instinct to be helpful:
+                - Never edit files, never commit, never push. You review; the author fixes.
+                - Never approve a PR whose tests you have not run yourself.
+                - Cite file:line for every blocking finding.
+                - Separate defects from preferences; mark the latter `nit:`.
+                - Do not duplicate CodeRabbit's line-level findings. Your value is the
+                  contract, the substance of the tests, and the impact on the demo.
+
+          - id: skill-filesystem
+            name: '@deepseek-ai/dsh-skill-filesystem'
+
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
+
+          - id: tool-pwsh
+            name: '@deepseek-ai/dsh-tool-pwsh'
+            disabled: !!js process.platform !== 'win32'
+
+          - id: tool-bash
+            name: '@deepseek-ai/dsh-tool-bash'
+            disabled: !!js process.platform === 'win32'
+
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+            config:
+              applyPatch: false
+
+          - id: tool-fs-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+
+          - id: tool-todo
+            name: '@deepseek-ai/dsh-tool-todo'

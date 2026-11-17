@@ -1,0 +1,114 @@
+# Routing manifest — per-task agent selection.
+#
+# Consumed by the harness (passed as `args.routing`) and read by humans when a run
+# needs auditing. Selection rules live in docs/ORCHESTRATION.md; this file is the
+# executable form. Change a row here, not in a prompt.
+#
+# Rules encoded below:
+#   - reviewer is never the author, and never the author's model family
+#   - verifiable work goes to the cheapest agent that passes the gate
+#   - irreversible work goes to the strongest reasoner and is serialized
+#   - taste work goes to a human gate, because no test can adjudicate it
+
+version: 1
+reviewer_default: pr-reviewer
+reviewer_human_gate: false   # true when the lead must also approve
+
+tasks:
+  - id: T1-contract
+    scope: "docs/LABEL.md, data/schema.sql, api/openapi.yaml, docs/DECISIONS.md"
+    agent: lead
+    model: anthropic
+    reviewer: human
+    gate: "human reads the contract"
+    parallel_group: 0
+    why: "highest leverage and irreversible; every lane codes against it"
+
+  - id: T2-generator
+    scope: "data/generator.py, data/seed.py, data/tests/"
+    agent: data-engineer
+    model: openai
+    reviewer: pr-reviewer
+    gate: "prevalence 18-22%, BU base rates plausibly ordered, no NaN"
+    parallel_group: 1
+    why: "statistics correctness; failures are silent and poison everything downstream"
+
+  - id: T3-features
+    scope: "ml/features.py, ml/tests/test_leakage.py"
+    agent: ml-engineer
+    model: openai
+    reviewer: pr-reviewer
+    gate: "leakage test green; snapshot discipline proven by test"
+    parallel_group: 1
+    why: "timing logic is subtle and leakage is invisible in metrics"
+
+  - id: T4-training
+    scope: "ml/train.py, ml/explain.py, ml/artifacts/"
+    agent: ml-engineer
+    model: openai
+    reviewer: pr-reviewer
+    gate: "AUC in [0.75, 0.90] (above = leakage), calibration < 0.05"
+    parallel_group: 2
+    why: "highest technical risk in the project"
+
+  - id: T5-api
+    scope: "api/app.py, api/tests/"
+    agent: service-engineer
+    model: deepseek
+    reviewer: pr-reviewer
+    gate: "contract tests against openapi.yaml green"
+    parallel_group: 1
+    why: "fully specified by the contract, therefore mechanical"
+
+  - id: T6-ui
+    scope: "web/"
+    agent: ui-engineer
+    model: openai
+    reviewer: human
+    gate: "one screen reviewed by a human for legibility"
+    parallel_group: 1
+    why: "taste; a test cannot tell whether an executive understands it"
+
+  - id: T7-retention
+    scope: "api/retention.py, api/tests/test_retention.py"
+    agent: service-engineer
+    model: deepseek
+    reviewer: pr-reviewer
+    gate: "unit tests; no duplicate task for an open action"
+    parallel_group: 1
+    why: "small, mechanical, low consequence"
+
+  - id: T8-integration
+    scope: "compose.yaml, scripts/, web/ data wiring"
+    agent: lead
+    model: anthropic
+    reviewer: pr-reviewer
+    gate: "docker compose up + click-through of all five screens"
+    parallel_group: 3
+    why: "cross-lane context; this is where agents diverge"
+
+  - id: T9-review
+    scope: "reports/"
+    agent: triage
+    model: anthropic
+    reviewer: human
+    gate: "coderabbit exit 0 + deterministic checks + PR approvals"
+    parallel_group: 4
+    why: "adjudication, not detection; detection belongs to CodeRabbit"
+
+  - id: T10-pitch
+    scope: "docs/PITCH.md, docs/DEMO_SCRIPT.md, README.md"
+    agent: lead
+    model: anthropic
+    reviewer: human
+    gate: "the demo runs unattended, twice"
+    parallel_group: 5
+    why: "writing quality is the deliverable"
+
+escalation:
+  - trigger: "gate fails once"
+    action: "same agent retries with the failure output attached"
+  - trigger: "gate fails twice"
+    action: "escalate one tier: deepseek -> openai -> lead; record it in the scoreboard"
+  - trigger: "gate fails three times"
+    action: "stop; the spec is wrong. Fix the contract, then restart the task"

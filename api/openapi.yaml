@@ -1,0 +1,304 @@
+openapi: 3.1.0
+info:
+  title: crm-churn-demo API
+  version: 0.1.0
+  description: |
+    Contract for the pitch demo. Lanes C (service) and D (UI) both code against this
+    file; neither may add a field unilaterally. Scores come from the LightGBM model in
+    ml/artifacts, drivers from SHAP, counterfactuals from re-scoring the same model.
+servers:
+  - url: http://localhost:8000
+
+paths:
+  /api/health:
+    get:
+      operationId: health
+      summary: Liveness plus the loaded model version
+      responses:
+        '200':
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, model_version, scored_at]
+                properties:
+                  status: { type: string, enum: [ok, degraded] }
+                  model_version: { type: string }
+                  scored_at: { type: string, format: date-time }
+
+  /api/queue:
+    get:
+      operationId: getQueue
+      summary: Accounts ranked by revenue at risk (probability x ARR)
+      parameters:
+        - { name: bu, in: query, schema: { $ref: '#/components/schemas/Bu' } }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 200, default: 25 }
+        - name: min_probability
+          in: query
+          schema: { type: number, minimum: 0, maximum: 1, default: 0 }
+      responses:
+        '200':
+          description: Ranked queue
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  total: { type: integer }
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/QueueItem' }
+
+  /api/accounts/{account_id}:
+    get:
+      operationId: getAccount
+      summary: Account 360 with score, drivers, and open actions
+      parameters:
+        - { name: account_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Account detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccountDetail' }
+        '404':
+          description: Unknown account
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/accounts/{account_id}/trend:
+    get:
+      operationId: getTrend
+      summary: Twelve weeks of historical scores for the sparkline
+      parameters:
+        - { name: account_id, in: path, required: true, schema: { type: string } }
+        - name: weeks
+          in: query
+          schema: { type: integer, minimum: 4, maximum: 52, default: 12 }
+      responses:
+        '200':
+          description: Trend points, oldest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TrendPoint' }
+
+  /api/accounts/{account_id}/counterfactual:
+    post:
+      operationId: postCounterfactual
+      summary: Re-score the same model under a hypothetical intervention
+      parameters:
+        - { name: account_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CounterfactualRequest' }
+      responses:
+        '200':
+          description: Beside comparison of current and hypothetical score
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CounterfactualResponse' }
+        '422':
+          description: Unsupported lever
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/accounts/{account_id}/actions:
+    post:
+      operationId: postAction
+      summary: Record a retention action and return the re-scored probability
+      parameters:
+        - { name: account_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ActionRequest' }
+      responses:
+        '201':
+          description: Action created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ActionResponse' }
+
+  /api/portfolio:
+    get:
+      operationId: getPortfolio
+      summary: Executive view — risk by BU, calibration, drift
+      responses:
+        '200':
+          description: Portfolio aggregates
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Portfolio' }
+
+components:
+  schemas:
+    Bu:
+      type: string
+      enum: [north, south, emea]
+
+    Band:
+      type: string
+      enum: [low, medium, high, critical]
+
+    Driver:
+      type: object
+      required: [feature, label, contribution, value, direction]
+      properties:
+        feature: { type: string }
+        label: { type: string, description: Human-readable, executive-safe wording }
+        contribution: { type: number, description: SHAP value in log-odds }
+        value: { type: string, description: Rendered current value, e.g. "7 tickets" }
+        direction: { type: string, enum: [increases, decreases] }
+
+    QueueItem:
+      type: object
+      required: [account_id, name, bu, arr, probability, band, arr_at_risk, top_driver]
+      properties:
+        account_id: { type: string }
+        name: { type: string }
+        bu: { $ref: '#/components/schemas/Bu' }
+        arr: { type: number }
+        probability: { type: number }
+        band: { $ref: '#/components/schemas/Band' }
+        arr_at_risk: { type: number, description: probability * arr }
+        top_driver: { $ref: '#/components/schemas/Driver' }
+
+    AccountDetail:
+      type: object
+      required: [account, risk, drivers, trend, open_actions]
+      properties:
+        account:
+          type: object
+          required: [id, name, bu, region, industry, arr, seats, renewal_date, owner_rep]
+          properties:
+            id: { type: string }
+            name: { type: string }
+            bu: { $ref: '#/components/schemas/Bu' }
+            region: { type: string }
+            industry: { type: string }
+            arr: { type: number }
+            seats: { type: integer }
+            renewal_date: { type: string, format: date }
+            owner_rep: { type: string }
+        risk:
+          type: object
+          required: [probability, band, model_version, scored_at, arr_at_risk]
+          properties:
+            probability: { type: number }
+            band: { $ref: '#/components/schemas/Band' }
+            model_version: { type: string }
+            scored_at: { type: string, format: date-time }
+            arr_at_risk: { type: number }
+        drivers:
+          type: array
+          items: { $ref: '#/components/schemas/Driver' }
+        trend:
+          type: array
+          items: { $ref: '#/components/schemas/TrendPoint' }
+        open_actions:
+          type: array
+          items: { $ref: '#/components/schemas/Action' }
+
+    TrendPoint:
+      type: object
+      required: [week, probability]
+      properties:
+        week: { type: string, format: date }
+        probability: { type: number }
+
+    CounterfactualRequest:
+      type: object
+      description: Only these levers are accepted; each maps to a feature change.
+      properties:
+        tickets_resolved: { type: integer, minimum: 0, maximum: 50 }
+        usage_recovery_pct: { type: number, minimum: 0, maximum: 100 }
+        discount_reduction_pct: { type: number, minimum: 0, maximum: 100 }
+        executive_meeting: { type: boolean }
+      additionalProperties: false
+
+    CounterfactualResponse:
+      type: object
+      required: [current_probability, hypothetical_probability, delta, explanation]
+      properties:
+        current_probability: { type: number }
+        hypothetical_probability: { type: number }
+        delta: { type: number, description: hypothetical minus current }
+        explanation: { type: string }
+
+    ActionRequest:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [call, exec_meeting, discount_review, support_escalation]
+        note: { type: string, maxLength: 500 }
+      additionalProperties: false
+
+    Action:
+      type: object
+      required: [id, kind, status, created_at, created_by]
+      properties:
+        id: { type: string }
+        kind: { type: string }
+        status: { type: string, enum: [open, done, cancelled] }
+        created_at: { type: string, format: date-time }
+        created_by: { type: string }
+        note: { type: string }
+
+    ActionResponse:
+      type: object
+      required: [action, probability_after, delta]
+      properties:
+        action: { $ref: '#/components/schemas/Action' }
+        probability_after: { type: number }
+        delta: { type: number }
+
+    Portfolio:
+      type: object
+      required: [total_arr_at_risk, by_bu, calibration, drift]
+      properties:
+        total_arr_at_risk: { type: number }
+        by_bu:
+          type: array
+          items:
+            type: object
+            required: [bu, accounts, churn_rate, arr_at_risk]
+            properties:
+              bu: { $ref: '#/components/schemas/Bu' }
+              accounts: { type: integer }
+              churn_rate: { type: number }
+              arr_at_risk: { type: number }
+        calibration:
+          type: array
+          description: Decile bins for the calibration chart
+          items:
+            type: object
+            required: [predicted, actual]
+            properties:
+              predicted: { type: number }
+              actual: { type: number }
+        drift:
+          type: object
+          required: [psi, status]
+          properties:
+            psi: { type: number }
+            status: { type: string, enum: [stable, watch, alert] }
+
+    Error:
+      type: object
+      required: [error, detail]
+      properties:
+        error: { type: string }
+        detail: { type: string }
