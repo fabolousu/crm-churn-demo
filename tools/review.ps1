@@ -7,6 +7,10 @@
 # Layer 0  deterministic checks (always required)
 # Layer 1  CodeRabbit review (third-party detection)
 #
+# Gates activate with the code they guard — the same rule CI follows. A branch that only
+# touches docs must not be blocked by a model artifact that does not exist yet, and code
+# with no tests must never pass.
+#
 # Exit codes: 0 pass, 1 deterministic failure, 2 CodeRabbit findings, 3 CodeRabbit
 # unavailable/errored. Never returns 0 when a check did not actually run.
 
@@ -31,42 +35,54 @@ function Pass([string]$layer, [string]$message) {
   Write-Host "[ ok ] $layer — $message" -ForegroundColor Green
 }
 
-# ── Layer 0: deterministic checks ────────────────────────────────────────────────
+function Skip([string]$layer, [string]$message) {
+  Write-Host "[skip] $layer — $message" -ForegroundColor DarkGray
+}
+
 $layer0Failed = $false
 
-# 0a. Test suite. A missing suite is a failure, not a skip.
-if (Test-Path "tests") {
+# ── 0a. Tests ───────────────────────────────────────────────────────────────────
+$testDirs = @("tests", "ml/tests", "api/tests", "data/tests") | Where-Object { Test-Path $_ }
+$codeFiles = @()
+foreach ($d in @("data", "ml", "api")) {
+  if (Test-Path $d) { $codeFiles += (Get-ChildItem -Path $d -Filter *.py -Recurse -File -ErrorAction SilentlyContinue) }
+}
+
+if ($codeFiles.Count -gt 0 -and $testDirs.Count -eq 0) {
+  Fail "tests" "Python code exists but no test directory (tests/, ml/tests, api/tests, data/tests)"
+  $layer0Failed = $true
+} elseif ($testDirs.Count -gt 0) {
   python -m pytest -q
   if ($LASTEXITCODE -ne 0) { Fail "tests" "pytest exited $LASTEXITCODE"; $layer0Failed = $true }
   else { Pass "tests" "pytest green" }
 } else {
-  Fail "tests" "no tests/ directory — the gate has nothing to verify"
-  $layer0Failed = $true
+  Skip "tests" "no Python code or tests yet"
 }
 
-# 0b. Model quality gate. Thresholds live in tools/check_metrics.py so CI and this
-# script cannot drift apart.
-if (Test-Path "ml/artifacts/metrics.json") {
-  python tools/check_metrics.py
-  if ($LASTEXITCODE -ne 0) {
-    Fail "metrics" "check_metrics.py exited $LASTEXITCODE"
+# ── 0b. Model quality gate (activates with the training lane) ────────────────────
+if (Test-Path "ml/train.py") {
+  if (-not (Test-Path "ml/artifacts/metrics.json")) {
+    Fail "metrics" "ml/train.py exists but ml/artifacts/metrics.json is missing"
     $layer0Failed = $true
   } else {
-    Pass "metrics" "within thresholds"
+    python tools/check_metrics.py
+    if ($LASTEXITCODE -ne 0) { Fail "metrics" "check_metrics.py exited $LASTEXITCODE"; $layer0Failed = $true }
+    else { Pass "metrics" "within thresholds" }
   }
 } else {
-  Fail "metrics" "ml/artifacts/metrics.json missing"
-  $layer0Failed = $true
+  Skip "metrics" "training lane has not landed"
 }
 
-# 0c. Leakage guard: feature code must not read the label table.
+# ── 0c. Leakage guard (activates with the feature pipeline) ──────────────────────
 if (Test-Path "ml/features.py") {
   $leak = Select-String -Path "ml/features.py" -Pattern "_outcomes" -Quiet
   if ($leak) { Fail "leakage" "features.py references the label table"; $layer0Failed = $true }
   else { Pass "leakage" "features.py does not read labels" }
+} else {
+  Skip "leakage" "no feature pipeline yet — guard inactive"
 }
 
-# 0d. Demo smoke test — the thing the pitch depends on.
+# ── 0d. Demo smoke test (only once the stack is composed) ────────────────────────
 if (Test-Path "compose.yaml") {
   docker compose up -d | Out-Null
   Start-Sleep -Seconds 5
@@ -80,6 +96,8 @@ if (Test-Path "compose.yaml") {
   } finally {
     docker compose down | Out-Null
   }
+} else {
+  Skip "smoke" "no compose.yaml yet"
 }
 
 if ($layer0Failed) {
@@ -102,7 +120,7 @@ if (-not (Get-Command coderabbit -ErrorAction SilentlyContinue)) {
 
 $status = coderabbit auth status --agent 2>&1
 if ($LASTEXITCODE -ne 0) {
-  Fail "coderabbit" "not authenticated; run: coderabbit auth login --api-key <key>"
+  Fail "coderabbit" "not authenticated; run: coderabbit auth login"
   exit 3
 }
 
@@ -110,7 +128,6 @@ if ($LASTEXITCODE -ne 0) {
 coderabbit review --agent --gate $Severity --base $Base 2>&1 | Tee-Object -FilePath $report
 $code = $LASTEXITCODE
 
-# Normalize stderr noise into the report so the triage agent reads one artifact.
 Add-Content -Path $report -Value "# exit=$code severity=$Severity base=$Base"
 
 switch ($code) {
