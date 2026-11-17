@@ -80,7 +80,7 @@ accepted limitation is engineering, an unrecorded one is a surprise.
 |---|---|
 | Derived response instants truncate fractional seconds (`ml/features.py`, fallback path only) | The generator writes integral seconds and `leads.first_response_at` is the preferred source, so the fallback only runs on legacy data; the discrepancy is sub-second |
 | The PR reviewer cannot formally "request changes" from GitHub | It authenticates as the repository owner, who is also the PR author, so GitHub rejects it; it posts `--comment` instead, and the human's approval remains the only approval |
-| CodeRabbit's GitHub App is not installed | The CLI gate runs locally and is what `tools/review.ps1` enforces; the app would add automatic PR comments, which is cosmetic for a demo |
+| The CodeRabbit GitHub App check reports `skipping` on PR #1 | The app is installed but is not gating this PR, so the **CLI** gate (`tools/review.ps1`) is the enforcing one. Worth fixing before a live demo so the PR page shows an explicit review status |
 
 ## How the harness builds this
 
