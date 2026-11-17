@@ -1,131 +1,129 @@
-# Churn label and the synthetic world
+# Lead-win label and the synthetic world
 
 Spec for `data/generator.py` and the definition every lane must use.
 If the label changes, everything downstream is invalid — so it lives in one place.
 
+## The business shape this encodes
+
+Contracts in this business **renew whenever there is a new initiative**. There is no
+renewal date, no renewal event, and therefore **no conventional churn**. A customer
+relationship is a sequence of initiatives, and it ends when initiatives stop being
+proposed — not on a date.
+
+That single fact drives the whole design:
+
+| Conventional CRM | This CRM |
+|---|---|
+| Customer churns at a renewal date | Initiative is **won or lost**; relationship decays when initiatives stop |
+| Target: probability of churn | Target: **probability an initiative is won** |
+| Horizon: 180 days of silence | Horizon: none needed — the lead closes |
+| "Save this customer" | "Win this initiative" |
+
+**Dormancy** survives as a derived indicator, not a target: a company with no new
+initiative for 180+ days is flagged dormant on its company page. It is shown, not modelled.
+
 ## Pilot scope
 
-**Italy only**, split into five macro-regions: `nord-ovest`, `nord-est`, `centro`,
-`sud`, `isole`. Currency EUR, synthetic VAT numbers, Italian company names.
+**Italy only**, five macro-regions: `nord-ovest`, `nord-est`, `centro`, `sud`, `isole`.
+EUR throughout, synthetic Italian company names and format-plausible VAT numbers.
 
-Region changes the *base rate*, not the model. One pooled model with region as a feature
-and per-region calibration — five separate models would have too little labelled data
-each. A single-country pilot is also the better pitch: it is a rollout story, not a
-fantasy.
-
-## The entity model
-
-```
-COMPANY ──< LEAD ──won──> ACCOUNT (customer relationship, ARR, renewal)
-```
-
-- The **company** is the master record.
-- **Leads** are the CRM's activity records against a company, with a success status:
-  `new → contacted → qualified → proposal → won | lost`.
-- A **won lead** creates an **account** — the relationship that can churn.
+Region changes the base rate, not the model: one pooled model with region as a feature and
+per-region calibration. At 20k companies and ~60k leads, a per-region model would be
+thinner than the pooled one.
 
 ## Definition
 
-> **Churned** = at the 180-day horizon after snapshot date `t0`, the account has no
-> renewal, no new won lead, and its status is `inactive` or `cancelled`.
+> **Won** = a lead whose `status` is `won` at close. **Lost** = `lost`.
+> The model predicts `won` for a lead that has reached at least `qualified`.
 
 | Parameter | Value |
 |---|---|
-| Horizon | 180 days |
-| Snapshot `t0` | Fixed at `2026-01-01` per generated world |
-| Eligible accounts | `tenure_days >= 180` and `status = active` at `t0` |
-| Excluded | Accounts younger than 180 days, accounts already churned |
-| Target prevalence | ~18–22% (asserted by a generator test) |
+| Population | Leads created before `t0`, reached `qualified`, closed by `t0` |
+| Excluded | Leads still open at `t0` (censored — they have no label yet) |
+| Scoring point | `qualified_at`; for open leads, their current stage at `t0` |
+| Label | `won = 1` if the lead closed `won`, else `0` |
+| Target prevalence | ~25–30% (asserted by a generator test) |
 
-**Open question, deliberately flagged:** churn on accounts is the target, with lead status
-as a *predictor*. The alternative is predicting **lead-win propensity** instead — a
-different target on a different population. If the pitch is "predict churning customers",
-churn stays the target; lead success becomes the feature family below. Switching later
-means a second model, not a relabel.
+Excluding censored leads is not fastidiousness — including them silently teaches the model
+that open means lost, and the pipeline screen would rank exactly backwards.
 
 ## Point-in-time discipline
 
-Features come only from rows with `*_at <= t0`. Labels come only from `(t0, t0 + 180d]`.
-Labels live in `account_outcomes`, which feature code may not read. A test enforces it.
+Features are computed as of `snapshot_date` (the scoring point). Nothing after it may
+appear in `lead_features`: not the outcome, not the final amount, not a late stage change.
+Labels live in `lead_outcomes`, which feature code may not read. A test enforces it.
 
 ## The generating process
 
-Region standardisation first, then:
-
 ```
-logit(p) = -1.55
-         -- commercial state
-         + 0.60 * is_renewal_within_60d
-         + 0.35 * z(discount_pct)
-         - 0.45 * z(seats_active_ratio)
-         -- product and service
-         + 0.45 * z(-usage_trend_slope)
-         + 0.55 * z(tickets_90d)
-         + 0.40 * z(last_login_days_ago)
-         -- relationship
-         - 0.30 * z(nps_last)
-         + 0.30 * z(payment_delay_days_avg_180d)
-         + 0.25 * z(-meetings_90d)
-         -- lead pipeline health (the CRM's own success signals)
-         + 0.40 * z(days_since_last_lead)     -- silence is the strongest signal
-         + 0.35 * z(leads_lost_90d)
-         - 0.30 * z(leads_won_90d)
-         + 0.30 * z(median_first_response_hours_90d)
-         + region_effect                      -- nord-ovest 0.00, nord-est -0.10,
-                                              -- centro +0.10, sud +0.25, isole +0.30
-         + noise ~ N(0, 0.35)
-p = sigmoid(logit(p)); churned ~ Bernoulli(p)
+logit(p) = -0.95
+         -- response and engagement (the strongest controllable signal)
+         - 0.45 * z(log1p(first_response_hours))
+         + 0.25 * z(meetings_before_scoring)
+         + 0.30 * is_proposal_stage
+         -- evidence from the account's history
+         + 0.40 * z(prior_won_initiatives)
+         - 0.30 * z(prior_lost_initiatives)
+         + 0.35 * z(owner_win_rate_180d)
+         + 0.20 * z(-days_since_last_initiative)
+         -- deal shape
+         - 0.25 * z(amount_arr)               -- bigger initiatives are harder
+         - 0.20 * z(discount_pct)
+         -- friction
+         - 0.25 * z(tickets_90d)
+         + 0.20 * z(nps_last)
+         + source_effect                      -- referral +0.35, partner +0.15,
+                                              -- inbound +0.10, event 0.00, outbound -0.25
+         + region_effect                      -- nord-ovest 0.00, nord-est +0.05,
+                                              -- centro 0.00, sud -0.10, isole -0.15
+         + noise ~ N(0, 0.40)
+p = sigmoid(logit(p)); won ~ Bernoulli(p)
 ```
 
-The lead terms are the point of this revision: **a customer whose pipeline went quiet is
-churning**, and the CRM already records that. It also gives the demo a distinctive line —
-"no new opportunity in 94 days" is more persuasive to a sales director than a usage metric.
+Expected results on a correct pipeline: **AUC 0.78–0.86**, calibration error below 0.05,
+lift@10% of 2.5× or better. The band in `tools/check_metrics.py` is [0.75, 0.90]; above
+0.90 means leakage, because `noise` and the censoring rule cap what is knowable.
 
-Expected results on a correct pipeline: **AUC 0.80–0.86**, calibration error < 0.05,
-lift@10% ≥ 3×. Above 0.90 means leakage, not brilliance.
+A lead-scoring model is naturally weaker than a churn model — less history per record and
+more human variance. Anyone who claims 0.95 on this task is measuring their own leak.
 
 ## Feature list (contract)
 
-| Feature | Definition at `t0` | Type |
+| Feature | Definition at the scoring point | Type |
 |---|---|---|
-| `tenure_days` | Days since `accounts.started_at` | int |
-| `arr` | Annual recurring revenue, EUR | float |
-| `seats` | Licensed seats | int |
-| `seats_active_ratio` | Active / licensed seats | float |
-| `discount_pct` | Contract discount | float |
-| `renewal_days_left` | Days until `accounts.renewal_date` | int |
-| `is_renewal_within_60d` | Derived from `renewal_days_left` | 0/1 |
+| `source` | Lead source | text |
+| `stage_at_scoring` | `new`/`contacted`/`qualified`/`proposal` | text |
+| `age_days_at_scoring` | Days from `created_at` to scoring | int |
+| `amount_arr` | Proposed initiative value, EUR | float |
+| `discount_pct` | Proposed discount | float |
+| `first_response_hours` | Hours to first response; NULL if unanswered | float |
 | `region` | Company macro-region | text |
-| `usage_events_90d` | Product events, last 90 days | int |
-| `usage_trend_slope` | OLS slope of weekly events, 90 days | float |
-| `last_login_days_ago` | Days since most recent login | int |
-| `tickets_90d` | Support tickets opened, last 90 days | int |
-| `tickets_sev_high_90d` | Of those, high or critical | int |
+| `industry`, `employees` | Company firmographics | text, int |
+| `company_age_days` | Days since `companies.created_at` | int |
+| `prior_won_initiatives` | Won initiatives before this one | int |
+| `prior_lost_initiatives` | Lost initiatives before this one | int |
+| `days_since_last_initiative` | Days since the company's previous lead | int |
+| `lifetime_won_arr` | Total ARR won from this company | float |
+| `open_initiatives_count` | Other open leads at scoring | int |
+| `usage_trend_slope` | OLS slope of weekly usage, 90 days | float |
+| `tickets_90d` | Support tickets, last 90 days | int |
 | `nps_last` | Most recent NPS (−100…100) | int |
-| `meetings_90d` | Meetings, last 90 days | int |
-| `emails_90d` | Answered outbound emails, last 90 days | int |
 | `payment_delay_days_avg_180d` | Mean days late on invoices | float |
-| `leads_created_90d` | Leads created for the company, last 90 days | int |
-| `leads_won_90d` | Leads won, last 90 days | int |
-| `leads_lost_90d` | Leads lost, last 90 days | int |
-| `days_since_last_lead` | Days since the company's most recent lead | int |
-| `median_first_response_hours_90d` | Median first-response time on those leads | float |
-| `open_pipeline_arr` | ARR of open leads at `t0` | float |
-| `win_rate_180d` | Won / (won + lost) over 180 days | float |
+| `meetings_before_scoring` | Meetings on this lead so far | int |
+| `owner_win_rate_180d` | Win rate of the assigned rep | float |
 
 ## Counterfactual levers
 
-Only these, because only these are believable to an executive — and all re-score the same
-model:
+All forward-looking — nothing time-travels a response that already happened — and all
+re-score the same model:
 
 | Lever | Effect on features |
 |---|---|
-| `tickets_resolved: n` | `tickets_90d -= n` (floor 0) |
-| `usage_recovery_pct: p` | `usage_trend_slope` moves `p%` toward the regional median |
-| `discount_reduction_pct: p` | `discount_pct` scaled down by `p%` |
-| `executive_meeting: true` | `meetings_90d += 1`, `nps_last += 5` (capped 100) |
-| `new_lead_logged: true` | `leads_created_90d += 1`, `days_since_last_lead = 0` |
+| `exec_sponsor_meeting: true` | `meetings_before_scoring += 1`, `nps_last += 5` (cap 100) |
+| `discovery_meeting: true` | `meetings_before_scoring += 1` |
+| `discount_pct: p` | `discount_pct = p` |
+| `accelerate_to_proposal: true` | `stage_at_scoring = 'proposal'` |
 
-That last lever is new and is the demo's best moment: "logging one qualified lead today
-moves this account from 71% to 58%" is a claim a sales director immediately understands,
-and it makes the CRM's own record-keeping the hero of the story.
+The pitch line this produces: **"Book an executive sponsor meeting and this initiative
+goes from 34% to 52%."** Actionable, forward-looking, and computed by the model rather than
+by a slide.

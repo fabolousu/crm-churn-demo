@@ -33,7 +33,7 @@ t4  ├── P5  pitch artifacts, demo hardening
 | Moment | Agents live | Gate before the next moment |
 |---|---|---|
 | t0 | A, B1, C, D, E (5 concurrent) | Each lane's own tests; contract tests for C |
-| t1 | B2 | Generator asserts ~20% prevalence and regional base rates |
+| t1 | B2 | Generator asserts win prevalence 25-30% and regional base rates |
 | t2 | P3 integrator, D | End-to-end click-through on `compose up` |
 | t3 | P4 triage agent | Deterministic checks green **and** CodeRabbit exit 0 |
 | t4 | P5 | The demo runs unattended, twice, in a row |

@@ -1,14 +1,14 @@
 -- Data contract for crm-churn-demo. SQLite dialect, Postgres-portable.
 --
--- Entity model: a COMPANY is the master record; LEADS are the CRM's activity
--- records against that company; a won lead creates an ACCOUNT (the customer
--- relationship). Churn is a property of the ACCOUNT, and lead history is a
--- first-class predictor of it.
+-- Entity model: a COMPANY is the master record; LEADS are initiatives proposed to that
+-- company; a won lead becomes an active initiative. There is no renewal event — the
+-- business renews by winning the next initiative — so the model target is lead win/loss,
+-- not contract churn.
 --
--- Pilot scope: Italy only, five macro-regions.
--- Snapshot date t0 is fixed at 2026-01-01 for the generated world.
--- Features may only be derived from rows with *_at <= t0. Labels live apart in
--- account_outcomes and must never be read by feature code.
+-- Pilot scope: Italy only, five macro-regions. Currency EUR.
+-- Scoring point: a lead is scored at qualification (or at its current stage if still open).
+-- Features may only describe the world at or before the scoring point. Labels live apart in
+-- lead_outcomes and must never be read by feature code.
 
 PRAGMA foreign_keys = ON;
 
@@ -21,11 +21,11 @@ CREATE TABLE companies (
   city            TEXT NOT NULL,
   industry        TEXT NOT NULL,
   employees       INTEGER NOT NULL,
-  created_at      TEXT NOT NULL,              -- ISO date
+  created_at      TEXT NOT NULL,
   owner_rep       TEXT NOT NULL
 );
 
--- The CRM's primary activity record. Status is the lead's success state.
+-- An initiative proposed to a company. Status is the lead's success state.
 CREATE TABLE leads (
   id              TEXT PRIMARY KEY,
   company_id      TEXT NOT NULL REFERENCES companies(id),
@@ -41,34 +41,20 @@ CREATE TABLE leads (
   closed_at       TEXT,
   lost_reason     TEXT CHECK (lost_reason IS NULL OR lost_reason IN
                     ('price', 'no_budget', 'competitor', 'no_fit', 'timing', 'silent')),
-  amount_arr      REAL
+  amount_arr      REAL,
+  discount_pct    REAL NOT NULL DEFAULT 0
 );
 
--- A customer relationship, created by a won lead.
-CREATE TABLE accounts (
-  id              TEXT PRIMARY KEY,
+CREATE TABLE company_usage_weekly (
   company_id      TEXT NOT NULL REFERENCES companies(id),
-  lead_id         TEXT NOT NULL REFERENCES leads(id),   -- the won lead that created it
-  started_at      TEXT NOT NULL,
-  arr             REAL NOT NULL,
-  seats           INTEGER NOT NULL,
-  seats_active    INTEGER NOT NULL,
-  discount_pct    REAL NOT NULL DEFAULT 0,
-  renewal_date    TEXT NOT NULL,
-  status          TEXT NOT NULL CHECK (status IN ('active', 'inactive', 'cancelled')),
-  owner_rep       TEXT NOT NULL
-);
-
-CREATE TABLE usage_weekly (
-  account_id      TEXT NOT NULL REFERENCES accounts(id),
   week_start      TEXT NOT NULL,
   events          INTEGER NOT NULL,
-  PRIMARY KEY (account_id, week_start)
+  PRIMARY KEY (company_id, week_start)
 );
 
 CREATE TABLE tickets (
   id              TEXT PRIMARY KEY,
-  account_id      TEXT NOT NULL REFERENCES accounts(id),
+  company_id      TEXT NOT NULL REFERENCES companies(id),
   opened_at       TEXT NOT NULL,
   closed_at       TEXT,
   severity        TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
@@ -77,7 +63,7 @@ CREATE TABLE tickets (
 
 CREATE TABLE invoices (
   id              TEXT PRIMARY KEY,
-  account_id      TEXT NOT NULL REFERENCES accounts(id),
+  company_id      TEXT NOT NULL REFERENCES companies(id),
   issued_at       TEXT NOT NULL,
   due_at          TEXT NOT NULL,
   paid_at         TEXT,
@@ -85,90 +71,88 @@ CREATE TABLE invoices (
 );
 
 CREATE TABLE nps_surveys (
-  account_id      TEXT NOT NULL REFERENCES accounts(id),
+  company_id      TEXT NOT NULL REFERENCES companies(id),
   surveyed_at     TEXT NOT NULL,
   score           INTEGER NOT NULL CHECK (score BETWEEN -100 AND 100),
-  PRIMARY KEY (account_id, surveyed_at)
+  PRIMARY KEY (company_id, surveyed_at)
 );
 
 CREATE TABLE interactions (
   id              TEXT PRIMARY KEY,
-  account_id      TEXT NOT NULL REFERENCES accounts(id),
+  company_id      TEXT NOT NULL REFERENCES companies(id),
+  lead_id         TEXT REFERENCES leads(id),
   kind            TEXT NOT NULL CHECK (kind IN ('meeting', 'email', 'call')),
   direction       TEXT NOT NULL CHECK (direction IN ('inbound', 'outbound')),
   occurred_at     TEXT NOT NULL,
   answered        INTEGER NOT NULL DEFAULT 1
 );
 
--- Materialised at t0 by ml/features.py. One row per account.
--- Lead-derived columns are the CRM's own success signals.
-CREATE TABLE features (
-  account_id      TEXT PRIMARY KEY REFERENCES accounts(id),
+-- Materialised at the scoring point by ml/features.py. One row per scored lead.
+-- Every column must be knowable at `snapshot_date`; nothing may encode the outcome.
+CREATE TABLE lead_features (
+  lead_id         TEXT PRIMARY KEY REFERENCES leads(id),
   snapshot_date   TEXT NOT NULL,
 
-  -- commercial state
-  tenure_days     INTEGER NOT NULL,
-  arr             REAL NOT NULL,
-  seats           INTEGER NOT NULL,
-  seats_active_ratio REAL NOT NULL,
+  -- the lead itself, at scoring time
+  source          TEXT NOT NULL,
+  stage_at_scoring TEXT NOT NULL CHECK (stage_at_scoring IN
+                    ('new', 'contacted', 'qualified', 'proposal')),
+  age_days_at_scoring INTEGER NOT NULL,
+  amount_arr      REAL NOT NULL,
   discount_pct    REAL NOT NULL,
-  renewal_days_left INTEGER NOT NULL,
-  is_renewal_within_60d INTEGER NOT NULL,
+  first_response_hours REAL,                  -- NULL if never answered
+
+  -- company context
   region          TEXT NOT NULL,
+  industry        TEXT NOT NULL,
+  employees       INTEGER NOT NULL,
+  company_age_days INTEGER NOT NULL,
+  prior_won_initiatives INTEGER NOT NULL,
+  prior_lost_initiatives INTEGER NOT NULL,
+  days_since_last_initiative INTEGER NOT NULL,
+  lifetime_won_arr REAL NOT NULL,
+  open_initiatives_count INTEGER NOT NULL,
 
-  -- product and service
-  usage_events_90d INTEGER NOT NULL,
+  -- relationship signals, measured before the scoring point
   usage_trend_slope REAL NOT NULL,
-  last_login_days_ago INTEGER NOT NULL,
   tickets_90d     INTEGER NOT NULL,
-  tickets_sev_high_90d INTEGER NOT NULL,
-
-  -- relationship
   nps_last        INTEGER NOT NULL,
-  meetings_90d    INTEGER NOT NULL,
-  emails_90d      INTEGER NOT NULL,
   payment_delay_days_avg_180d REAL NOT NULL,
-
-  -- lead pipeline health (the CRM's own records)
-  leads_created_90d INTEGER NOT NULL,
-  leads_won_90d   INTEGER NOT NULL,
-  leads_lost_90d  INTEGER NOT NULL,
-  days_since_last_lead INTEGER NOT NULL,
-  median_first_response_hours_90d REAL NOT NULL,
-  open_pipeline_arr REAL NOT NULL,
-  win_rate_180d   REAL NOT NULL
+  meetings_before_scoring INTEGER NOT NULL,
+  owner_win_rate_180d REAL NOT NULL
 );
 
--- Ground truth. Written once by the generator, never read by feature or training
--- code. Reviewers: the presence of a read here is a defect.
-CREATE TABLE account_outcomes (
-  account_id      TEXT PRIMARY KEY REFERENCES accounts(id),
+-- Ground truth. Written once by the generator; never read by feature or training code.
+-- Reviewers: any read of this table from ml/ is a defect.
+CREATE TABLE lead_outcomes (
+  lead_id         TEXT PRIMARY KEY REFERENCES leads(id),
   snapshot_date   TEXT NOT NULL,
-  churned_180d    INTEGER NOT NULL CHECK (churned_180d IN (0, 1)),
-  churned_on      TEXT,
-  latent_p        REAL NOT NULL               -- the generating probability, for audit only
+  won             INTEGER NOT NULL CHECK (won IN (0, 1)),
+  closed_at       TEXT NOT NULL,
+  latent_p        REAL NOT NULL               -- generating probability, for audit only
 );
 
-CREATE TABLE risk_scores (
-  account_id      TEXT NOT NULL REFERENCES accounts(id),
+CREATE TABLE lead_scores (
+  lead_id         TEXT NOT NULL REFERENCES leads(id),
   scored_at       TEXT NOT NULL,
   model_version   TEXT NOT NULL,
   probability     REAL NOT NULL CHECK (probability BETWEEN 0 AND 1),
   band            TEXT NOT NULL CHECK (band IN ('low', 'medium', 'high', 'critical')),
   drivers_json    TEXT NOT NULL,              -- [{feature,label,contribution,value,direction}]
-  arr_at_risk     REAL NOT NULL,
-  PRIMARY KEY (account_id, scored_at)
+  amount_arr      REAL NOT NULL,
+  expected_value  REAL NOT NULL,              -- probability * amount_arr
+  PRIMARY KEY (lead_id, scored_at)
 );
 
 CREATE TABLE actions (
   id              TEXT PRIMARY KEY,
-  account_id      TEXT NOT NULL REFERENCES accounts(id),
+  lead_id         TEXT NOT NULL REFERENCES leads(id),
   kind            TEXT NOT NULL CHECK (kind IN
-                    ('call','exec_meeting','discount_review','support_escalation')),
+                    ('call', 'exec_sponsor_meeting', 'discovery_meeting', 'discount_review')),
   note            TEXT,
   created_at      TEXT NOT NULL,
   created_by      TEXT NOT NULL,
-  status          TEXT NOT NULL CHECK (status IN ('open','done','cancelled'))
+  status          TEXT NOT NULL CHECK (status IN ('open', 'done', 'cancelled'))
 );
 
 CREATE TABLE model_runs (
@@ -180,8 +164,7 @@ CREATE TABLE model_runs (
 
 CREATE INDEX idx_leads_company      ON leads(company_id, created_at);
 CREATE INDEX idx_leads_status       ON leads(status, closed_at);
-CREATE INDEX idx_accounts_company   ON accounts(company_id);
-CREATE INDEX idx_tickets_account_opened ON tickets(account_id, opened_at);
-CREATE INDEX idx_invoices_account_due   ON invoices(account_id, due_at);
-CREATE INDEX idx_interactions_account   ON interactions(account_id, occurred_at);
-CREATE INDEX idx_scores_probability     ON risk_scores(probability DESC);
+CREATE INDEX idx_tickets_company    ON tickets(company_id, opened_at);
+CREATE INDEX idx_invoices_company   ON invoices(company_id, due_at);
+CREATE INDEX idx_interactions_company ON interactions(company_id, occurred_at);
+CREATE INDEX idx_scores_expected    ON lead_scores(expected_value DESC);

@@ -50,7 +50,7 @@ jobs:
 
       - name: Leakage guard
         run: |
-          if grep -rn "account_outcomes" ml/features.py 2>/dev/null; then
+          if grep -rn "_outcomes" ml/features.py 2>/dev/null; then
             echo "features.py reads the label table"
             exit 1
           fi

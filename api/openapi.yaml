@@ -1,15 +1,15 @@
 openapi: 3.1.0
 info:
   title: crm-churn-demo API
-  version: 0.2.0
+  version: 0.3.0
   description: |
     Contract for the pitch demo. Lanes C (service) and D (UI) both code against this
-    file; neither may add a field unilaterally. Scores come from the LightGBM model in
-    ml/artifacts, drivers from SHAP, counterfactuals from re-scoring the same model.
+    file; neither may add a field unilaterally. Probabilities come from the LightGBM model
+    in ml/artifacts, drivers from SHAP, counterfactuals from re-scoring the same model.
 
-    Entity model: company -> leads -> account (customer). Churn is a property of the
-    account; lead-pipeline health is a first-class predictor. Pilot scope is Italy,
-    five macro-regions.
+    Entity model: company -> leads (initiatives) -> won initiative. There is no renewal
+    event, so the target is lead win probability, not contract churn. Pilot scope is
+    Italy, five macro-regions.
 servers:
   - url: http://localhost:8000
 
@@ -31,10 +31,10 @@ paths:
                   model_version: { type: string }
                   scored_at: { type: string, format: date-time }
 
-  /api/queue:
+  /api/pipeline:
     get:
-      operationId: getQueue
-      summary: Accounts ranked by revenue at risk (probability x ARR)
+      operationId: getPipeline
+      summary: Open leads ranked by expected value (probability x proposed ARR)
       parameters:
         - { name: region, in: query, schema: { $ref: '#/components/schemas/Region' } }
         - name: limit
@@ -43,80 +43,49 @@ paths:
         - name: min_probability
           in: query
           schema: { type: number, minimum: 0, maximum: 1, default: 0 }
+        - name: sort
+          in: query
+          description: expected_value (default) chases the biggest wins; at_risk flips to (1-p) x ARR
+          schema: { type: string, enum: [expected_value, at_risk], default: expected_value }
       responses:
         '200':
-          description: Ranked queue
+          description: Ranked pipeline
           content:
             application/json:
               schema:
                 type: object
-                required: [items, total]
+                required: [items, total, total_expected_value]
                 properties:
                   total: { type: integer }
+                  total_expected_value: { type: number }
                   items:
                     type: array
-                    items: { $ref: '#/components/schemas/QueueItem' }
+                    items: { $ref: '#/components/schemas/PipelineItem' }
 
-  /api/accounts/{account_id}:
+  /api/leads/{lead_id}:
     get:
-      operationId: getAccount
-      summary: Account 360 with company, score, drivers, and open actions
+      operationId: getLead
+      summary: Lead 360 with company context, score, drivers, and open actions
       parameters:
-        - { name: account_id, in: path, required: true, schema: { type: string } }
+        - { name: lead_id, in: path, required: true, schema: { type: string } }
       responses:
         '200':
-          description: Account detail
+          description: Lead detail
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/AccountDetail' }
+              schema: { $ref: '#/components/schemas/LeadDetail' }
         '404':
-          description: Unknown account
+          description: Unknown lead
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
 
-  /api/accounts/{account_id}/trend:
-    get:
-      operationId: getTrend
-      summary: Twelve weeks of historical scores for the sparkline
-      parameters:
-        - { name: account_id, in: path, required: true, schema: { type: string } }
-        - name: weeks
-          in: query
-          schema: { type: integer, minimum: 4, maximum: 52, default: 12 }
-      responses:
-        '200':
-          description: Trend points, oldest first
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/TrendPoint' }
-
-  /api/accounts/{account_id}/leads:
-    get:
-      operationId: getLeads
-      summary: The company's leads — the CRM records that drive the pipeline-health drivers
-      parameters:
-        - { name: account_id, in: path, required: true, schema: { type: string } }
-        - name: limit
-          in: query
-          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
-      responses:
-        '200':
-          description: Leads, most recent first
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/Lead' }
-
-  /api/accounts/{account_id}/counterfactual:
+  /api/leads/{lead_id}/counterfactual:
     post:
       operationId: postCounterfactual
-      summary: Re-score the same model under a hypothetical intervention
+      summary: Re-score the same model under a hypothetical action on an open lead
       parameters:
-        - { name: account_id, in: path, required: true, schema: { type: string } }
+        - { name: lead_id, in: path, required: true, schema: { type: string } }
       requestBody:
         required: true
         content:
@@ -124,22 +93,22 @@ paths:
             schema: { $ref: '#/components/schemas/CounterfactualRequest' }
       responses:
         '200':
-          description: Beside comparison of current and hypothetical score
+          description: Beside comparison of current and hypothetical probability
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CounterfactualResponse' }
         '422':
-          description: Unsupported lever
+          description: Unsupported lever, or a lead already closed
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
 
-  /api/accounts/{account_id}/actions:
+  /api/leads/{lead_id}/actions:
     post:
       operationId: postAction
       summary: Record a retention action and return the re-scored probability
       parameters:
-        - { name: account_id, in: path, required: true, schema: { type: string } }
+        - { name: lead_id, in: path, required: true, schema: { type: string } }
       requestBody:
         required: true
         content:
@@ -152,10 +121,25 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ActionResponse' }
 
+  /api/companies/{company_id}:
+    get:
+      operationId: getCompany
+      summary: Company 360 — initiative history, dormancy flag, relationship signals
+      parameters:
+        - { name: company_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Company detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompanyDetail' }
+        '404':
+          description: Unknown company
+
   /api/portfolio:
     get:
       operationId: getPortfolio
-      summary: Executive view — risk by region, calibration, drift
+      summary: Executive view — pipeline and win rate by region, calibration, drift
       responses:
         '200':
           description: Portfolio aggregates
@@ -167,12 +151,16 @@ components:
   schemas:
     Region:
       type: string
-      description: Italian macro-region of the customer's company
+      description: Italian macro-region of the company
       enum: [nord-ovest, nord-est, centro, sud, isole]
 
     Band:
       type: string
       enum: [low, medium, high, critical]
+
+    Source:
+      type: string
+      enum: [inbound, outbound, referral, partner, event]
 
     Driver:
       type: object
@@ -181,95 +169,117 @@ components:
         feature: { type: string }
         label: { type: string, description: Human-readable, executive-safe wording }
         contribution: { type: number, description: SHAP value in log-odds }
-        value: { type: string, description: Rendered current value, e.g. "94 days since last lead" }
+        value: { type: string, description: Rendered value, e.g. "11 hours to first response" }
         direction: { type: string, enum: [increases, decreases] }
 
     Lead:
       type: object
-      required: [id, status, created_at, source]
+      required: [id, status, source, created_at, amount_arr]
       properties:
         id: { type: string }
         status:
           type: string
           enum: [new, contacted, qualified, proposal, won, lost]
-        source:
-          type: string
-          enum: [inbound, outbound, referral, partner, event]
+        source: { $ref: '#/components/schemas/Source' }
         created_at: { type: string, format: date }
         closed_at: { type: [string, 'null'], format: date }
         amount_arr: { type: [number, 'null'] }
+        discount_pct: { type: number }
         lost_reason:
           type: [string, 'null']
           enum: [price, no_budget, competitor, no_fit, timing, silent, null]
 
-    QueueItem:
+    PipelineItem:
       type: object
-      required: [account_id, company_name, region, arr, probability, band, arr_at_risk, top_driver]
+      required: [lead_id, company_name, region, source, status, amount_arr, probability, band, expected_value, days_open, top_driver]
       properties:
-        account_id: { type: string }
+        lead_id: { type: string }
         company_name: { type: string }
         region: { $ref: '#/components/schemas/Region' }
-        arr: { type: number }
+        source: { $ref: '#/components/schemas/Source' }
+        status: { type: string }
+        amount_arr: { type: number }
         probability: { type: number }
         band: { $ref: '#/components/schemas/Band' }
-        arr_at_risk: { type: number, description: probability * arr }
+        expected_value: { type: number, description: probability * amount_arr }
+        days_open: { type: integer }
         top_driver: { $ref: '#/components/schemas/Driver' }
 
-    AccountDetail:
+    LeadDetail:
       type: object
-      required: [account, risk, drivers, trend, open_actions]
+      required: [lead, company, score, drivers, prior_initiatives, open_actions]
       properties:
-        account:
+        lead: { $ref: '#/components/schemas/Lead' }
+        company:
           type: object
-          required: [id, company_id, company_name, region, industry, arr, seats, renewal_date, owner_rep]
+          required: [id, name, region, industry, employees, lifetime_won_arr, dormant]
           properties:
             id: { type: string }
-            company_id: { type: string }
-            company_name: { type: string }
+            name: { type: string }
             region: { $ref: '#/components/schemas/Region' }
             industry: { type: string }
-            arr: { type: number }
-            seats: { type: integer }
-            renewal_date: { type: string, format: date }
-            owner_rep: { type: string }
-        risk:
+            employees: { type: integer }
+            lifetime_won_arr: { type: number }
+            dormant:
+              type: boolean
+              description: True when no new initiative has been proposed for 180+ days
+        score:
           type: object
-          required: [probability, band, model_version, scored_at, arr_at_risk]
+          required: [probability, band, model_version, scored_at, expected_value]
           properties:
             probability: { type: number }
             band: { $ref: '#/components/schemas/Band' }
             model_version: { type: string }
             scored_at: { type: string, format: date-time }
-            arr_at_risk: { type: number }
+            expected_value: { type: number }
         drivers:
           type: array
           items: { $ref: '#/components/schemas/Driver' }
-        trend:
+        prior_initiatives:
           type: array
-          items: { $ref: '#/components/schemas/TrendPoint' }
+          description: The company's earlier initiatives, most recent first
+          items: { $ref: '#/components/schemas/Lead' }
         open_actions:
           type: array
           items: { $ref: '#/components/schemas/Action' }
 
-    TrendPoint:
+    CompanyDetail:
       type: object
-      required: [week, probability]
+      required: [company, initiatives, signals]
       properties:
-        week: { type: string, format: date }
-        probability: { type: number }
+        company:
+          type: object
+          required: [id, name, region, industry, employees, created_at]
+          properties:
+            id: { type: string }
+            name: { type: string }
+            region: { $ref: '#/components/schemas/Region' }
+            industry: { type: string }
+            employees: { type: integer }
+            created_at: { type: string, format: date }
+        initiatives:
+          type: array
+          items: { $ref: '#/components/schemas/Lead' }
+        signals:
+          type: object
+          required: [dormant, days_since_last_initiative, won, lost, lifetime_won_arr]
+          properties:
+            dormant: { type: boolean }
+            days_since_last_initiative: { type: integer }
+            won: { type: integer }
+            lost: { type: integer }
+            lifetime_won_arr: { type: number }
 
     CounterfactualRequest:
       type: object
       description: |
-        Only these levers are accepted; each maps to a feature change and is re-scored by
-        the same model. `new_lead_logged` is the demo's strongest lever: the CRM's own
-        record-keeping moves the prediction.
+        Forward-looking levers only; nothing rewrites a response that already happened.
+        Each is re-scored by the same model.
       properties:
-        tickets_resolved: { type: integer, minimum: 0, maximum: 50 }
-        usage_recovery_pct: { type: number, minimum: 0, maximum: 100 }
-        discount_reduction_pct: { type: number, minimum: 0, maximum: 100 }
-        executive_meeting: { type: boolean }
-        new_lead_logged: { type: boolean }
+        exec_sponsor_meeting: { type: boolean }
+        discovery_meeting: { type: boolean }
+        discount_pct: { type: number, minimum: 0, maximum: 60 }
+        accelerate_to_proposal: { type: boolean }
       additionalProperties: false
 
     CounterfactualResponse:
@@ -287,7 +297,7 @@ components:
       properties:
         kind:
           type: string
-          enum: [call, exec_meeting, discount_review, support_escalation]
+          enum: [call, exec_sponsor_meeting, discovery_meeting, discount_review]
         note: { type: string, maxLength: 500 }
       additionalProperties: false
 
@@ -312,19 +322,19 @@ components:
 
     Portfolio:
       type: object
-      required: [total_arr_at_risk, by_region, calibration, drift]
+      required: [total_expected_value, by_region, calibration, drift]
       properties:
-        total_arr_at_risk: { type: number }
+        total_expected_value: { type: number }
         by_region:
           type: array
           items:
             type: object
-            required: [region, accounts, churn_rate, arr_at_risk]
+            required: [region, open_leads, win_rate, expected_value]
             properties:
               region: { $ref: '#/components/schemas/Region' }
-              accounts: { type: integer }
-              churn_rate: { type: number }
-              arr_at_risk: { type: number }
+              open_leads: { type: integer }
+              win_rate: { type: number }
+              expected_value: { type: number }
         calibration:
           type: array
           description: Decile bins for the calibration chart

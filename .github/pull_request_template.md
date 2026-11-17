@@ -19,7 +19,7 @@ $ python tools/check_metrics.py
 - [ ] Every file in the diff is inside this task's `scope`
 - [ ] Tests assert values or boundaries, not just that code runs
 - [ ] No test skipped, xfailed, or loosened to pass
-- [ ] No feature reads a row dated after the snapshot, and nothing in `ml/` reads `account_outcomes`
+- [ ] No feature reads a row dated after the snapshot, and nothing in `ml/` reads `lead_outcomes`
 - [ ] Response shapes match `api/openapi.yaml`; columns match `data/schema.sql`
 - [ ] If a screen changed, it still matches the flow in `docs/PITCH.md`
 - [ ] No fabricated metric: every number quoted comes from `ml/artifacts/metrics.json`

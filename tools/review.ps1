@@ -61,8 +61,8 @@ if (Test-Path "ml/artifacts/metrics.json") {
 
 # 0c. Leakage guard: feature code must not read the label table.
 if (Test-Path "ml/features.py") {
-  $leak = Select-String -Path "ml/features.py" -Pattern "account_outcomes" -Quiet
-  if ($leak) { Fail "leakage" "features.py references account_outcomes"; $layer0Failed = $true }
+  $leak = Select-String -Path "ml/features.py" -Pattern "_outcomes" -Quiet
+  if ($leak) { Fail "leakage" "features.py references the label table"; $layer0Failed = $true }
   else { Pass "leakage" "features.py does not read labels" }
 }
 

@@ -41,7 +41,7 @@ docker compose up -d && curl -fsS localhost:8080/api/health   # when api/ or web
 | # | Check | Fails when |
 |---|---|---|
 | 1 | **Contract compliance** | A response field, table column, or enum value differs from `openapi.yaml` / `schema.sql` |
-| 2 | **Point-in-time discipline** | Any feature reads a row with `*_at > snapshot_date`, or touches `account_outcomes` |
+| 2 | **Point-in-time discipline** | Any feature reads a row with `*_at > snapshot_date`, or touches `lead_outcomes` |
 | 3 | **Test substance** | Tests assert only that code runs; no assertion on values, boundaries, or the leakage rule |
 | 4 | **Gate integrity** | A test is skipped, xfailed, or loosened to make the gate pass |
 | 5 | **Metric honesty** | AUC outside [0.75, 0.90] (high = leakage), calibration ≥ 0.05, or a hardcoded number |
