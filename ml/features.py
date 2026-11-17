@@ -52,8 +52,9 @@ itself.  ``days_since_last_initiative`` is snapshot-relative: the gap from the c
 previous initiative ``created_at`` back to the scoring point, and to the company's
 ``created_at`` when this is its first initiative.
 
-The build replaces ``lead_features`` inside one explicit transaction, so a failure leaves
-the previous materialisation intact on both autocommit and default connections.
+The build runs read, compute, replace and commit inside one transaction, so an autocommit
+connection cannot observe two different committed states part-way through a build, and both
+a failed insert and a failed commit roll back to the previous materialisation.
 
 All arithmetic is standard library only.
 """
@@ -151,38 +152,43 @@ class _World:
 def build_features(conn: sqlite3.Connection) -> int:
     """Replace ``lead_features`` with one row per lead and return the row count.
 
-    The build is a full refresh inside a single transaction: existing rows are deleted and
-    the new ones inserted together, so a failure rolls back and leaves the previous
-    materialisation exactly as it was.  It works on autocommit connections
-    (``isolation_level=None``) as well as on default ones.  If the caller already has a
-    transaction open, a savepoint is used so the caller's own work is neither committed nor
-    discarded.
+    The whole build runs in a single transaction: the transaction is opened *before* the
+    source tables are read, so an autocommit connection cannot hand back two different
+    committed states during one build, and a failure at any point -- loading, computing,
+    deleting, inserting, or committing -- rolls back to the previous materialisation.
+    Works on autocommit connections (``isolation_level=None``) as well as on default ones.
+    If the caller already has a transaction open, a savepoint is used so the caller's own
+    work is neither committed nor discarded.
     """
-    world = _load_world(conn)
-    rows = [_feature_row(lead, world) for lead in world.leads]
-    rows.sort(key=lambda row: row[0])
-
+    # Ownership is decided before any work: a transaction the caller opened stays theirs.
     caller_owns_transaction = conn.in_transaction
     if caller_owns_transaction:
         conn.execute("SAVEPOINT lead_features_build")
     else:
         conn.execute("BEGIN IMMEDIATE")
+
     try:
+        world = _load_world(conn)
+        rows = [_feature_row(lead, world) for lead in world.leads]
+        rows.sort(key=lambda row: row[0])
+
         conn.execute("DELETE FROM lead_features")
         if rows:
             conn.executemany(_INSERT_SQL, rows)
+
+        if caller_owns_transaction:
+            conn.execute("RELEASE lead_features_build")
+        else:
+            conn.commit()
     except BaseException:
         if caller_owns_transaction:
             conn.execute("ROLLBACK TO lead_features_build")
             conn.execute("RELEASE lead_features_build")
         else:
+            # Covers a failed commit too: SQLite leaves the transaction active when COMMIT
+            # fails, and a retry must not mistake that for a caller-owned transaction.
             conn.rollback()
         raise
-
-    if caller_owns_transaction:
-        conn.execute("RELEASE lead_features_build")
-    else:
-        conn.commit()
     return len(rows)
 
 

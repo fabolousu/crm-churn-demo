@@ -40,6 +40,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from ml.features import build_features  # noqa: E402
+import ml.features as features_module  # noqa: E402
 
 SCHEMA_PATH = REPO_ROOT / "data" / "schema.sql"
 FEATURES_PATH = REPO_ROOT / "ml" / "features.py"
@@ -901,3 +902,67 @@ def test_build_inside_a_caller_transaction_uses_a_savepoint() -> None:
     ).fetchone()[0] == 1
     assert conn.in_transaction is True
     conn.rollback()
+
+
+def test_transaction_opens_before_the_source_tables_are_read(monkeypatch) -> None:
+    # Autocommit: nothing else has a transaction open, so a True at load time can only come
+    # from build_features opening it before the read.
+    conn = _seeded_connection(isolation_level=None)
+    seen: dict[str, bool] = {}
+    original_load = features_module._load_world
+
+    def observing_load(connection):
+        seen["in_transaction"] = connection.in_transaction
+        return original_load(connection)
+
+    monkeypatch.setattr(features_module, "_load_world", observing_load)
+
+    assert build_features(conn) == len(_LEADS)
+    assert seen["in_transaction"] is True, (
+        "the source tables were read before the build opened its transaction"
+    )
+    assert conn.in_transaction is False, "a successful build left a transaction open"
+
+
+class _CommitFailsOnce:
+    """Connection proxy whose first commit raises, as SQLITE_BUSY would on a busy database."""
+
+    def __init__(self, conn: sqlite3.Connection) -> None:
+        self._conn = conn
+        self._raised = False
+
+    def __getattr__(self, name: str) -> object:
+        return getattr(self._conn, name)
+
+    def commit(self) -> None:
+        if not self._raised:
+            self._raised = True
+            raise sqlite3.OperationalError("database is locked")
+        return self._conn.commit()
+
+
+@pytest.mark.parametrize(
+    "isolation_level",
+    ["", None],
+    ids=["default-connection", "autocommit"],
+)
+def test_failed_commit_rolls_back_and_leaves_a_usable_connection(
+    isolation_level: str | None,
+) -> None:
+    conn = _seeded_connection(isolation_level=isolation_level)
+    before = _build(conn)
+
+    with pytest.raises(sqlite3.OperationalError, match="database is locked"):
+        build_features(_CommitFailsOnce(conn))
+
+    # SQLite leaves the transaction active when COMMIT fails; the build must close it, or a
+    # retry would see a caller-owned transaction and never commit.
+    assert conn.in_transaction is False, "a failed commit left the transaction open"
+    assert _feature_rows(conn) == before, (
+        "a failed commit lost the previous materialisation"
+    )
+
+    # The connection is still usable: the next build sees no open transaction and commits.
+    assert build_features(conn) == len(_LEADS)
+    assert _feature_rows(conn) == before
+    assert conn.in_transaction is False
