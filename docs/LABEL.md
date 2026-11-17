@@ -55,6 +55,18 @@ Labels live in `lead_outcomes`, which feature code may not read. A test enforces
 
 ## The generating process
 
+**Standardisation reference (part of the contract).** Continuous features are standardised
+over the **generated population at `t0`, globally** — not per region, and not over the scored
+subset. The generator's reference scale is therefore observable and fixed, not an
+implementation detail: a different reference population rescales the logit and changes the
+achievable AUC.
+
+One consequence is written down here on purpose: the world has a **known signal ceiling**.
+The lane that built it measured the latent-probability AUC at **~0.79**, so a faithful model
+should land around 0.77–0.79, and anything near 0.86 is leakage rather than skill.
+`tools/check_metrics.py` enforces exactly that: the reported AUC may not exceed the latent
+ceiling by more than 0.02.
+
 ```
 logit(p) = -0.95
          -- response and engagement (the strongest controllable signal)
