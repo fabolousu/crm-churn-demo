@@ -1,22 +1,36 @@
 """Materialise ``lead_features`` at each lead's scoring point.
 
 The column contract is ``data/schema.sql``; the semantics are ``docs/LABEL.md`` and
-``docs/DECISIONS.md`` (contract v0.3).  Two rules shape everything in this module:
+``docs/DECISIONS.md`` (contract v0.3.1).  Four rules shape everything in this module:
 
 Scoring point
-    A *closed* lead (``won``/``lost``) is scored at ``qualified_at`` — the point the model
+    A *closed* lead (``won``/``lost``) is scored at ``qualified_at`` -- the point the model
     is meant to predict from, so nothing that happened after qualification may inform it.
     A *still-open* lead is scored at the stage it currently holds: ``proposal_at`` for a
-    proposal, ``qualified_at`` for qualification, ``created_at`` before contact.  That is
-    the "current stage at the snapshot" rule, and it is what the pipeline screen acts on.
-    ``snapshot_date`` is the verbatim timestamp text of that stage entry, so it joins back
-    to the source table and to the label rows written by the generator.
+    proposal, ``qualified_at`` for qualification, ``created_at`` before contact.  Stage and
+    snapshot always agree: when the timestamp for the current stage is missing, the row
+    falls back to a stage the available timestamp proves, never to a later stage at an
+    earlier instant.  ``snapshot_date`` is the verbatim timestamp text of that stage entry.
 
 Point-in-time discipline
-    Every aggregate is filtered to rows at or before ``snapshot_date``.  A ticket opened,
-    an invoice issued, a meeting held or an initiative closed after the snapshot is
-    invisible to that lead's features.  The ground-truth label table is never queried;
+    Every aggregate is filtered to rows at or before ``snapshot_date``, and "at the
+    snapshot" is always a *timestamp* test, never a status test: a sibling initiative that
+    is closed today but was open at the snapshot still counted then, and one that closed
+    later must not change a historical row.  A ticket, invoice, meeting, response or close
+    dated after the snapshot is invisible.  The ground-truth label table is never queried;
     labels live somewhere else and feature code has no business reading them.
+
+Self-exclusion
+    A record's own outcome never enters its own features.  ``owner_win_rate_180d`` drops
+    the scored lead's own closure from the rep's window, and the company aggregates exclude
+    the lead too.  This matters when ``closed_at == qualified_at``: the lead's own won/lost
+    result would otherwise sit inside its own feature.
+
+``first_response_at`` is the instant implied by ``created_at`` plus the recorded
+``first_response_hours`` -- the source schema stores a duration, not a timestamp -- and is
+materialised only when it is at or before ``snapshot_date``.  ``first_response_hours`` is
+NULL whenever that instant is missing or later, so a ``contacted`` lead scored at creation
+carries no response duration yet.
 
 Every lead gets a row, including leads that never reached qualification: the pipeline
 screen scores whatever is open.  Deciding which rows carry a usable label is the trainer's
@@ -25,15 +39,18 @@ job (``docs/LABEL.md`` excludes censored and never-qualified leads), not this mo
 Degenerate cases are explicit rather than invented: ``amount_arr`` falls back to ``0.0``
 when the source column is NULL (the materialised column is NOT NULL); no survey yields
 ``nps_last = 0``; no invoices yields ``0.0`` average delay; fewer than two usage weeks (or
-no variance in time) yields ``usage_trend_slope = 0.0``; and a rep with no closed initiative
-in the window yields ``owner_win_rate_180d = 0.0``.  ``prior_won_initiatives`` and
-``prior_lost_initiatives`` count initiatives of the same company closed at or before the
-scoring point, never the lead itself.  ``days_since_last_initiative`` measures the gap from
-the company's previous initiative ``created_at`` to this lead's ``created_at``, falling back
-to the company's ``created_at`` when this is the company's first initiative.  The schema keeps
-no stage history, so ``open_initiatives_count`` can only see leads that are *still* open at
-build time and were created at or before the snapshot; a lead that was open at the snapshot
-and closed afterwards is invisible.  That limitation is upstream of this module.
+no variance in time) yields ``usage_trend_slope = 0.0``; a rep with no closed initiative in
+the window yields ``owner_win_rate_180d = 0.0``.  Those columns are NOT NULL in
+``data/schema.sql``, so 0.0 is the only representable value for "not measured" even though
+convention 5 in ``docs/LABEL.md`` prefers NULL; changing that needs a schema change.
+``prior_won_initiatives`` and ``prior_lost_initiatives`` count initiatives of the same
+company closed at or before the scoring point, never the lead itself.
+``days_since_last_initiative`` is snapshot-relative: the gap from the company's previous
+initiative ``created_at`` back to the scoring point, and to the company's ``created_at``
+when this is its first initiative.
+
+The build replaces ``lead_features`` inside one explicit transaction, so a failure leaves
+the previous materialisation intact on both autocommit and default connections.
 
 All arithmetic is standard library only.
 """
@@ -43,18 +60,18 @@ from __future__ import annotations
 import sqlite3
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Callable, NamedTuple
 
 __all__ = ["build_features"]
 
-_OPEN_STATUSES = frozenset({"new", "contacted", "qualified", "proposal"})
+_CLOSED_STATUSES = frozenset({"won", "lost"})
 _SECONDS_PER_DAY = 86400.0
 
 _INSERT_SQL = """
 INSERT INTO lead_features (
     lead_id, snapshot_date, source, stage_at_scoring, age_days_at_scoring,
-    amount_arr, discount_pct, first_response_hours,
+    amount_arr, discount_pct, first_response_hours, first_response_at,
     region, industry, employees, company_age_days,
     prior_won_initiatives, prior_lost_initiatives, days_since_last_initiative,
     lifetime_won_arr, open_initiatives_count,
@@ -62,7 +79,7 @@ INSERT INTO lead_features (
     meetings_before_scoring, owner_win_rate_180d
 ) VALUES (
     ?, ?, ?, ?, ?,
-    ?, ?, ?,
+    ?, ?, ?, ?,
     ?, ?, ?, ?,
     ?, ?, ?,
     ?, ?,
@@ -82,7 +99,6 @@ class _Lead(NamedTuple):
     created_days: float
     qualified_at: str | None
     proposal_at: str | None
-    closed_at: str | None
     closed_days: float | None
     amount_arr: float
     discount_pct: float
@@ -112,10 +128,8 @@ class _World:
         default_factory=lambda: defaultdict(list)
     )
     lost: dict[str, list[float]] = field(default_factory=lambda: defaultdict(list))
+    closed: dict[str, list[float]] = field(default_factory=lambda: defaultdict(list))
     lead_created: dict[str, list[float]] = field(
-        default_factory=lambda: defaultdict(list)
-    )
-    open_created: dict[str, list[float]] = field(
         default_factory=lambda: defaultdict(list)
     )
 
@@ -133,18 +147,38 @@ class _World:
 def build_features(conn: sqlite3.Connection) -> int:
     """Replace ``lead_features`` with one row per lead and return the row count.
 
-    The build is a full refresh: existing rows are deleted and re-inserted, so calling it
-    twice produces the identical table and a rebuild after new activity changes only the
-    leads whose inputs changed.  The caller's connection is committed on success.
+    The build is a full refresh inside a single transaction: existing rows are deleted and
+    the new ones inserted together, so a failure rolls back and leaves the previous
+    materialisation exactly as it was.  It works on autocommit connections
+    (``isolation_level=None``) as well as on default ones.  If the caller already has a
+    transaction open, a savepoint is used so the caller's own work is neither committed nor
+    discarded.
     """
     world = _load_world(conn)
     rows = [_feature_row(lead, world) for lead in world.leads]
     rows.sort(key=lambda row: row[0])
 
-    conn.execute("DELETE FROM lead_features")
-    if rows:
-        conn.executemany(_INSERT_SQL, rows)
-    conn.commit()
+    caller_owns_transaction = conn.in_transaction
+    if caller_owns_transaction:
+        conn.execute("SAVEPOINT lead_features_build")
+    else:
+        conn.execute("BEGIN IMMEDIATE")
+    try:
+        conn.execute("DELETE FROM lead_features")
+        if rows:
+            conn.executemany(_INSERT_SQL, rows)
+    except BaseException:
+        if caller_owns_transaction:
+            conn.execute("ROLLBACK TO lead_features_build")
+            conn.execute("RELEASE lead_features_build")
+        else:
+            conn.rollback()
+        raise
+
+    if caller_owns_transaction:
+        conn.execute("RELEASE lead_features_build")
+    else:
+        conn.commit()
     return len(rows)
 
 
@@ -174,11 +208,15 @@ def _parse_timestamp(value: str) -> datetime:
     return parsed
 
 
-def _day_number(value: str) -> float:
-    """Timestamp text -> absolute (fractional) day number, the unit used for comparisons."""
-    moment = _parse_timestamp(value)
+def _moment_days(moment: datetime) -> float:
+    """Datetime -> absolute (fractional) day number, the unit used for comparisons."""
     seconds = moment.hour * 3600 + moment.minute * 60 + moment.second + moment.microsecond / 1e6
     return moment.toordinal() + seconds / _SECONDS_PER_DAY
+
+
+def _day_number(value: str) -> float:
+    """Timestamp text -> absolute (fractional) day number."""
+    return _moment_days(_parse_timestamp(value))
 
 
 def _whole_days(delta: float) -> int:
@@ -233,27 +271,52 @@ def _window(
 
 
 def _scoring_point(lead: _Lead) -> tuple[str, float, str]:
-    """Return ``(snapshot_date_text, snapshot_day_number, stage_at_scoring)``."""
+    """Return ``(snapshot_date_text, snapshot_day_number, stage_at_scoring)``.
+
+    The stage always describes the instant: when the timestamp for the lead's current stage
+    is missing, the row falls back to the latest stage an available timestamp proves rather
+    than claiming a later stage at an earlier time.
+    """
     status = lead.status
 
-    if status in _OPEN_STATUSES:
-        if status == "proposal" and lead.proposal_at is not None:
-            return lead.proposal_at, _day_number(lead.proposal_at), "proposal"
-        if status == "qualified" and lead.qualified_at is not None:
-            return lead.qualified_at, _day_number(lead.qualified_at), "qualified"
-        if status in ("new", "contacted"):
-            return lead.created_at, lead.created_days, status
-        # status says qualified/proposal but the stage timestamp is missing: fall back to
-        # the earliest timestamp we do have rather than invent a later one.
-        raw = lead.qualified_at or lead.proposal_at or lead.created_at
-        return raw, _day_number(raw), status
+    if status in ("new", "contacted"):
+        return lead.created_at, lead.created_days, status
 
-    # Closed lead: the model is trained on the state at qualification.
+    # Open or closed: a stage timestamp is only usable if it belongs to the stage claimed.
+    if status == "proposal" and lead.proposal_at is not None:
+        return lead.proposal_at, _day_number(lead.proposal_at), "proposal"
+    if status == "qualified" and lead.qualified_at is not None:
+        return lead.qualified_at, _day_number(lead.qualified_at), "qualified"
+
+    if status in _CLOSED_STATUSES:
+        # Closed leads are scored at qualification, the training population's instant.
+        if lead.qualified_at is not None:
+            return lead.qualified_at, _day_number(lead.qualified_at), "qualified"
+        if lead.proposal_at is not None:
+            return lead.proposal_at, _day_number(lead.proposal_at), "proposal"
+        return lead.created_at, lead.created_days, "new"
+
+    # Still open but the timestamp for its current stage is missing: claim only what a
+    # timestamp proves.  A proposal with no proposal_at was at best qualified.
     if lead.qualified_at is not None:
         return lead.qualified_at, _day_number(lead.qualified_at), "qualified"
-    if lead.proposal_at is not None:
-        return lead.proposal_at, _day_number(lead.proposal_at), "proposal"
     return lead.created_at, lead.created_days, "new"
+
+
+def _first_response(lead: _Lead, snapshot: float) -> tuple[str | None, float | None]:
+    """Resolve the response instant and gate the duration on it.
+
+    ``leads`` records only a duration, so the instant is ``created_at + hours``.  A response
+    that has not happened by the snapshot is not knowable there: both materialised columns
+    are NULL.  Returns ``(first_response_at, first_response_hours)``.
+    """
+    if lead.first_response_hours is None:
+        return None, None
+    moment = _parse_timestamp(lead.created_at) + timedelta(hours=lead.first_response_hours)
+    if _moment_days(moment) > snapshot:
+        return None, None
+    separator = "T" if "T" in lead.created_at else " "
+    return moment.isoformat(sep=separator, timespec="seconds"), lead.first_response_hours
 
 
 def _usage_trend_slope(world: _World, company_id: str, snapshot: float) -> float:
@@ -338,7 +401,6 @@ def _load_world(conn: sqlite3.Connection) -> _World:
             created_days=created_days,
             qualified_at=qualified_at,
             proposal_at=proposal_at,
-            closed_at=closed_at,
             closed_days=_day_number(closed_at) if closed_at is not None else None,
             amount_arr=float(amount_arr) if amount_arr is not None else 0.0,
             discount_pct=float(discount_pct) if discount_pct is not None else 0.0,
@@ -348,8 +410,8 @@ def _load_world(conn: sqlite3.Connection) -> _World:
         )
         world.leads.append(lead)
         world.lead_created[company_id].append(created_days)
-        if status in _OPEN_STATUSES:
-            world.open_created[company_id].append(created_days)
+        if lead.closed_days is not None:
+            world.closed[company_id].append(lead.closed_days)
         if status == "won" and lead.closed_days is not None:
             world.won[company_id].append((lead.closed_days, lead.amount_arr))
         elif status == "lost" and lead.closed_days is not None:
@@ -403,8 +465,8 @@ def _finalise(world: _World) -> None:
     for bucket in (
         world.tickets,
         world.lost,
+        world.closed,
         world.lead_created,
-        world.open_created,
         world.meetings,
     ):
         for values in bucket.values():
@@ -477,12 +539,23 @@ def _feature_row(lead: _Lead, world: _World) -> tuple:
         if previous_index >= 0
         else company_created
     )
-    days_since_last_initiative = _whole_days(lead.created_days - previous_created)
+    # Snapshot-relative, per docs/LABEL.md: the gap from the scoring point back to the
+    # previous initiative's creation, not creation-to-creation.
+    days_since_last_initiative = _whole_days(snapshot - previous_created)
 
-    open_entries = world.open_created.get(company_id, [])
-    open_initiatives_count = _upper_bound(open_entries, snapshot, key=lambda d: d)
-    if lead.status in _OPEN_STATUSES and lead.created_days <= snapshot:
+    # "Open at the snapshot" is a timestamp test, never a status test: an initiative that
+    # closed today but was open at the snapshot still counted then.
+    closed_entries = world.closed.get(company_id, [])
+    open_initiatives_count = _upper_bound(created_entries, snapshot, key=lambda d: d) - (
+        _upper_bound(closed_entries, snapshot, key=lambda d: d)
+    )
+    scored_lead_was_open = (
+        lead.created_days <= snapshot
+        and (lead.closed_days is None or lead.closed_days > snapshot)
+    )
+    if scored_lead_was_open:
         open_initiatives_count -= 1
+    open_initiatives_count = max(0, open_initiatives_count)
 
     # --- relationship signals ----------------------------------------------------------
     ticket_days = world.tickets.get(company_id, [])
@@ -496,15 +569,24 @@ def _feature_row(lead: _Lead, world: _World) -> tuple:
 
     rep_entries = world.rep_closed.get(lead.owner_rep, [])
     rep_start, rep_end = _window(rep_entries, snapshot, 180.0, key=lambda row: row[0])
+    rep_prefix = world.rep_wins_prefix.get(lead.owner_rep, [0])
     rep_total = rep_end - rep_start
-    if rep_total == 0:
-        owner_win_rate_180d = 0.0
-    else:
-        rep_prefix = world.rep_wins_prefix[lead.owner_rep]
-        owner_win_rate_180d = (rep_prefix[rep_end] - rep_prefix[rep_start]) / rep_total
+    rep_wins = rep_prefix[rep_end] - rep_prefix[rep_start]
+    if (
+        lead.status in _CLOSED_STATUSES
+        and lead.closed_days is not None
+        and snapshot - 180.0 <= lead.closed_days <= snapshot
+    ):
+        # Never let the scored lead's own result enter its own feature: when a lead closes
+        # at its own qualification instant the closure would otherwise land in this window.
+        rep_total -= 1
+        rep_wins -= 1 if lead.status == "won" else 0
+    owner_win_rate_180d = rep_wins / rep_total if rep_total > 0 else 0.0
 
     meeting_days = world.meetings.get(lead.lead_id, [])
     meetings_before_scoring = _upper_bound(meeting_days, snapshot, key=lambda d: d)
+
+    first_response_at, first_response_hours = _first_response(lead, snapshot)
 
     return (
         lead.lead_id,
@@ -514,7 +596,8 @@ def _feature_row(lead: _Lead, world: _World) -> tuple:
         _whole_days(snapshot - lead.created_days),
         lead.amount_arr,
         lead.discount_pct,
-        lead.first_response_hours,
+        first_response_hours,
+        first_response_at,
         region,
         industry,
         employees,
