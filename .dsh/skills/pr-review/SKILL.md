@@ -48,6 +48,13 @@ docker compose up -d && curl -fsS localhost:8080/api/health   # when api/ or web
 | 6 | **Demo impact** | The change breaks a screen in `docs/PITCH.md`, or makes a claim the artifacts don't support |
 | 7 | **Scope creep** | Files outside the task's `scope` in `workflow/routing.yaml` |
 
+**When a finding rests on a contract clause, quote the clause and judge the clause itself.**
+A gate that enforces a bad rule is a false positive, and the most expensive defect in a
+multi-agent build is a contract that specifies the wrong thing. Both of the lead's
+over-specifications in this project were caught this way, after a lane had already
+implemented to the letter — say "the clause is wrong, here is why" in the review rather than
+asking the author to comply.
+
 ## Decision
 
 ```sh
