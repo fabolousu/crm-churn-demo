@@ -333,7 +333,13 @@ def test_win_prevalence(demo_db: Path) -> None:
         assert total == closed_qualified
 
 
-def test_latent_signal_is_in_the_documented_band(demo_db: Path) -> None:
+def test_latent_signal_matches_seed42_reference(demo_db: Path) -> None:
+    """The generating-process ceiling is a reference, not the model gate band.
+
+    docs/LABEL.md pins the seed-42 latent ceiling at ~0.78.  This is a
+    regression assertion on the generating process itself: if it moves
+    materially, the world changed and every downstream metric is invalid.
+    """
     with connect(demo_db) as connection:
         rows = connection.execute(
             "SELECT latent_p, won FROM lead_outcomes ORDER BY lead_id"
@@ -341,9 +347,11 @@ def test_latent_signal_is_in_the_documented_band(demo_db: Path) -> None:
     probabilities = [row["latent_p"] for row in rows]
     labels = [row["won"] for row in rows]
     auc = _rank_auc(probabilities, labels)
-    assert 0.75 <= auc <= 0.90, (
-        f"generating-process AUC {auc:.3f} is outside [0.75, 0.90]; "
-        "below means too little signal, above means leakage"
+    reference = 0.78
+    tolerance = 0.01
+    assert abs(auc - reference) <= tolerance, (
+        f"generating-process AUC {auc:.3f} is outside the seed-42 reference "
+        f"{reference:.2f} +/- {tolerance:.2f}"
     )
 
 
@@ -558,7 +566,10 @@ def test_raw_point_in_time_temporal_coherence(demo_db: Path) -> None:
 
 def test_reachability_of_null_and_zero_states(demo_db: Path) -> None:
     with connect(demo_db) as connection:
-        snapshot = "COALESCE(l.qualified_at, '2026-01-01T00:00:00')"
+        snapshot = (
+            "CASE WHEN l.status IN ('won','lost') THEN l.qualified_at "
+            "ELSE '2026-01-01T00:00:00' END"
+        )
         rep_window = (
             "p.owner_rep = l.owner_rep AND p.id <> l.id "
             "AND p.status IN ('won','lost') AND p.closed_at IS NOT NULL "

@@ -45,8 +45,9 @@ Run::
 
 Known limitation (deferred, recorded on purpose): the database is written in
 place, so replacement is not atomic.  A crash leaves a partial ``demo.db`` and
-costs one rerun of a deterministic generator; ``temp file + os.replace`` is the
-eventual fix.
+costs one rerun of a deterministic generator.  The existence check and unlink
+are also a TOCTOU window if two runs target the same path.  ``temp file +
+os.replace`` closes both; it is deliberately deferred, not forgotten.
 """
 
 from __future__ import annotations
@@ -240,14 +241,14 @@ BETA_TICKETS = -0.25
 BETA_NPS = 0.20
 NOISE_SD = 0.40
 
-# z() uses a fixed global reference scale, never a per-region or per-snapshot
-# refit.  CALIBRATED_Z stores the scored-population mean and SD from the
-# deterministic seed-42 calibration.  Z_REFERENCE_SCALE converts those SDs to
-# the reference scale used by the hazard: reference SD = scored SD / 1.25, so
-# z = (x - mean) * 1.25 / scored_sd.  This is a scale conversion, not a second
-# standardisation, and it is applied identically everywhere.  The constant is
-# fixed so the world's true latent AUC is ~0.79, the documented signal ceiling
-# (a model should land around 0.77-0.79; materially above means leakage).
+# z() uses a fixed global reference scale, never a per-region, per-snapshot or
+# per-lead refit.  CALIBRATED_Z stores the scored-population mean and SD from
+# the deterministic seed-42 calibration.  Z_REFERENCE_SCALE converts those SDs
+# to the fixed reference scale used by the hazard: reference SD = scored SD /
+# 1.25, so z = (x - mean) * 1.25 / scored_sd.  This is a scale conversion, not
+# a second standardisation, and the constants are derived once and stored here
+# as fixed values (docs/LABEL.md).  The resulting true latent AUC is ~0.78,
+# inside the model gate's [0.75, 0.90] band; materially above it means leakage.
 Z_REFERENCE_SCALE = 1.25
 
 # Population parameters for z().  They were measured from a deterministic
@@ -1338,7 +1339,7 @@ def write_database(
         if candidate.exists():
             candidate.unlink()
 
-    connection = sqlite3.connect(db_path)
+    connection = sqlite3.connect(str(db_path.absolute()))
     try:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.execute("PRAGMA synchronous = OFF")
