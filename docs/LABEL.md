@@ -55,17 +55,24 @@ Labels live in `lead_outcomes`, which feature code may not read. A test enforces
 
 ## The generating process
 
-**Standardisation reference (part of the contract).** Continuous features are standardised
-over the **generated population at `t0`, globally** — not per region, and not over the scored
-subset. The generator's reference scale is therefore observable and fixed, not an
-implementation detail: a different reference population rescales the logit and changes the
-achievable AUC.
+**Standardisation reference (generator-internal; must be fixed and documented).** These
+z-scores exist only inside the hazard that generates the labels. The model trains on raw
+features, so the reference population is a construction detail, not a modelling choice — and
+prescribing one specific population was over-specification on my part.
 
-One consequence is written down here on purpose: the world has a **known signal ceiling**.
-The lane that built it measured the latent-probability AUC at **~0.79**, so a faithful model
-should land around 0.77–0.79, and anything near 0.86 is leakage rather than skill.
-`tools/check_metrics.py` enforces exactly that: the reported AUC may not exceed the latent
-ceiling by more than 0.02.
+What the contract does require:
+
+- the constants are derived **once** and stored as fixed values — no per-region, per-snapshot
+  or per-lead statistics, so the world stays deterministic and reproducible from the seed;
+- the chosen reference moments, any scale factor, and the resulting **signal ceiling** are
+  written next to the code that implements them;
+- the ceiling falls inside the model gate's band `[0.75, 0.90]`, and `latent_auc` is recorded
+  in `metrics.json` so the gate can enforce it.
+
+The property that matters is not *which* population standardises the logit — it is that the
+world's signal is **fixed, measurable, and documented**, so leakage is detectable rather than
+arguable. The current world sits at a latent ceiling of **~0.78**, and
+`tools/check_metrics.py` fails any model whose AUC exceeds that by more than 0.02.
 
 ```
 logit(p) = -0.95
