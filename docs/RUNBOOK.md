@@ -92,5 +92,9 @@ find it before the room does.
   only committable levers). `discount_upside` is shown separately and labelled as not actionable.
   If asked: the model says price-sensitive accounts churn more; it does not say un-discounting a
   signed deal saves it.
-- The lever's median value is **+4.19 points**, not the 17.3 of the hero lead. Say the
-  median out loud — it is the credible number.
+- The lever's **committable** median is **+0.43 points** and the p90 is **+3.41**; Russo's
+  +10.2 is a tail case, not the norm, and 2,845 of 19,752 leads have no positive committable
+  move at all. Say the median out loud — it is the credible number, and it is why the
+  leverage sort is the product.
+- `discount_upside` (the old Rossi +19.5) is a what-if the model can score but no rep can
+  commit. Show it only in the what-if lane, never as a recommendation.
