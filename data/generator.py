@@ -70,6 +70,9 @@ COMPANY_CREATED_END = datetime(2024, 12, 31, 23, 59, 59)
 
 DEFAULT_COMPANIES = 20_000
 LEADS_PER_COMPANY = 3  # ~60,000 when the default company count is used
+# Hard cap on ordinary leads per company.  Rep-history seeds are additional and
+# bounded separately, so a degenerate --companies 1 run has a known limit.
+MAX_NORMAL_LEADS_PER_COMPANY = 20
 
 # ---------------------------------------------------------------------------
 # Geography, language, firmographics
@@ -445,7 +448,10 @@ def generate_companies(rng: random.Random, count: int) -> list[Company]:
 
 
 def adjust_counts_to_total(
-    rng: random.Random, counts: list[int], target: int, cap: int = 20
+    rng: random.Random,
+    counts: list[int],
+    target: int,
+    cap: int = MAX_NORMAL_LEADS_PER_COMPANY,
 ) -> None:
     total = sum(counts)
     if total < target:
@@ -584,6 +590,15 @@ def generate_leads(
     seed_total = min(target_leads, seeded_rep_count * len(SEED_LEAD_DATES))
     normal_target = max(0, target_leads - seed_total)
 
+    normal_capacity = len(companies) * MAX_NORMAL_LEADS_PER_COMPANY
+    if normal_target > normal_capacity:
+        limit = normal_capacity + seed_total
+        raise ValueError(
+            f"cannot allocate {target_leads} leads: limit is {limit} "
+            f"({len(companies)} companies x {MAX_NORMAL_LEADS_PER_COMPANY} "
+            f"normal leads + {seed_total} rep-history seeds)"
+        )
+
     counts = [
         min(15, poisson_draw(rng, float(LEADS_PER_COMPANY))) for _ in companies
     ]
@@ -640,15 +655,15 @@ def generate_leads(
     # Rep-history seeds: closed, never qualified, and therefore outside the
     # labelled population.  They keep owner_win_rate_180d measured rather than
     # forcing a sentinel.  One rep in four is deliberately left unseeded, so the
-    # rep with no prior closures (NULL) case is reachable too.  Only companies
-    # that already existed on 2024-01-01 are eligible, so no seed predates its
-    # company.
+    # rep with no prior closures (NULL) case is reachable too.  Prefer companies
+    # that already existed by 2024-01-01; if a degenerate --companies count has
+    # none, slide the seed to just after the chosen company's creation so the
+    # count is preserved without inventing a row before its company existed.
     seed_company_cutoff = datetime(2024, 1, 1, 8, 0, 0)
     eligible_companies = [
         company for company in companies if company.created_at <= seed_company_cutoff
     ]
-    if not eligible_companies:
-        eligible_companies = companies
+    seed_pool = eligible_companies if eligible_companies else companies
     for rep_index, rep in enumerate(REPS):
         if rep_index % 4 == 3:
             continue
@@ -656,12 +671,14 @@ def generate_leads(
             if lead_number >= target_leads:
                 break
             lead_number += 1
-            company = eligible_companies[
-                (rep_index * 37 + seed_index * 101) % len(eligible_companies)
+            company = seed_pool[
+                (rep_index * 37 + seed_index * 101) % len(seed_pool)
             ]
             created_at = datetime(
                 seed_date.year, seed_date.month, seed_date.day, 9, 0, 0
             )
+            if created_at < company.created_at:
+                created_at = company.created_at + timedelta(hours=1)
             amount_arr = (
                 round(
                     clamp(

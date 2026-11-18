@@ -58,20 +58,25 @@ TABLES = (
 # ---------------------------------------------------------------------------
 
 
+def _generator_command(db_path: Path, extra_args: list[str]) -> list[str]:
+    return [
+        sys.executable,
+        str(GENERATOR),
+        "--db",
+        str(db_path),
+        "--seed",
+        "42",
+        *extra_args,
+    ]
+
+
 def run_generator(db_path: Path) -> None:
     result = subprocess.run(
-        [
-            sys.executable,
-            str(GENERATOR),
-            "--db",
-            str(db_path),
-            "--seed",
-            "42",
-            "--quiet",
-        ],
+        _generator_command(db_path, ["--quiet"]),
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
+        timeout=300,
     )
     assert result.returncode == 0, (
         f"generator failed with {result.returncode}\n"
@@ -168,6 +173,66 @@ def test_row_counts_and_single_writer(demo_db: Path) -> None:
         assert {
             row[0] for row in connection.execute("SELECT DISTINCT source FROM leads")
         } == SOURCES
+
+
+def test_degenerate_cli_targets_terminate_and_fail_fast(tmp_path: Path) -> None:
+    """Odd --companies/--leads combinations must not hang.
+
+    A single company can hold 20 ordinary leads plus 90 rep-history seeds, so
+    110 is the hard limit.  111 must fail fast with that limit in the message;
+    zero must still be a valid, terminating world.
+    """
+    zero_db = tmp_path / "zero.db"
+    zero = subprocess.run(
+        _generator_command(zero_db, ["--companies", "1", "--leads", "0", "--quiet"]),
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    assert zero.returncode == 0, zero.stderr
+    with connect(zero_db) as connection:
+        assert scalar(connection, "SELECT COUNT(*) FROM companies") == 1
+        assert scalar(connection, "SELECT COUNT(*) FROM leads") == 0
+        assert scalar(connection, "SELECT COUNT(*) FROM lead_features") == 0
+
+    feasible_db = tmp_path / "feasible.db"
+    feasible = subprocess.run(
+        _generator_command(
+            feasible_db, ["--companies", "1", "--leads", "110", "--quiet"]
+        ),
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    assert feasible.returncode == 0, feasible.stderr
+    with connect(feasible_db) as connection:
+        assert scalar(connection, "SELECT COUNT(*) FROM companies") == 1
+        assert scalar(connection, "SELECT COUNT(*) FROM leads") == 110
+        assert scalar(connection, "SELECT COUNT(*) FROM lead_features") == 0
+        assert scalar(
+            connection,
+            """
+            SELECT COUNT(*) FROM leads l
+            JOIN companies c ON c.id = l.company_id
+            WHERE l.created_at < c.created_at
+            """,
+        ) == 0
+
+    over_db = tmp_path / "over.db"
+    over = subprocess.run(
+        _generator_command(
+            over_db, ["--companies", "1", "--leads", "111", "--quiet"]
+        ),
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert over.returncode != 0, "111 leads must be rejected, not silently clipped"
+    combined = over.stdout + over.stderr
+    assert "limit is 110" in combined, combined
 
 
 def test_domain_invariants(demo_db: Path) -> None:
@@ -390,6 +455,16 @@ def test_leads_first_response_at_consistency(demo_db: Path) -> None:
 
 def test_raw_point_in_time_temporal_coherence(demo_db: Path) -> None:
     with connect(demo_db) as connection:
+        # A lead can never exist before its company.
+        assert scalar(
+            connection,
+            """
+            SELECT COUNT(*) FROM leads l
+            JOIN companies c ON c.id = l.company_id
+            WHERE l.created_at < c.created_at
+            """,
+        ) == 0
+
         # created <= qualified <= proposal <= closed, wherever present.
         coherence_checks = (
             "qualified_at IS NOT NULL AND qualified_at < created_at",
