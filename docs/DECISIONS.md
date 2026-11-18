@@ -81,6 +81,8 @@ accepted limitation is engineering, an unrecorded one is a surprise.
 | Derived response instants truncate fractional seconds (`ml/features.py`, fallback path only) | The generator writes integral seconds and `leads.first_response_at` is the preferred source, so the fallback only runs on legacy data; the discrepancy is sub-second |
 | The PR reviewer cannot formally "request changes" from GitHub | It authenticates as the repository owner, who is also the PR author, so GitHub rejects it; it posts `--comment` instead, and the human's approval remains the only approval |
 | The CodeRabbit GitHub App check reports `skipping` on PR #1 | The app is installed but is not gating this PR, so the **CLI** gate (`tools/review.ps1`) is the enforcing one. Worth fixing before a live demo so the PR page shows an explicit review status |
+| Generator: `write_database` replaces the target in place, with a TOCTOU race between the existence check and the unlink | `--db` is deleted before the new file is written, and a concurrent run can unlink a completed output. One fix closes both: temp file + `os.replace`. Deferred because the cost of a failed run is one rerun of a deterministic script |
+| Generator: three test-substance gaps — determinism compares only row counts for `company_usage_weekly`/`tickets`/`invoices`/`nps_surveys`/`interactions`; the response-duration tolerance is looser than the stored precision; the overwrite-refusal test asserts the message but not that the database survived | Cheap to close, deferred to keep the lane closed after four review rounds. The determinism hash gap is the most valuable follow-up: the "reproducible from seed 42" claim currently rests on hashing only companies, leads and outcomes |
 
 ## How the harness builds this
 
