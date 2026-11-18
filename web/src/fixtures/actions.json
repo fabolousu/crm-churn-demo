@@ -1,23 +1,23 @@
 {
-  "L-10482": {
+  "L057056": {
     "call": {
-      "probability_after": 0.34,
+      "probability_after": 0.5431,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.4065,
-      "delta": 0.0665
+      "probability_after": 0.7158,
+      "delta": 0.1727
     },
     "discovery_meeting": {
-      "probability_after": 0.3979,
-      "delta": 0.0579
+      "probability_after": 0.6039,
+      "delta": 0.0608
     },
     "discount_review": {
-      "probability_after": 0.34,
+      "probability_after": 0.5431,
       "delta": 0
     }
   },
-  "L-10517": {
+  "L052117": {
     "call": {
       "probability_after": 0.43,
       "delta": 0
@@ -35,7 +35,7 @@
       "delta": 0
     }
   },
-  "L-10396": {
+  "L048322": {
     "call": {
       "probability_after": 0.56,
       "delta": 0
@@ -53,7 +53,7 @@
       "delta": 0
     }
   },
-  "L-10533": {
+  "L061904": {
     "call": {
       "probability_after": 0.31,
       "delta": 0
@@ -71,7 +71,7 @@
       "delta": 0
     }
   },
-  "L-10455": {
+  "L043781": {
     "call": {
       "probability_after": 0.62,
       "delta": 0
@@ -89,7 +89,7 @@
       "delta": 0
     }
   },
-  "L-10561": {
+  "L059233": {
     "call": {
       "probability_after": 0.27,
       "delta": 0
@@ -107,7 +107,7 @@
       "delta": 0
     }
   },
-  "L-10408": {
+  "L050418": {
     "call": {
       "probability_after": 0.48,
       "delta": 0
@@ -125,7 +125,7 @@
       "delta": 0
     }
   },
-  "L-10502": {
+  "L046677": {
     "call": {
       "probability_after": 0.38,
       "delta": 0
@@ -143,7 +143,7 @@
       "delta": 0
     }
   },
-  "L-10574": {
+  "L057912": {
     "call": {
       "probability_after": 0.24,
       "delta": 0
@@ -161,7 +161,7 @@
       "delta": 0
     }
   },
-  "L-10441": {
+  "L044105": {
     "call": {
       "probability_after": 0.52,
       "delta": 0
@@ -179,7 +179,7 @@
       "delta": 0
     }
   },
-  "L-10588": {
+  "L060284": {
     "call": {
       "probability_after": 0.19,
       "delta": 0
@@ -197,7 +197,7 @@
       "delta": 0
     }
   },
-  "L-10529": {
+  "L051639": {
     "call": {
       "probability_after": 0.35,
       "delta": 0

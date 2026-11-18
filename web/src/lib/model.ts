@@ -21,6 +21,24 @@ export const OPEN_LEADS = 19_752;
 export const WIN_PREVALENCE = 0.2866;
 export const SNAPSHOT_DATE = "2026-11-18";
 
+// Across the whole open book: the median best lever is +4.19 points and the
+// 90th percentile is +16.9. L057056's executive-sponsor lever is +17.27, which
+// is why it is the demo lead rather than a typical one.
+export const LEVERAGE_BOOK = {
+  median: 0.0419,
+  p90: 0.169,
+} as const;
+
+// Train vs holdout score distributions. The holdout genuinely scores higher;
+// "watch" is a base-rate shift in the synthetic world, not a model fault.
+// /api/portfolio carries psi/status, not these means and win rates.
+export const MODEL_STABILITY = {
+  trainMeanProbability: 0.272,
+  holdoutMeanProbability: 0.36,
+  trainWinRate: 0.27,
+  holdoutWinRate: 0.351,
+} as const;
+
 export const OPEN_PIPELINE_ARR = OPEN_LEADS * MEAN_PROPOSED_ARR;
 
 export function pipelineAtRisk(totalExpectedValue: number): number {

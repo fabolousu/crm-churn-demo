@@ -47,6 +47,10 @@ export interface PipelineItem {
   band: Band;
   expected_value: number;
   days_open: number;
+  // Contract v0.3 addition: largest achievable probability delta across the
+  // supported counterfactual levers. Nullable for closed leads; optional
+  // because the field was added to PipelineItem without being made required.
+  max_leverage?: number | null;
   top_driver: Driver;
 }
 

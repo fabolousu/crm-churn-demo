@@ -1,13 +1,10 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import QueueRow from "../components/QueueRow";
 import RegionFilter, {
   type RegionFilterValue,
 } from "../components/RegionFilter";
-import {
-  ArrowUpRightIcon,
-  GridIcon,
-} from "../components/icons";
+import { ArrowUpRightIcon, GridIcon } from "../components/icons";
 import {
   buttonSecondary,
   Card,
@@ -19,20 +16,33 @@ import {
   formatEUR,
   formatEURCompact,
   formatPercent,
+  formatPoints,
   regionLabel,
 } from "../lib/format";
 import {
+  LEVERAGE_BOOK,
   pipelineAtRisk,
   winPrevalence,
 } from "../lib/model";
 import { usePipeline } from "../state/PipelineProvider";
 
-type SortKey = "expected_value" | "at_risk";
+type SortKey = "expected_value" | "at_risk" | "leverage";
 
 export default function PipelinePage() {
   const { pipeline, portfolio } = usePipeline();
   const [region, setRegion] = useState<RegionFilterValue>("all");
-  const [sort, setSort] = useState<SortKey>("expected_value");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const sortParam = searchParams.get("sort");
+  const sort: SortKey =
+    sortParam === "at_risk" || sortParam === "leverage"
+      ? sortParam
+      : "expected_value";
+
+  const changeSort = (next: SortKey) => {
+    if (next === "expected_value") setSearchParams({});
+    else setSearchParams({ sort: next });
+  };
 
   const prevalence = winPrevalence(portfolio.by_region);
 
@@ -48,6 +58,9 @@ export default function PipelinePage() {
           (1 - b.probability) * b.amount_arr -
           (1 - a.probability) * a.amount_arr
         );
+      }
+      if (sort === "leverage") {
+        return (b.max_leverage ?? 0) - (a.max_leverage ?? 0);
       }
       return b.expected_value - a.expected_value;
     });
@@ -74,26 +87,33 @@ export default function PipelinePage() {
         }
       />
 
-      <Card className="grid gap-6 p-6 sm:grid-cols-3 sm:divide-x sm:divide-line sm:gap-0 sm:p-0">
-        <div className="sm:px-6 sm:py-6">
+      <Card className="grid grid-cols-2 gap-6 p-6 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-line lg:p-0">
+        <div className="lg:px-6 lg:py-6">
           <Stat
             label="Expected pipeline value"
             value={formatEURCompact(portfolio.total_expected_value)}
             hint={`across ${pipeline.total.toLocaleString("en-GB")} open initiatives`}
           />
         </div>
-        <div className="border-t border-line pt-6 sm:border-0 sm:px-6 sm:py-6 sm:pt-6">
+        <div className="lg:px-6 lg:py-6">
           <Stat
             label="Proposed ARR at risk"
             value={formatEURCompact(pipelineAtRisk(portfolio.total_expected_value))}
             hint="open ARR not expected to convert"
           />
         </div>
-        <div className="border-t border-line pt-6 sm:border-0 sm:px-6 sm:py-6 sm:pt-6">
+        <div className="lg:px-6 lg:py-6">
           <Stat
             label="Win rate"
             value={formatPercent(prevalence, 2)}
             hint="model-calibrated prevalence, five regions"
+          />
+        </div>
+        <div className="lg:px-6 lg:py-6">
+          <Stat
+            label="Median best lever"
+            value={formatPoints(LEVERAGE_BOOK.median, 2)}
+            hint={`90th percentile ${formatPoints(LEVERAGE_BOOK.p90)}`}
           />
         </div>
       </Card>
@@ -115,13 +135,14 @@ export default function PipelinePage() {
               [
                 ["expected_value", "Expected value"],
                 ["at_risk", "Value at risk"],
+                ["leverage", "Leverage"],
               ] as const
             ).map(([key, label]) => (
               <button
                 key={key}
                 type="button"
                 aria-pressed={sort === key}
-                onClick={() => setSort(key)}
+                onClick={() => changeSort(key)}
                 className={cn(
                   "rounded-[6px] px-3 py-1.5 text-[11.5px] font-medium transition",
                   sort === key
@@ -149,7 +170,9 @@ export default function PipelinePage() {
         <p className="text-[11.5px] text-muted">
           {sort === "at_risk"
             ? "Sorted by value at risk — (1 − probability) × proposed ARR"
-            : "Sorted by expected value — probability × proposed ARR"}
+            : sort === "leverage"
+              ? "Sorted by max leverage — the largest lift across the three levers"
+              : "Sorted by expected value — probability × proposed ARR"}
         </p>
       </div>
 
@@ -168,17 +191,35 @@ export default function PipelinePage() {
             key={item.lead_id}
             item={item}
             rank={index + 1}
-            badge={sort === "at_risk" ? "Most at risk" : "Top of queue"}
+            badge={
+              sort === "at_risk"
+                ? "Most at risk"
+                : sort === "leverage"
+                  ? "Most leverage"
+                  : "Top of queue"
+            }
           />
         ))}
       </div>
 
-      <div className="mt-8 grid gap-3 border-t border-line pt-5 text-[10.5px] leading-relaxed text-muted md:grid-cols-[1fr_auto]">
+      <div className="mt-8 grid gap-4 border-t border-line pt-5 text-[10.5px] leading-relaxed text-muted md:grid-cols-[1fr_1fr_auto]">
         <p>
           Risk bands: critical below 15% probability, high below 30%, medium below
           50%, low at 50% or above. The contract defines the band names, not the
           cut points; the UI applies them consistently and re-bands every
           re-score.
+        </p>
+        <p>
+          Leverage is the contract's <code>max_leverage</code>: the largest
+          achievable probability lift across the three levers. The book median is{" "}
+          <span className="font-medium text-ink">
+            {formatPoints(LEVERAGE_BOOK.median, 2)}
+          </span>
+          ; the 90th percentile is{" "}
+          <span className="font-medium text-ink">
+            {formatPoints(LEVERAGE_BOOK.p90)}
+          </span>
+          . Sort by it to see where effort pays off.
         </p>
         <Link
           to="/act"

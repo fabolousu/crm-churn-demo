@@ -10,7 +10,7 @@ the FastAPI service.
 
 | Screen | What it proves |
 |---|---|
-| [Pipeline](#pipeline-queue) | The first screen is a ranked queue, not a list of records. |
+| [Pipeline](#pipeline-queue) | The first screen is a ranked queue, not a list of records — and it sorts by where effort pays off. |
 | [Lead 360](#lead-360) | Every probability explains itself in three business drivers. |
 | [The lever](#the-lever) | The rep can see what would move it before spending the meeting. |
 | [Act](#act) | Logging an action re-scores the lead and moves it in the queue. |
@@ -66,7 +66,7 @@ Endpoints the UI uses:
 |---|---|
 | `GET /api/pipeline?limit=50` | Pipeline queue (fetched once; region and sort are applied client-side so the queue can re-rank locally after an action) |
 | `GET /api/leads/{id}` | Lead 360 and the lever |
-| `GET /api/portfolio` | Portfolio regions, calibration bins, drift |
+| `GET /api/portfolio` | Portfolio regions, calibration bins, model stability |
 | `GET /api/health` | Model version and last scoring time in the shell |
 | `POST /api/leads/{id}/counterfactual` | The lever's re-score |
 | `POST /api/leads/{id}/actions` | Act's one write, then the re-score |
@@ -88,16 +88,17 @@ and portfolio cannot drift apart.
 src/fixtures/
   pipeline.json        # GET /api/pipeline — 12 top-of-queue items, total 19,752
   leads.json           # GET /api/leads/{id} — one LeadDetail per queue item
-  counterfactuals.json # POST /counterfactual — 9 lever states per lead
+  counterfactuals.json # POST /counterfactual — lever states per lead
   actions.json         # POST /actions — re-score per lead × action kind
-  portfolio.json       # GET /api/portfolio — regions, calibration, drift
+  portfolio.json       # GET /api/portfolio — regions, calibration, stability
   health.json          # GET /api/health
 scripts/build-fixtures.mjs  # single authoring source + validation
 ```
 
 ### The numbers and where they come from
 
-The task facts and the generator's own constants are the only inputs:
+The task facts, the updated contract and the generator's own constants are the
+only inputs:
 
 | Fact | Value | Use |
 |---|---|---|
@@ -108,6 +109,9 @@ The task facts and the generator's own constants are the only inputs:
 | Latent ceiling | **0.789** | The honest upper bound on AUC |
 | Mean proposed ARR | **€36,246.05** | `data/generator.py` `CALIBRATED_Z.amount_arr` |
 | Regions | 5 | Nord-Ovest, Nord-Est, Centro, Sud, Isole |
+| Median best lever | **+4.19 pts** | Queue stat + lever context |
+| 90th-percentile lever | **+16.9 pts** | Queue stat + lever context |
+| Model stability | **PSI 0.1707, watch** | Holdout vs train in the synthetic world |
 
 The portfolio is rolled up consistently:
 
@@ -126,43 +130,57 @@ to 28.66% and their equally weighted mean absolute gap is exactly **0.0104**:
 |---|---|---|---|---|---|---|---|---|---|---|
 | Actual | 6.7% | 8.5% | 14.9% | 17.7% | 25.1% | 28.7% | 36.9% | 41.0% | 49.7% | 57.6% |
 
-Drift is a single current value (`PSI 0.041`, `stable`). It is a fixture because
-the contract has no history; see the gaps below.
+### The demo lead: L057056
 
-### Counterfactual fixture math
+The updated pitch uses a real lead for the 54% → 71% beat. The fixture uses it
+as the top of the queue:
 
-The fixture re-score uses the documented feature effects in `docs/LABEL.md`,
-not a hand-picked percentage:
+| Field | Value |
+|---|---|
+| Lead / company | `L057056` · Farina Vetri S.r.l. |
+| Region / industry / employees | Nord-Est · Manifattura · 240 |
+| Proposed ARR | €280,000 |
+| Current probability | **54.31%** |
+| Expected value | **€152,068** |
+| `max_leverage` | **+17.27 points** |
+| Executive sponsor meeting | **54.31% → 71.58%** |
+| Best driver | 11 hours to first response |
+| Other drivers | no executive sponsor meeting yet; 2 of the last 4 initiatives lost |
+| Company history | 2 won / 2 lost, €710,000 lifetime won ARR, last initiative 61 days ago |
 
-- one meeting: `+0.25` logit (z of 1 meeting at the fixed reference scale)
-- +5 NPS: `+0.20 × 5 × 1.25 / 34.99` logit
-- discount: `−0.20` logit per z of `discount_pct`, with the reference SD 8.357
+`L057056` is the top of the queue by expected value and also the top by
+`max_leverage`. The real executive-sponsor counterfactual is used verbatim from
+the contract update (+17.27 points). The other leads' levers use the documented
+`docs/LABEL.md` feature effects, not hand-picked percentages: one meeting
+`+0.25` logit and +5 NPS `+0.20` logit at the fixed reference scales; discount
+`−0.20` logit per z with reference SD 8.357. The Act lead (`L052117`, Cantieri
+Marini S.p.A.) is the second queue item, at 43% on €320,000; its
+executive-sponsor action is **43.0% → 50.1%**, enough to take it past `L057056`
+to #1.
 
-At the demo lead's 34%, an executive sponsor meeting is **+6.7 points**
-(34.0% → 40.7%), a discovery meeting **+5.8**, and raising the discount to 20%
-is **−7.2** (34.0% → 26.8%). Those are the deltas the UI shows. With
-`VITE_API_BASE` set, the real model's response replaces them.
+### The remaining stale pitch number
 
-Action fixtures follow the same rule: `exec_sponsor_meeting` and
-`discovery_meeting` carry the deltas above; `call` and `discount_review` carry
-zero because they are activity, not a feature the model learned from.
+The updated pitch now matches the UI on the lever: **54% → 71%**, median action
+**4 points**. The 0:30 line still says "€4.2M of pipeline". That figure would
+imply €213 of expected value per open initiative; the generator's mean proposed
+ARR is €36,246 at 28.66% prevalence, so the book is **€205.2M**. The screen shows
+the derived number. If the pitch wants €4.2M, it needs to be scoped to a defined
+subset (and that subset needs to exist in the data).
 
-### The pitch's two stale numbers
+### Model stability, not "drift"
 
-`docs/PITCH.md` says "€4.2M of pipeline" and "34% to 52%". Neither survives the
-fixed world, so the UI does not print them:
+The portfolio's stability panel is **holdout vs train**, not a production drift
+monitor. PSI **0.1707** is in the watch band, and it is correct: the holdout
+genuinely scores higher than the training set.
 
-- **€4.2M** would imply €213 of expected value per open initiative. The
-  generator's mean proposed ARR is €36,246 and prevalence is 28.66%, so the
-  book is **€205.2M**. The screen shows the derived number.
-- **34% → 52%** would require a +18-point lever. The documented executive
-  sponsor meeting is one meeting plus +5 NPS: about +6.7 points at 34%. A
-  +18-point jump would be a fabricated number, which `docs/DECISIONS.md`
-  explicitly rules out. The screen shows the model-consistent **34% → 40.7%**.
+| Metric | Train | Holdout |
+|---|---|---|
+| Mean predicted probability | 27.2% | **36.0%** |
+| Win rate | 27.0% | **35.1%** |
 
-If the pitch wants those exact numbers, either the world or the lever definition
-has to change in `docs/LABEL.md` — not in the UI. See "What the contract does
-not carry" for the related stage-lever finding.
+The UI labels this "Model stability · holdout vs train" and says explicitly that
+it is a real base-rate shift in the synthetic world, not a model fault. It is one
+panel, not a monitoring stack.
 
 ---
 
@@ -172,31 +190,35 @@ not carry" for the related stage-lever finding.
 
 ![Pipeline queue](./screenshots/pipeline.png)
 
-- `€205.2M` expected value across 19,752 open initiatives, `€510.7M` of proposed
-  ARR at risk, 28.66% calibrated win rate.
-- Region filter with real counts (All / Nord-Ovest / Nord-Est / Centro / Sud /
-  Isole) and a sort switch: expected value, or value at risk `(1-p) × ARR`.
+- `€205.2M` expected value across 19,752 open initiatives, `€510.7M` proposed
+  ARR at risk, 28.66% calibrated win rate, and the **median best lever +4.19 pts**
+  (90th percentile +16.9).
+- Region filter with real counts and three sorts: expected value, value at risk,
+  and **leverage** (`max_leverage`). Leverage is the contract's answer to "where
+  does effort pay off?" — the sort is the product idea, not a filter.
 - Every row is a card, not a table cell: rank, company, region/source/days open,
   the single strongest driver as a sentence, win probability with a risk band,
-  proposed ARR and expected value.
-- The top of the queue is the demo lead; the second row is the one the Act
-  screen uses to show a queue move.
+  proposed ARR, expected value, and the lead's leverage.
+- The top row is `L057056` Farina Vetri at 54% with **+17.3 pts** of leverage.
+
+![Pipeline sorted by leverage](./screenshots/pipeline-leverage.png)
 
 ### Lead 360
 
 ![Lead 360](./screenshots/lead.png)
 
-- Company, region, industry, employees, stage and days open.
-- A calibrated probability dial with the portfolio benchmark at 28.66%, the win
-  probability, the risk band, expected value and proposed ARR.
-- **Three drivers as business sentences** ("2 of the last 4 initiatives lost",
-  "11 hours to first response", "Rep wins 41% of initiatives"), each with its
-  direction and a relative influence bar.
-- Company context: lifetime won ARR, won/lost counts, last initiative and days
-  since, dormancy state, and the initiative history that makes "2 of the last 4
-  lost" auditable.
-- Open actions. The demo lead has a call already booked; that is why the Act
-  screen's default next call is the second row.
+- Calibrated probability dial with the 28.66% portfolio benchmark, risk band,
+  expected value and proposed ARR.
+- **Three drivers as business sentences**: "11 hours to first response", "No
+  executive sponsor meeting yet", "2 of the last 4 initiatives lost" — each with
+  direction and a relative influence bar. These are the three reasons in the
+  updated pitch.
+- A "Best lever +17.3 pts" chip links directly to the lever screen.
+- Company context: lifetime won ARR (€710,000), 2 won / 2 lost, last initiative
+  61 days ago, active relationship, and the four-initiative history that makes
+  "2 of the last 4 lost" auditable.
+- One open action: a technical review call. The executive sponsor has not met the
+  buyer yet — which is the lever.
 
 ### The lever
 
@@ -204,16 +226,24 @@ not carry" for the related stage-lever finding.
 
 - Current vs hypothetical probability, delta in points, expected value before
   and after, and a two-bar comparison.
-- Three levers, exactly the contract's: **executive sponsor meeting**,
-  **discovery meeting**, **discount %**. No stage-advance lever.
-- The explanation comes from the API (fixtures in this build), not from the UI
-  inventing a reason.
-- The discount is a slider (0–30%); it is a **preview only**. The action contract
-  has no field for a proposed discount value, so the UI does not pretend the
-  preview can be committed exactly. Meetings can be committed and carry their
-  kind into Act.
+- Exactly the contract's levers: `exec_sponsor_meeting`, `discovery_meeting`,
+  `discount_pct`. **No stage-advance lever** — it was removed because the model
+  cannot learn it.
+- **54.3% → 71.6% with an executive sponsor meeting (+17.3 pts)** — the real
+  `L057056` counterfactual, not a script number.
+- The "Where effort pays off" card puts this initiative in context: **+17.3
+  points**, against a **+4.19-point book median** and a **+16.9-point 90th
+  percentile**.
+- The discount lever is a slider and is labelled **preview only**: the action
+  contract records a discount review but has no field for the proposed discount
+  value, so the UI does not claim it can commit the preview exactly. Meeting
+  levers carry their kind into Act.
 
 ![Discount lever](./screenshots/lever-discount.png)
+
+A secondary note names the real contrast: discount removal on **Serra Gruppo**
+is worth **+34.9 points** — a real effect, and deliberately not the hero, because
+leading with a discount is the weakest commercial story.
 
 ### Act
 
@@ -221,30 +251,31 @@ not carry" for the related stage-lever finding.
 
 ![Act result](./screenshots/act-result.png)
 
-- Defaults to the second queue row — the highest-value initiative without an
-  action already open, which makes the rank movement visible.
-- Four action kinds from the contract: call, executive sponsor meeting,
-  discovery meeting, discount review; optional note (500 chars).
-- On submit the API returns `probability_after` and `delta`; the UI computes the
-  new expected value from the proposed ARR already in the queue, then re-ranks.
-- The screen shows the before/after queue explicitly: **#2 → #1**, with both
-  lists on screen and the acted row highlighted. `call` and `discount_review`
-  correctly show a zero delta — a call is activity, not a lever.
+- Defaults to the second queue row (Cantieri Marini, 43%, €320k) so the re-rank
+  is visible. Four action kinds from the contract plus an optional note.
+- On submit: `probability_after` and `delta` come from the action response;
+  expected value = new probability × proposed ARR; the queue is re-ranked
+  client-side (the response has no rank field).
+- Shown on screen: **43.0% → 50.1% (+7.1 pts)**, **€137.6K → €160.2K**,
+  **#2 → #1**, with before/after queue lists and the acted row highlighted. A
+  call correctly shows a zero delta: activity is not a lever.
 - The updated probability is held in the queue context, so going back to the
   lead or the lever shows the new score; the lever re-bases its logit effect on
-  the current probability rather than replaying the original one.
+  the current probability instead of replaying the original one.
 
 ### Portfolio
 
 ![Portfolio](./screenshots/portfolio.png)
 
-- Expected value, calibrated win rate, AUC, calibration error.
+- Expected value, calibrated win rate, ranking quality (AUC 0.773), calibration
+  error (0.0104).
 - Pipeline value by region (Recharts horizontal bars) and win rate by region
   with the 28.66% portfolio benchmark marked on every row.
-- Calibration chart: ten decile bins on predicted vs actual win rate, with the
-  perfect-calibration diagonal. The mean calibration error is 0.0104.
-- Drift/status panel: PSI 0.041, stable, one panel only; AUC 0.773 against the
-  latent ceiling 0.789; model version and last scoring time from `/api/health`.
+- Calibration chart: ten decile bins, predicted vs actual, with the
+  perfect-calibration diagonal; mean calibration error 0.0104.
+- **Model stability · holdout vs train**: PSI 0.1707, **Watch**, with the
+  holdout's higher mean probability (36.0% vs 27.2%) and win rate (35.1% vs
+  27.0%) shown as the explanation. One panel; not presented as a problem.
 
 ---
 
@@ -266,11 +297,11 @@ They live in `src/lib/bands.ts`; changing them changes the fixture output via
 
 ## Model numbers the API does not carry
 
-`/api/portfolio` returns the calibration bins and the current drift PSI. It does
-**not** return AUC, ECE or the latent ceiling, and it has no proposed-ARR total.
-The Portfolio screen reads those from `src/lib/model.ts`, sourced from the build
-facts (`ml/artifacts/metrics.json` in the full project). The UI labels them as
-build metrics rather than inventing fields on the wire.
+`/api/portfolio` returns the calibration bins and the stability PSI/status. It
+does **not** return AUC, ECE, the latent ceiling, or the holdout/train means and
+win rates. The Portfolio screen reads those from `src/lib/model.ts`, sourced from
+the measured build facts (`ml/artifacts/metrics.json` in the full project). The
+UI labels them as measured build facts rather than inventing fields on the wire.
 
 ---
 
@@ -281,11 +312,13 @@ provide. None of them is hidden behind a made-up number.
 
 | Gap | Screen impact | What this build does |
 |---|---|---|
+| `max_leverage` is on `PipelineItem` but **not** on `LeadDetail` | The Lead 360 cannot read the lead's leverage from its own detail payload | The queue item in context supplies it; the Lead 360 shows "Best lever +17.3 pts" from the pipeline item |
 | `Portfolio` has no AUC, ECE or latent ceiling | The "three numbers to have ready" are not in the payload | Constants in `src/lib/model.ts`, shown as build metrics |
-| `Portfolio` has no time series, only current `psi` + `status` | No honest trend chart can be drawn | Region chart + calibration chart (both Recharts) + one status panel; no fabricated trend |
+| `Portfolio` has no holdout/train means or win rates | The stability panel cannot explain the PSI from the payload | Constants in `src/lib/model.ts`; the API only carries `psi` and `status` |
+| `Portfolio` has no time series | No honest trend chart can be drawn | Region bars + calibration (Recharts) + one stability panel; no fabricated trend |
 | `Band` thresholds are undefined | Risk colouring is ambiguous | Documented cut points above; the UI re-bands every re-score |
-| `Lead` has no stage-entry timestamp | The pitch's "six days into the proposal stage" cannot be rendered | Stage is shown; it is not a driver, because it is constant in training and unlearnable |
-| `ActionRequest` has no `discount_pct` field | A discount preview cannot be committed exactly | Discount lever is labelled "Preview only"; meetings commit and carry their kind into Act |
+| `Lead` has no stage-entry timestamp | The old pitch's "six days into the proposal stage" cannot be rendered | Stage is shown; it is not a driver, because it is constant in training and unlearnable |
+| `ActionRequest` has no `discount_pct` field | A discount preview cannot be committed exactly | Discount lever is labelled "Preview only"; meeting levers commit and carry their kind into Act |
 | `ActionResponse` has no expected value, rank or drivers | The loop cannot read the new queue position from the write | Expected value = `probability_after × amount_arr` from the queue item; rank re-computed client-side |
 | `PipelineItem` has no open-action state | The API cannot say which lead is the "next call" | Act defaults to the second queue row in fixtures and offers a picker; a live build defaults to the first |
 | `by_region.win_rate` is undefined (closed win rate vs open expected rate) | Labelling risk | Shown as the calibrated win rate, with the raw open-lead counts beside it |
@@ -328,8 +361,8 @@ Last build:
 
 ```
 dist/index.html                   0.62 kB │ gzip:   0.37 kB
-dist/assets/index-D6Qru8Sg.css   29.79 kB │ gzip:   6.49 kB
-dist/assets/index-D4BJwfCR.js   670.96 kB │ gzip: 187.04 kB
+dist/assets/index-aZv5RZA3.css   30.49 kB │ gzip:   6.55 kB
+dist/assets/index-IL9nnlRI.js   676.02 kB │ gzip: 188.56 kB
 ✓ built
 ```
 
@@ -343,6 +376,6 @@ mock serving the same fixtures: `/api/pipeline`, `/api/leads/{id}`,
 action) returned a re-score that updated the UI. The mock is not committed; it
 only proved the switch.
 
-Screenshots are captured at 1440×1200–1600 with headless Chrome from the fixture
+Screenshots are captured at 1440px wide with headless Chrome from the fixture
 build; `act-result.png` is the post-click state after an executive sponsor
 meeting on the second queue item.

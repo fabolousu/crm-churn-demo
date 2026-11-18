@@ -69,7 +69,22 @@ const CALIBRATION = [
   { predicted: 0.586, actual: 0.576 },
 ];
 
-const DRIFT = { psi: 0.041, status: "stable" };
+// Model stability: train vs holdout score distributions. The holdout genuinely
+// scores higher (mean p 0.360 vs 0.272, win rate 35.1% vs 27.0%), so "watch"
+// is the honest status, not a degradation.
+const DRIFT = { psi: 0.1707, status: "watch" };
+
+// The updated pitch uses this real lead on the lever screen. Its executive
+// sponsor counterfactual is the model's actual re-score, not the fixture
+// approximation used for the other leads.
+const REAL_DEMO = {
+  leadId: "L057056",
+  exec: {
+    current_probability: 0.5431,
+    hypothetical_probability: 0.7158,
+    delta: 0.1727,
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Model arithmetic for the fixture counterfactuals
@@ -128,60 +143,62 @@ function daysBetween(from, to) {
 
 const leads = [
   {
-    lead_id: "L-10482",
-    company_id: "C-00318",
-    company_name: "Fonderia Valsesia S.p.A.",
-    region: "nord-ovest",
+    // The real demo lead from the updated pitch: 54.31% -> 71.58% with an
+    // executive sponsor meeting (+17.27 points, the contract's max_leverage).
+    lead_id: "L057056",
+    company_id: "C-01142",
+    company_name: "Farina Vetri S.r.l.",
+    region: "nord-est",
     industry: "Manifattura",
-    employees: 420,
+    employees: 240,
     source: "referral",
     status: "proposal",
-    created_at: "2026-11-01",
-    amount_arr: 360_000,
-    discount_pct: 8.5,
-    probability: 0.34,
+    created_at: "2026-10-15",
+    amount_arr: 280_000,
+    discount_pct: 8,
+    probability: 0.5431,
     drivers: [
-      {
-        feature: "prior_lost_initiatives",
-        label: "Lost initiatives",
-        contribution: -0.34,
-        value: "2 of the last 4 initiatives lost",
-        direction: "decreases",
-      },
       {
         feature: "first_response_hours",
         label: "First response",
-        contribution: -0.27,
+        contribution: -0.33,
         value: "11 hours to first response",
         direction: "decreases",
       },
       {
-        feature: "owner_win_rate_180d",
-        label: "Rep track record",
-        contribution: 0.22,
-        value: "Rep wins 41% of initiatives",
-        direction: "increases",
+        feature: "meetings_before_scoring",
+        label: "Executive access",
+        contribution: -0.28,
+        value: "No executive sponsor meeting yet",
+        direction: "decreases",
+      },
+      {
+        feature: "prior_lost_initiatives",
+        label: "Lost initiatives",
+        contribution: -0.25,
+        value: "2 of the last 4 initiatives lost",
+        direction: "decreases",
       },
     ],
     open_actions: [
       {
-        id: "ACT-0412",
+        id: "ACT-0571",
         kind: "call",
         status: "open",
-        created_at: "2026-11-17T09:15:00+01:00",
-        created_by: "Marco Rossi",
-        note: "Confirm the technical sponsor for the proposal review.",
+        created_at: "2026-11-14T10:20:00+01:00",
+        created_by: "Giulia Bianchi",
+        note: "Technical review booked; the executive sponsor has not met the buyer yet.",
       },
     ],
     history: [
-      { id: "L-09881", status: "won", source: "referral", created_at: "2026-08-16", closed_at: "2026-09-30", amount_arr: 610_000, discount_pct: 5, lost_reason: null },
-      { id: "L-08914", status: "lost", source: "outbound", created_at: "2026-04-02", closed_at: "2026-05-20", amount_arr: 240_000, discount_pct: 12, lost_reason: "price" },
-      { id: "L-07742", status: "won", source: "partner", created_at: "2025-11-14", closed_at: "2025-12-19", amount_arr: 355_000, discount_pct: 4, lost_reason: null },
-      { id: "L-06603", status: "lost", source: "outbound", created_at: "2025-06-27", closed_at: "2025-08-01", amount_arr: 310_000, discount_pct: 9, lost_reason: "competitor" },
+      { id: "L049901", status: "won", source: "referral", created_at: "2026-09-18", closed_at: "2026-10-30", amount_arr: 420_000, discount_pct: 5, lost_reason: null },
+      { id: "L041277", status: "lost", source: "outbound", created_at: "2026-05-02", closed_at: "2026-06-18", amount_arr: 260_000, discount_pct: 12, lost_reason: "price" },
+      { id: "L033118", status: "won", source: "partner", created_at: "2025-11-10", closed_at: "2025-12-22", amount_arr: 290_000, discount_pct: 4, lost_reason: null },
+      { id: "L026604", status: "lost", source: "outbound", created_at: "2025-06-15", closed_at: "2025-07-30", amount_arr: 180_000, discount_pct: 9, lost_reason: "competitor" },
     ],
   },
   {
-    lead_id: "L-10517",
+    lead_id: "L052117",
     company_id: "C-00542",
     company_name: "Cantieri Marini S.p.A.",
     region: "nord-est",
@@ -190,7 +207,7 @@ const leads = [
     source: "partner",
     status: "proposal",
     created_at: "2026-10-20",
-    amount_arr: 284_000,
+    amount_arr: 320_000,
     discount_pct: 6,
     probability: 0.43,
     drivers: [
@@ -212,7 +229,7 @@ const leads = [
         feature: "amount_arr",
         label: "Deal size",
         contribution: -0.18,
-        value: "€284,000 proposed — larger initiatives close less often",
+        value: "€320,000 proposed — larger initiatives close less often",
         direction: "decreases",
       },
     ],
@@ -224,7 +241,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10396",
+    lead_id: "L048322",
     company_id: "C-00271",
     company_name: "Tecnoimpianti Sabina S.r.l.",
     region: "centro",
@@ -267,7 +284,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10533",
+    lead_id: "L061904",
     company_id: "C-00786",
     company_name: "Officine Bertolini S.p.A.",
     region: "nord-ovest",
@@ -310,7 +327,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10455",
+    lead_id: "L043781",
     company_id: "C-00409",
     company_name: "Logistica Mediterranea S.r.l.",
     region: "sud",
@@ -353,7 +370,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10561",
+    lead_id: "L059233",
     company_id: "C-00812",
     company_name: "Agrumi di Sicilia S.r.l.",
     region: "isole",
@@ -404,7 +421,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10408",
+    lead_id: "L050418",
     company_id: "C-00596",
     company_name: "Serigrafia Veneta S.r.l.",
     region: "nord-est",
@@ -447,7 +464,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10502",
+    lead_id: "L046677",
     company_id: "C-00633",
     company_name: "Studio Medico Appia S.r.l.",
     region: "centro",
@@ -489,7 +506,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10574",
+    lead_id: "L057912",
     company_id: "C-00847",
     company_name: "Salumi Irpini S.p.A.",
     region: "sud",
@@ -532,7 +549,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10441",
+    lead_id: "L044105",
     company_id: "C-00471",
     company_name: "Hotel Riviera del Sud S.r.l.",
     region: "isole",
@@ -574,7 +591,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10588",
+    lead_id: "L060284",
     company_id: "C-00903",
     company_name: "Cooperativa Edilizia Tevere S.r.l.",
     region: "centro",
@@ -616,7 +633,7 @@ const leads = [
     ],
   },
   {
-    lead_id: "L-10529",
+    lead_id: "L051639",
     company_id: "C-00724",
     company_name: "Mobilificio Salentino S.r.l.",
     region: "sud",
@@ -666,6 +683,18 @@ const leads = [
 
 const details = {};
 const pipelineItems = [];
+
+function maxLeverageFor(lead) {
+  if (lead.lead_id === REAL_DEMO.leadId) return REAL_DEMO.exec.delta;
+  const p = lead.probability;
+  const deltas = [EXEC_DELTA, DISCOVERY_DELTA];
+  for (let pct = 0; pct <= 30; pct += 5) {
+    deltas.push(discountLogitDelta(lead.discount_pct, pct));
+  }
+  return round(
+    Math.max(...deltas.map((delta) => sigmoid(logit(p) + delta) - p)),
+  );
+}
 
 for (const lead of leads) {
   const daysOpen = daysBetween(lead.created_at, SNAPSHOT);
@@ -724,6 +753,7 @@ for (const lead of leads) {
     band: band(lead.probability),
     expected_value: score.expected_value,
     days_open: daysOpen,
+    max_leverage: maxLeverageFor(lead),
     top_driver: drivers[0],
   });
 }
@@ -764,13 +794,30 @@ for (const lead of leads) {
     };
   }
 
+  if (lead.lead_id === REAL_DEMO.leadId) {
+    cf["exec_sponsor_meeting=true"] = {
+      ...REAL_DEMO.exec,
+      explanation:
+        "An executive sponsor meeting moves this initiative from 54.3% to 71.6% — the largest lever on the lead.",
+    };
+  }
+
   counterfactuals[lead.lead_id] = cf;
+
+  const execAfter =
+    lead.lead_id === REAL_DEMO.leadId
+      ? REAL_DEMO.exec.hypothetical_probability
+      : sigmoid(logit(p) + EXEC_DELTA);
+  const execDelta =
+    lead.lead_id === REAL_DEMO.leadId
+      ? REAL_DEMO.exec.delta
+      : round(execAfter - p);
 
   actions[lead.lead_id] = {
     call: { probability_after: round(p), delta: 0 },
     exec_sponsor_meeting: {
-      probability_after: round(sigmoid(logit(p) + EXEC_DELTA)),
-      delta: round(sigmoid(logit(p) + EXEC_DELTA) - p),
+      probability_after: round(execAfter),
+      delta: round(execDelta),
     },
     discovery_meeting: {
       probability_after: round(sigmoid(logit(p) + DISCOVERY_DELTA)),
@@ -822,6 +869,26 @@ for (const item of pipelineItems) {
   if (detail.score.expected_value !== item.expected_value) errors.push(`EV drift ${item.lead_id}`);
   if (detail.drivers[0].feature !== item.top_driver.feature) errors.push(`top driver drift ${item.lead_id}`);
   if (detail.score.band !== item.band) errors.push(`band drift ${item.lead_id}`);
+  if (typeof item.max_leverage !== "number") {
+    errors.push(`missing max_leverage ${item.lead_id}`);
+  }
+}
+const demoItem = pipelineItems.find((item) => item.lead_id === REAL_DEMO.leadId);
+if (!demoItem) {
+  errors.push("demo lead missing");
+} else {
+  if (pipelineItems[0].lead_id !== REAL_DEMO.leadId) {
+    errors.push("demo lead is not the top of the queue");
+  }
+  if (Math.abs(demoItem.probability - 0.5431) > 1e-9) {
+    errors.push(`demo lead probability ${demoItem.probability}`);
+  }
+  if (Math.abs(demoItem.max_leverage - 0.1727) > 1e-9) {
+    errors.push(`demo lead max_leverage ${demoItem.max_leverage}`);
+  }
+}
+if (DRIFT.status !== "watch" || Math.abs(DRIFT.psi - 0.1707) > 1e-9) {
+  errors.push("model stability fixture");
 }
 if (sum(REGIONS.map((r) => r.open_leads)) !== OPEN_LEADS) errors.push("region leads do not sum to 19,752");
 if (Math.abs(sum(REGIONS.map((r) => r.wins)) / OPEN_LEADS - PREVALENCE) > 1e-4) {

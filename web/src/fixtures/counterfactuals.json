@@ -1,61 +1,61 @@
 {
-  "L-10482": {
+  "L057056": {
     "exec_sponsor_meeting=true": {
-      "current_probability": 0.34,
-      "hypothetical_probability": 0.4065,
-      "delta": 0.0665,
-      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.7158,
+      "delta": 0.1727,
+      "explanation": "An executive sponsor meeting moves this initiative from 54.3% to 71.6% — the largest lever on the lead."
     },
     "discovery_meeting=true": {
-      "current_probability": 0.34,
-      "hypothetical_probability": 0.3979,
-      "delta": 0.0579,
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.6039,
+      "delta": 0.0608,
       "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
     },
     "discount_pct=0": {
-      "current_probability": 0.34,
-      "hypothetical_probability": 0.3991,
-      "delta": 0.0591,
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.6016,
+      "delta": 0.0585,
       "explanation": "Lowering the proposed discount to 0% raises the score by 5.9 points."
     },
     "discount_pct=5": {
-      "current_probability": 0.34,
-      "hypothetical_probability": 0.3639,
-      "delta": 0.0239,
-      "explanation": "Lowering the proposed discount to 5% raises the score by 2.4 points."
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.5653,
+      "delta": 0.0222,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 2.2 points."
     },
     "discount_pct=10": {
-      "current_probability": 0.34,
-      "hypothetical_probability": 0.33,
-      "delta": -0.01,
-      "explanation": "Raising the proposed discount to 10% lowers the score by 1.0 points — a discount does not buy the win."
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.5282,
+      "delta": -0.0149,
+      "explanation": "Raising the proposed discount to 10% lowers the score by 1.5 points — a discount does not buy the win."
     },
     "discount_pct=15": {
-      "current_probability": 0.34,
-      "hypothetical_probability": 0.2978,
-      "delta": -0.0422,
-      "explanation": "Raising the proposed discount to 15% lowers the score by 4.2 points — a discount does not buy the win."
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.4909,
+      "delta": -0.0522,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 5.2 points — a discount does not buy the win."
     },
     "discount_pct=20": {
-      "current_probability": 0.34,
-      "hypothetical_probability": 0.2675,
-      "delta": -0.0725,
-      "explanation": "Raising the proposed discount to 20% lowers the score by 7.2 points — a discount does not buy the win."
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.4536,
+      "delta": -0.0895,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 8.9 points — a discount does not buy the win."
     },
     "discount_pct=25": {
-      "current_probability": 0.34,
-      "hypothetical_probability": 0.2392,
-      "delta": -0.1008,
-      "explanation": "Raising the proposed discount to 25% lowers the score by 10.1 points — a discount does not buy the win."
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.4169,
+      "delta": -0.1262,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 12.6 points — a discount does not buy the win."
     },
     "discount_pct=30": {
-      "current_probability": 0.34,
-      "hypothetical_probability": 0.2131,
-      "delta": -0.1269,
-      "explanation": "Raising the proposed discount to 30% lowers the score by 12.7 points — a discount does not buy the win."
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.381,
+      "delta": -0.1621,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 16.2 points — a discount does not buy the win."
     }
   },
-  "L-10517": {
+  "L052117": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.43,
       "hypothetical_probability": 0.5007,
@@ -111,7 +111,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 16.1 points — a discount does not buy the win."
     }
   },
-  "L-10396": {
+  "L048322": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.56,
       "hypothetical_probability": 0.6285,
@@ -167,7 +167,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 13.4 points — a discount does not buy the win."
     }
   },
-  "L-10533": {
+  "L061904": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.31,
       "hypothetical_probability": 0.3739,
@@ -223,7 +223,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 11.2 points — a discount does not buy the win."
     }
   },
-  "L-10455": {
+  "L043781": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.62,
       "hypothetical_probability": 0.6844,
@@ -279,7 +279,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 18.4 points — a discount does not buy the win."
     }
   },
-  "L-10561": {
+  "L059233": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.27,
       "hypothetical_probability": 0.3296,
@@ -335,7 +335,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 10.5 points — a discount does not buy the win."
     }
   },
-  "L-10408": {
+  "L050418": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.48,
       "hypothetical_probability": 0.551,
@@ -391,7 +391,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 5.9 points — a discount does not buy the win."
     }
   },
-  "L-10502": {
+  "L046677": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.38,
       "hypothetical_probability": 0.449,
@@ -447,7 +447,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 14.4 points — a discount does not buy the win."
     }
   },
-  "L-10574": {
+  "L057912": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.24,
       "hypothetical_probability": 0.2957,
@@ -503,7 +503,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 8.8 points — a discount does not buy the win."
     }
   },
-  "L-10441": {
+  "L044105": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.52,
       "hypothetical_probability": 0.5902,
@@ -559,7 +559,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 18.8 points — a discount does not buy the win."
     }
   },
-  "L-10588": {
+  "L060284": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.19,
       "hypothetical_probability": 0.2377,
@@ -615,7 +615,7 @@
       "explanation": "Raising the proposed discount to 30% lowers the score by 2.2 points — a discount does not buy the win."
     }
   },
-  "L-10529": {
+  "L051639": {
     "exec_sponsor_meeting=true": {
       "current_probability": 0.35,
       "hypothetical_probability": 0.4172,

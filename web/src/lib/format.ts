@@ -73,10 +73,10 @@ export function formatPercent(value: number, fractionDigits = 0): string {
   }).format(value);
 }
 
-export function formatPoints(value: number): string {
+export function formatPoints(value: number, digits = 1): string {
   const pts = value * 100;
   const sign = pts > 0 ? "+" : pts < 0 ? "−" : "";
-  return `${sign}${Math.abs(pts).toFixed(1)} pts`;
+  return `${sign}${Math.abs(pts).toFixed(digits)} pts`;
 }
 
 export function formatSignedEUR(value: number): string {

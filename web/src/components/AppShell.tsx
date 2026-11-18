@@ -65,23 +65,28 @@ function Wordmark() {
 
 function ModelCard() {
   const { health, portfolio, live } = usePipeline();
-  const stable = portfolio.drift.status === "stable";
+  const stabilityStatus =
+    portfolio.drift.status === "stable"
+      ? "Stable"
+      : portfolio.drift.status === "watch"
+        ? "Watch"
+        : "Alert";
 
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
       <div className="flex items-center justify-between">
         <span className="text-[10px] uppercase tracking-[0.16em] text-paper/45">
-          Model
+          Model stability
         </span>
         <span className="inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-paper/60">
           <span
             className={
-              stable
+              portfolio.drift.status === "stable"
                 ? "h-1.5 w-1.5 rounded-full bg-[#5FD3A5]"
                 : "h-1.5 w-1.5 rounded-full bg-[#F0B45A]"
             }
           />
-          {stable ? "Stable" : portfolio.drift.status}
+          {stabilityStatus}
         </span>
       </div>
       <p className="mt-2 text-[13px] font-medium text-paper">

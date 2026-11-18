@@ -20,7 +20,12 @@ import {
   Stat,
 } from "../components/ui";
 import { formatEURCompact, formatPercent, regionLabel } from "../lib/format";
-import { MODEL_METRICS, OPEN_LEADS, winPrevalence } from "../lib/model";
+import {
+  MODEL_METRICS,
+  MODEL_STABILITY,
+  OPEN_LEADS,
+  winPrevalence,
+} from "../lib/model";
 import { usePipeline } from "../state/PipelineProvider";
 
 const CALIBRATION_DOMAIN: [number, number] = [0, 0.7];
@@ -40,6 +45,12 @@ export default function PortfolioPage() {
 
   const drift = portfolio.drift;
   const latentGap = MODEL_METRICS.latentAuc - MODEL_METRICS.auc;
+  const stabilityStatus =
+    drift.status === "stable"
+      ? "Stable"
+      : drift.status === "watch"
+        ? "Watch"
+        : "Alert";
 
   return (
     <div>
@@ -179,15 +190,12 @@ export default function PortfolioPage() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
-                Model health
+                Model stability
               </p>
               <h2 className="mt-1.5 font-display text-[24px] leading-tight text-ink">
-                {drift.status === "stable"
-                  ? "Stable"
-                  : drift.status === "watch"
-                    ? "On watch"
-                    : "Alert"}
+                {stabilityStatus}
               </h2>
+              <p className="mt-0.5 text-[10px] text-muted">Holdout vs train</p>
             </div>
             <span
               className={cn(
@@ -209,14 +217,14 @@ export default function PortfolioPage() {
                       : "bg-risk-high",
                 )}
               />
-              {drift.status}
+              {stabilityStatus}
             </span>
           </div>
 
           <div className="mt-6">
             <div className="flex items-baseline justify-between">
               <span className="text-[9.5px] font-semibold uppercase tracking-[0.13em] text-muted">
-                Population stability
+                Population stability (PSI)
               </span>
               <span className="font-display text-[24px] tabular-nums text-ink">
                 {drift.psi.toFixed(3)}
@@ -239,8 +247,13 @@ export default function PortfolioPage() {
               <span>alert</span>
             </div>
             <p className="mt-2 text-[10.5px] leading-relaxed text-muted">
-              PSI {drift.psi.toFixed(3)} is below the 0.10 watch threshold. One
-              panel, one status — no drift infrastructure in this build.
+              PSI {drift.psi.toFixed(3)} sits in the watch band. The holdout
+              genuinely scores higher than train — mean probability{" "}
+              {formatPercent(MODEL_STABILITY.holdoutMeanProbability, 1)} vs{" "}
+              {formatPercent(MODEL_STABILITY.trainMeanProbability, 1)}, win rate{" "}
+              {formatPercent(MODEL_STABILITY.holdoutWinRate, 1)} vs{" "}
+              {formatPercent(MODEL_STABILITY.trainWinRate, 1)}. That is a real
+              base-rate shift in the synthetic world, not a model fault.
             </p>
           </div>
 
@@ -251,6 +264,24 @@ export default function PortfolioPage() {
                 {MODEL_METRICS.auc.toFixed(3)}
                 <span className="ml-2 text-[10px] font-normal text-muted">
                   ceiling {MODEL_METRICS.latentAuc.toFixed(3)}
+                </span>
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-4">
+              <dt className="text-muted">Holdout mean p</dt>
+              <dd className="font-medium tabular-nums text-ink">
+                {formatPercent(MODEL_STABILITY.holdoutMeanProbability, 1)}
+                <span className="ml-2 text-[10px] font-normal text-muted">
+                  train {formatPercent(MODEL_STABILITY.trainMeanProbability, 1)}
+                </span>
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-4">
+              <dt className="text-muted">Holdout win rate</dt>
+              <dd className="font-medium tabular-nums text-ink">
+                {formatPercent(MODEL_STABILITY.holdoutWinRate, 1)}
+                <span className="ml-2 text-[10px] font-normal text-muted">
+                  train {formatPercent(MODEL_STABILITY.trainWinRate, 1)}
                 </span>
               </dd>
             </div>
@@ -288,7 +319,7 @@ export default function PortfolioPage() {
             Measured build facts: AUC {MODEL_METRICS.auc}, calibration error{" "}
             {MODEL_METRICS.calibrationError}, latent ceiling{" "}
             {MODEL_METRICS.latentAuc}. The API contract exposes the calibration
-            bins and the drift PSI, not these; they are held here until the
+            bins and the stability PSI, not these; they are held here until the
             contract carries them.
           </p>
         </Card>

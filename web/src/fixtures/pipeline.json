@@ -3,35 +3,37 @@
   "total_expected_value": 205190000,
   "items": [
     {
-      "lead_id": "L-10482",
-      "company_name": "Fonderia Valsesia S.p.A.",
-      "region": "nord-ovest",
+      "lead_id": "L057056",
+      "company_name": "Farina Vetri S.r.l.",
+      "region": "nord-est",
       "source": "referral",
       "status": "proposal",
-      "amount_arr": 360000,
-      "probability": 0.34,
-      "band": "medium",
-      "expected_value": 122400,
-      "days_open": 17,
+      "amount_arr": 280000,
+      "probability": 0.5431,
+      "band": "low",
+      "expected_value": 152068,
+      "days_open": 34,
+      "max_leverage": 0.1727,
       "top_driver": {
-        "feature": "prior_lost_initiatives",
-        "label": "Lost initiatives",
-        "contribution": -0.34,
-        "value": "2 of the last 4 initiatives lost",
+        "feature": "first_response_hours",
+        "label": "First response",
+        "contribution": -0.33,
+        "value": "11 hours to first response",
         "direction": "decreases"
       }
     },
     {
-      "lead_id": "L-10517",
+      "lead_id": "L052117",
       "company_name": "Cantieri Marini S.p.A.",
       "region": "nord-est",
       "source": "partner",
       "status": "proposal",
-      "amount_arr": 284000,
+      "amount_arr": 320000,
       "probability": 0.43,
       "band": "medium",
-      "expected_value": 122120,
+      "expected_value": 137600,
       "days_open": 29,
+      "max_leverage": 0.0707,
       "top_driver": {
         "feature": "meetings_before_scoring",
         "label": "Meetings held",
@@ -41,7 +43,7 @@
       }
     },
     {
-      "lead_id": "L-10396",
+      "lead_id": "L048322",
       "company_name": "Tecnoimpianti Sabina S.r.l.",
       "region": "centro",
       "source": "referral",
@@ -51,6 +53,7 @@
       "band": "low",
       "expected_value": 120400,
       "days_open": 51,
+      "max_leverage": 0.0857,
       "top_driver": {
         "feature": "prior_won_initiatives",
         "label": "Won initiatives",
@@ -60,7 +63,7 @@
       }
     },
     {
-      "lead_id": "L-10533",
+      "lead_id": "L061904",
       "company_name": "Officine Bertolini S.p.A.",
       "region": "nord-ovest",
       "source": "outbound",
@@ -70,6 +73,7 @@
       "band": "medium",
       "expected_value": 117800,
       "days_open": 86,
+      "max_leverage": 0.0673,
       "top_driver": {
         "feature": "amount_arr",
         "label": "Deal size",
@@ -79,7 +83,7 @@
       }
     },
     {
-      "lead_id": "L-10455",
+      "lead_id": "L043781",
       "company_name": "Logistica Mediterranea S.r.l.",
       "region": "sud",
       "source": "inbound",
@@ -89,6 +93,7 @@
       "band": "low",
       "expected_value": 108500,
       "days_open": 34,
+      "max_leverage": 0.0644,
       "top_driver": {
         "feature": "source",
         "label": "Lead source",
@@ -98,7 +103,7 @@
       }
     },
     {
-      "lead_id": "L-10561",
+      "lead_id": "L059233",
       "company_name": "Agrumi di Sicilia S.r.l.",
       "region": "isole",
       "source": "outbound",
@@ -108,6 +113,7 @@
       "band": "high",
       "expected_value": 106650,
       "days_open": 77,
+      "max_leverage": 0.0596,
       "top_driver": {
         "feature": "days_since_last_initiative",
         "label": "Relationship gap",
@@ -117,7 +123,7 @@
       }
     },
     {
-      "lead_id": "L-10408",
+      "lead_id": "L050418",
       "company_name": "Serigrafia Veneta S.r.l.",
       "region": "nord-est",
       "source": "event",
@@ -127,6 +133,7 @@
       "band": "medium",
       "expected_value": 100800,
       "days_open": 44,
+      "max_leverage": 0.1606,
       "top_driver": {
         "feature": "discount_pct",
         "label": "Discount",
@@ -136,7 +143,7 @@
       }
     },
     {
-      "lead_id": "L-10502",
+      "lead_id": "L046677",
       "company_name": "Studio Medico Appia S.r.l.",
       "region": "centro",
       "source": "outbound",
@@ -146,6 +153,7 @@
       "band": "medium",
       "expected_value": 98800,
       "days_open": 60,
+      "max_leverage": 0.069,
       "top_driver": {
         "feature": "tickets_90d",
         "label": "Support friction",
@@ -155,7 +163,7 @@
       }
     },
     {
-      "lead_id": "L-10574",
+      "lead_id": "L057912",
       "company_name": "Salumi Irpini S.p.A.",
       "region": "sud",
       "source": "outbound",
@@ -165,6 +173,7 @@
       "band": "high",
       "expected_value": 93600,
       "days_open": 41,
+      "max_leverage": 0.065,
       "top_driver": {
         "feature": "first_response_hours",
         "label": "First response",
@@ -174,7 +183,7 @@
       }
     },
     {
-      "lead_id": "L-10441",
+      "lead_id": "L044105",
       "company_name": "Hotel Riviera del Sud S.r.l.",
       "region": "isole",
       "source": "referral",
@@ -184,6 +193,7 @@
       "band": "low",
       "expected_value": 92560,
       "days_open": 23,
+      "max_leverage": 0.0702,
       "top_driver": {
         "feature": "nps_last",
         "label": "Relationship health",
@@ -193,7 +203,7 @@
       }
     },
     {
-      "lead_id": "L-10588",
+      "lead_id": "L060284",
       "company_name": "Cooperativa Edilizia Tevere S.r.l.",
       "region": "centro",
       "source": "outbound",
@@ -203,6 +213,7 @@
       "band": "high",
       "expected_value": 76000,
       "days_open": 11,
+      "max_leverage": 0.1413,
       "top_driver": {
         "feature": "first_response_hours",
         "label": "First response",
@@ -212,7 +223,7 @@
       }
     },
     {
-      "lead_id": "L-10529",
+      "lead_id": "L051639",
       "company_name": "Mobilificio Salentino S.r.l.",
       "region": "sud",
       "source": "outbound",
@@ -222,6 +233,7 @@
       "band": "medium",
       "expected_value": 71750,
       "days_open": 67,
+      "max_leverage": 0.0672,
       "top_driver": {
         "feature": "owner_win_rate_180d",
         "label": "Rep track record",

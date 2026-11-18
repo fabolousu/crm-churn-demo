@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import LeadTabs from "../components/LeadTabs";
 import {
   ArrowLeftIcon,
+  ArrowUpRightIcon,
   BoltIcon,
   CalendarIcon,
   CheckIcon,
@@ -25,6 +26,7 @@ import {
   formatPoints,
   formatSignedEUR,
 } from "../lib/format";
+import { LEVERAGE_BOOK } from "../lib/model";
 import { usePipeline } from "../state/PipelineProvider";
 import type {
   CounterfactualResponse,
@@ -64,7 +66,7 @@ const LEVERS: Array<{
 
 export default function LeverPage() {
   const { leadId = "" } = useParams();
-  const { loadLead, counterfactual } = usePipeline();
+  const { loadLead, counterfactual, pipeline } = usePipeline();
   const [detail, setDetail] = useState<LeadDetail | null>(() =>
     initialLeadDetail(leadId),
   );
@@ -96,6 +98,9 @@ export default function LeverPage() {
   }, [leadId, loadLead]);
 
   const lead = detail?.lead;
+  const maxLeverage =
+    pipeline.items.find((item) => item.lead_id === lead?.id)?.max_leverage ??
+    null;
 
   useEffect(() => {
     if (!lead) return;
@@ -335,6 +340,27 @@ export default function LeverPage() {
         </div>
 
         <div className="space-y-3">
+          <div className="rounded-xl border border-accent/30 bg-accent-soft/45 p-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent-deep">
+              Where effort pays off
+            </p>
+            <p className="mt-1 font-display text-[32px] leading-none tabular-nums text-ink">
+              {maxLeverage !== null ? formatPoints(maxLeverage) : "—"}
+            </p>
+            <p className="mt-2 text-[10.5px] leading-relaxed text-muted">
+              Largest achievable lift for this initiative. Across the book the
+              median best lever is {formatPoints(LEVERAGE_BOOK.median, 2)}; the
+              90th percentile is {formatPoints(LEVERAGE_BOOK.p90)}.
+            </p>
+            <Link
+              to="/?sort=leverage"
+              className="mt-2.5 inline-flex items-center gap-1.5 text-[10.5px] font-semibold text-accent transition hover:text-accent-deep"
+            >
+              See where effort pays off
+              <ArrowUpRightIcon className="h-3 w-3" />
+            </Link>
+          </div>
+
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
             Choose a lever
           </p>
@@ -430,7 +456,14 @@ export default function LeverPage() {
             );
           })}
 
-          <InlineNotice className="mt-4">
+          <p className="px-1 text-[10px] leading-relaxed text-muted">
+            For contrast: discount removal on{" "}
+            <span className="font-medium text-ink">Serra Gruppo</span> is worth
+            +34.9 points. It is a real effect and deliberately not the hero —
+            leading with a discount is the weakest commercial story.
+          </p>
+
+          <InlineNotice className="mt-1">
             <strong className="font-semibold text-ink">
               No stage-advance lever.
             </strong>{" "}

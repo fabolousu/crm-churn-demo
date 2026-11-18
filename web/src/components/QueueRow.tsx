@@ -5,10 +5,16 @@ import {
   formatEURCompact,
   formatOrdinal,
   formatPercent,
+  formatPoints,
   regionLabel,
   sourceLabel,
 } from "../lib/format";
-import { ChevronRightIcon, TrendDownIcon, TrendUpIcon } from "./icons";
+import {
+  BoltIcon,
+  ChevronRightIcon,
+  TrendDownIcon,
+  TrendUpIcon,
+} from "./icons";
 import { BandPill, cn, ProbabilityMeter } from "./ui";
 
 export default function QueueRow({
@@ -92,8 +98,20 @@ export default function QueueRow({
           band={item.band}
           className="mt-2 max-w-[104px]"
         />
-        <div className="mt-1.5">
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
           <BandPill band={item.band} compact />
+          {typeof item.max_leverage === "number" ? (
+            <span
+              className="inline-flex items-center gap-1 text-[9.5px] text-muted"
+              title="Largest achievable probability lift across the three counterfactual levers"
+            >
+              <BoltIcon className="h-2.5 w-2.5 text-accent" />
+              Leverage{" "}
+              <span className="font-semibold tabular-nums text-ink">
+                {formatPoints(item.max_leverage)}
+              </span>
+            </span>
+          ) : null}
         </div>
       </div>
 

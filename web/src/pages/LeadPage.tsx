@@ -31,6 +31,7 @@ import {
   formatEUR,
   formatEURCompact,
   formatPercent,
+  formatPoints,
   lostReasonLabel,
   regionLabel,
   sourceLabel,
@@ -43,7 +44,7 @@ import type { LeadDetail } from "../lib/types";
 
 export default function LeadPage() {
   const { leadId = "" } = useParams();
-  const { loadLead, rankOf, portfolio } = usePipeline();
+  const { loadLead, rankOf, portfolio, pipeline } = usePipeline();
   const prevalence = winPrevalence(portfolio.by_region);
   const [detail, setDetail] = useState<LeadDetail | null>(() =>
     initialLeadDetail(leadId),
@@ -101,6 +102,11 @@ export default function LeadPage() {
   );
 
   const rank = detail ? rankOf(detail.lead.id) : null;
+  // max_leverage lives on PipelineItem. The contract update did not add it to
+  // LeadDetail, so the lead page reads it from the queue item in context.
+  const maxLeverage =
+    pipeline.items.find((item) => item.lead_id === detail?.lead.id)
+      ?.max_leverage ?? null;
 
   if (error) {
     return (
@@ -227,11 +233,11 @@ export default function LeadPage() {
                 ) : null}
               </div>
               <p className="mt-3 max-w-md text-[12.5px] leading-relaxed text-muted">
-                About one in three comparable initiatives win. The three drivers
-                below explain why this one sits{" "}
+                About one in three comparable initiatives win. This one sits{" "}
                 {score.probability >= prevalence ? "above" : "below"} the{" "}
-                {formatPercent(prevalence, 2)} portfolio average — and where the
-                risk is.
+                {formatPercent(prevalence, 2)} portfolio average. The three
+                drivers below explain the score, in order of influence — and the
+                lever shows what changing one is worth.
               </p>
 
               <div className="mt-5 grid grid-cols-2 gap-5">
@@ -252,6 +258,16 @@ export default function LeadPage() {
                   </p>
                 </div>
               </div>
+
+              {maxLeverage !== null ? (
+                <Link
+                  to={`/leads/${lead.id}/lever`}
+                  className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-[11px] font-semibold text-accent-deep transition hover:bg-[#D4E8E0]"
+                >
+                  <BoltIcon className="h-3.5 w-3.5" />
+                  Best lever {formatPoints(maxLeverage)} · see the move
+                </Link>
+              ) : null}
 
               <p className="mt-5 border-t border-line pt-3 text-[10.5px] text-muted">
                 Scored {formatDateTime(score.scored_at)} · {score.model_version} ·

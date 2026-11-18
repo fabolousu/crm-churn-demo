@@ -53,7 +53,9 @@ export function fixtureLeadExists(id: string): boolean {
   return Boolean(leadsData[id]);
 }
 
-export const DEFAULT_ACT_LEAD_ID = "L-10517";
+// Cantieri Marini: second by expected value, no action open yet, and the
+// executive-sponsor re-score is enough to take it past L057056.
+export const DEFAULT_ACT_LEAD_ID = "L052117";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {

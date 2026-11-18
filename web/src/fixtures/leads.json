@@ -1,115 +1,115 @@
 {
-  "L-10482": {
+  "L057056": {
     "lead": {
-      "id": "L-10482",
+      "id": "L057056",
       "status": "proposal",
       "source": "referral",
-      "created_at": "2026-11-01",
+      "created_at": "2026-10-15",
       "closed_at": null,
-      "amount_arr": 360000,
-      "discount_pct": 8.5,
+      "amount_arr": 280000,
+      "discount_pct": 8,
       "lost_reason": null
     },
     "company": {
-      "id": "C-00318",
-      "name": "Fonderia Valsesia S.p.A.",
-      "region": "nord-ovest",
+      "id": "C-01142",
+      "name": "Farina Vetri S.r.l.",
+      "region": "nord-est",
       "industry": "Manifattura",
-      "employees": 420,
-      "lifetime_won_arr": 965000,
+      "employees": 240,
+      "lifetime_won_arr": 710000,
       "dormant": false
     },
     "score": {
-      "probability": 0.34,
-      "band": "medium",
+      "probability": 0.5431,
+      "band": "low",
       "model_version": "lead-win-gbm-0.3.0",
       "scored_at": "2026-11-18T06:00:00+01:00",
-      "expected_value": 122400
+      "expected_value": 152068
     },
     "drivers": [
       {
-        "feature": "prior_lost_initiatives",
-        "label": "Lost initiatives",
-        "contribution": -0.34,
-        "value": "2 of the last 4 initiatives lost",
-        "direction": "decreases"
-      },
-      {
         "feature": "first_response_hours",
         "label": "First response",
-        "contribution": -0.27,
+        "contribution": -0.33,
         "value": "11 hours to first response",
         "direction": "decreases"
       },
       {
-        "feature": "owner_win_rate_180d",
-        "label": "Rep track record",
-        "contribution": 0.22,
-        "value": "Rep wins 41% of initiatives",
-        "direction": "increases"
+        "feature": "meetings_before_scoring",
+        "label": "Executive access",
+        "contribution": -0.28,
+        "value": "No executive sponsor meeting yet",
+        "direction": "decreases"
+      },
+      {
+        "feature": "prior_lost_initiatives",
+        "label": "Lost initiatives",
+        "contribution": -0.25,
+        "value": "2 of the last 4 initiatives lost",
+        "direction": "decreases"
       }
     ],
     "prior_initiatives": [
       {
-        "id": "L-09881",
+        "id": "L049901",
         "status": "won",
         "source": "referral",
-        "created_at": "2026-08-16",
-        "closed_at": "2026-09-30",
-        "amount_arr": 610000,
+        "created_at": "2026-09-18",
+        "closed_at": "2026-10-30",
+        "amount_arr": 420000,
         "discount_pct": 5,
         "lost_reason": null
       },
       {
-        "id": "L-08914",
+        "id": "L041277",
         "status": "lost",
         "source": "outbound",
-        "created_at": "2026-04-02",
-        "closed_at": "2026-05-20",
-        "amount_arr": 240000,
+        "created_at": "2026-05-02",
+        "closed_at": "2026-06-18",
+        "amount_arr": 260000,
         "discount_pct": 12,
         "lost_reason": "price"
       },
       {
-        "id": "L-07742",
+        "id": "L033118",
         "status": "won",
         "source": "partner",
-        "created_at": "2025-11-14",
-        "closed_at": "2025-12-19",
-        "amount_arr": 355000,
+        "created_at": "2025-11-10",
+        "closed_at": "2025-12-22",
+        "amount_arr": 290000,
         "discount_pct": 4,
         "lost_reason": null
       },
       {
-        "id": "L-06603",
+        "id": "L026604",
         "status": "lost",
         "source": "outbound",
-        "created_at": "2025-06-27",
-        "closed_at": "2025-08-01",
-        "amount_arr": 310000,
+        "created_at": "2025-06-15",
+        "closed_at": "2025-07-30",
+        "amount_arr": 180000,
         "discount_pct": 9,
         "lost_reason": "competitor"
       }
     ],
     "open_actions": [
       {
-        "id": "ACT-0412",
+        "id": "ACT-0571",
         "kind": "call",
         "status": "open",
-        "created_at": "2026-11-17T09:15:00+01:00",
-        "created_by": "Marco Rossi",
-        "note": "Confirm the technical sponsor for the proposal review."
+        "created_at": "2026-11-14T10:20:00+01:00",
+        "created_by": "Giulia Bianchi",
+        "note": "Technical review booked; the executive sponsor has not met the buyer yet."
       }
     ]
   },
-  "L-10517": {
+  "L052117": {
     "lead": {
-      "id": "L-10517",
+      "id": "L052117",
       "status": "proposal",
       "source": "partner",
       "created_at": "2026-10-20",
       "closed_at": null,
-      "amount_arr": 284000,
+      "amount_arr": 320000,
       "discount_pct": 6,
       "lost_reason": null
     },
@@ -127,7 +127,7 @@
       "band": "medium",
       "model_version": "lead-win-gbm-0.3.0",
       "scored_at": "2026-11-18T06:00:00+01:00",
-      "expected_value": 122120
+      "expected_value": 137600
     },
     "drivers": [
       {
@@ -148,7 +148,7 @@
         "feature": "amount_arr",
         "label": "Deal size",
         "contribution": -0.18,
-        "value": "€284,000 proposed — larger initiatives close less often",
+        "value": "€320,000 proposed — larger initiatives close less often",
         "direction": "decreases"
       }
     ],
@@ -186,9 +186,9 @@
     ],
     "open_actions": []
   },
-  "L-10396": {
+  "L048322": {
     "lead": {
-      "id": "L-10396",
+      "id": "L048322",
       "status": "qualified",
       "source": "referral",
       "created_at": "2026-09-28",
@@ -270,9 +270,9 @@
     ],
     "open_actions": []
   },
-  "L-10533": {
+  "L061904": {
     "lead": {
-      "id": "L-10533",
+      "id": "L061904",
       "status": "proposal",
       "source": "outbound",
       "created_at": "2026-08-24",
@@ -354,9 +354,9 @@
     ],
     "open_actions": []
   },
-  "L-10455": {
+  "L043781": {
     "lead": {
-      "id": "L-10455",
+      "id": "L043781",
       "status": "qualified",
       "source": "inbound",
       "created_at": "2026-10-15",
@@ -438,9 +438,9 @@
     ],
     "open_actions": []
   },
-  "L-10561": {
+  "L059233": {
     "lead": {
-      "id": "L-10561",
+      "id": "L059233",
       "status": "contacted",
       "source": "outbound",
       "created_at": "2026-09-02",
@@ -521,9 +521,9 @@
       }
     ]
   },
-  "L-10408": {
+  "L050418": {
     "lead": {
-      "id": "L-10408",
+      "id": "L050418",
       "status": "proposal",
       "source": "event",
       "created_at": "2026-10-05",
@@ -605,9 +605,9 @@
     ],
     "open_actions": []
   },
-  "L-10502": {
+  "L046677": {
     "lead": {
-      "id": "L-10502",
+      "id": "L046677",
       "status": "qualified",
       "source": "outbound",
       "created_at": "2026-09-19",
@@ -679,9 +679,9 @@
     ],
     "open_actions": []
   },
-  "L-10574": {
+  "L057912": {
     "lead": {
-      "id": "L-10574",
+      "id": "L057912",
       "status": "contacted",
       "source": "outbound",
       "created_at": "2026-10-08",
@@ -763,9 +763,9 @@
     ],
     "open_actions": []
   },
-  "L-10441": {
+  "L044105": {
     "lead": {
-      "id": "L-10441",
+      "id": "L044105",
       "status": "qualified",
       "source": "referral",
       "created_at": "2026-10-26",
@@ -837,9 +837,9 @@
     ],
     "open_actions": []
   },
-  "L-10588": {
+  "L060284": {
     "lead": {
-      "id": "L-10588",
+      "id": "L060284",
       "status": "contacted",
       "source": "outbound",
       "created_at": "2026-11-07",
@@ -911,9 +911,9 @@
     ],
     "open_actions": []
   },
-  "L-10529": {
+  "L051639": {
     "lead": {
-      "id": "L-10529",
+      "id": "L051639",
       "status": "proposal",
       "source": "outbound",
       "created_at": "2026-09-12",
