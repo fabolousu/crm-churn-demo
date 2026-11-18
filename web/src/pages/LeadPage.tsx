@@ -22,10 +22,9 @@ import {
   ProbabilityDial,
   SectionHeading,
 } from "../components/ui";
-import { initialLeadDetail } from "../lib/api";
+import { fetchCompany, initialLeadDetail } from "../lib/api";
 import {
   actionKindLabel,
-  daysBetween,
   formatDate,
   formatDateTime,
   formatEUR,
@@ -38,17 +37,18 @@ import {
   statusLabel,
 } from "../lib/format";
 import { driverNarrative } from "../lib/narratives";
-import { SNAPSHOT_DATE, winPrevalence } from "../lib/model";
+import { winPrevalence } from "../lib/model";
 import { usePipeline } from "../state/PipelineProvider";
-import type { LeadDetail } from "../lib/types";
+import type { CompanyDetail, LeadDetail } from "../lib/types";
 
 export default function LeadPage() {
   const { leadId = "" } = useParams();
-  const { loadLead, rankOf, portfolio } = usePipeline();
-  const prevalence = winPrevalence(portfolio.by_region);
+  const { loadLead, rankOf, portfolio, pipeline } = usePipeline();
+  const prevalence = portfolio.win_prevalence ?? winPrevalence(portfolio.by_region);
   const [detail, setDetail] = useState<LeadDetail | null>(() =>
     initialLeadDetail(leadId),
   );
+  const [companyDetail, setCompanyDetail] = useState<CompanyDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -81,16 +81,40 @@ export default function LeadPage() {
   const drivers = detail?.drivers ?? [];
   const history = detail?.prior_initiatives ?? [];
 
-  const daysSinceLast = useMemo(() => {
-    if (!history.length) return null;
-    return daysBetween(history[0].created_at, SNAPSHOT_DATE);
-  }, [history]);
+  useEffect(() => {
+    const companyId = company?.id;
+    if (!companyId) {
+      setCompanyDetail(null);
+      return;
+    }
+    let cancelled = false;
+    fetchCompany(companyId)
+      .then((next) => {
+        if (!cancelled) setCompanyDetail(next);
+      })
+      .catch(() => {
+        if (!cancelled) setCompanyDetail(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [company?.id]);
 
-  const counts = useMemo(() => {
+  const priorCounts = useMemo(() => {
     const won = history.filter((item) => item.status === "won").length;
     const lost = history.filter((item) => item.status === "lost").length;
     return { won, lost };
   }, [history]);
+
+  const signals = companyDetail?.signals;
+  const counts = signals
+    ? { won: signals.won, lost: signals.lost }
+    : priorCounts;
+  const daysSinceLast = signals?.days_since_last_initiative ?? null;
+  const lastInitiative =
+    companyDetail?.initiatives[0] ?? history[0] ?? null;
+  const lifetimeWon = signals?.lifetime_won_arr ?? company?.lifetime_won_arr ?? 0;
+  const dormant = signals?.dormant ?? company?.dormant ?? false;
 
   const maxContribution = useMemo(
     () =>
@@ -105,8 +129,11 @@ export default function LeadPage() {
   // Contract v0.3 puts max_leverage on LeadDetail too, nullable for closed
   // leads. Treat a missing value the same as null: no lever is offered.
   const maxLeverage = detail?.max_leverage ?? null;
+  const discountUpside = detail?.discount_upside ?? null;
   const isClosed =
     detail?.lead.status === "won" || detail?.lead.status === "lost";
+  const daysOpen =
+    pipeline.items.find((item) => item.lead_id === lead?.id)?.days_open ?? null;
 
   if (error) {
     return (
@@ -157,8 +184,6 @@ export default function LeadPage() {
     );
   }
 
-  const daysOpen = daysBetween(lead.created_at, SNAPSHOT_DATE);
-
   return (
     <div>
       <Link
@@ -191,9 +216,11 @@ export default function LeadPage() {
               <CalendarIcon className="h-3.5 w-3.5" />
               {isClosed
                 ? `Closed${lead.closed_at ? ` ${formatDate(lead.closed_at)}` : ""}`
-                : `${daysOpen} days open`}
+                : daysOpen !== null
+                  ? `${daysOpen} days open`
+                  : "open"}
             </span>
-            {company.dormant ? (
+            {dormant ? (
               <span className="rounded-full bg-[#FDECEA] px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.1em] text-risk-high">
                 Dormant
               </span>
@@ -274,8 +301,15 @@ export default function LeadPage() {
                   className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-[11px] font-semibold text-accent-deep transition hover:bg-[#D4E8E0]"
                 >
                   <BoltIcon className="h-3.5 w-3.5" />
-                  Best lever {formatPoints(maxLeverage)} · see the move
+                  Best committable lever {formatPoints(maxLeverage)} · see the
+                  move
                 </Link>
+              ) : null}
+              {discountUpside !== null && discountUpside > 0 ? (
+                <p className="mt-2 text-[10px] leading-relaxed text-muted">
+                  Discount what-if {formatPoints(discountUpside)} — not
+                  committable, not part of the leverage ranking.
+                </p>
               ) : null}
 
               <p className="mt-5 border-t border-line pt-3 text-[10.5px] text-muted">
@@ -356,7 +390,7 @@ export default function LeadPage() {
             <SectionHeading
               label="Company context"
               title="The initiatives before this one"
-              hint={`${counts.won} won · ${counts.lost} lost · ${formatEUR(company.lifetime_won_arr)} lifetime won ARR. The relationship continues only if someone proposes the next initiative.`}
+              hint={`${counts.won} won · ${counts.lost} lost · ${formatEUR(lifetimeWon)} lifetime won ARR. The relationship continues only if someone proposes the next initiative.`}
             />
             <Card className="divide-y divide-line">
               {history.map((initiative) => {
@@ -414,7 +448,7 @@ export default function LeadPage() {
             <dl className="mt-4 divide-y divide-line border-t border-line">
               <MetaRow
                 label="Lifetime won ARR"
-                value={formatEUR(company.lifetime_won_arr)}
+                value={formatEUR(lifetimeWon)}
               />
               <MetaRow
                 label="Initiatives"
@@ -423,15 +457,17 @@ export default function LeadPage() {
               <MetaRow
                 label="Last initiative"
                 value={
-                  history.length && daysSinceLast !== null
-                    ? `${formatDate(history[0].created_at)} · ${daysSinceLast}d ago`
+                  lastInitiative
+                    ? `${formatDate(lastInitiative.created_at)}${
+                        daysSinceLast !== null ? ` · ${daysSinceLast}d ago` : ""
+                      }`
                     : "None on record"
                 }
               />
               <MetaRow
                 label="Dormancy"
                 value={
-                  company.dormant ? (
+                  dormant ? (
                     <span className="font-medium text-risk-high">Dormant</span>
                   ) : (
                     "Active"
@@ -446,7 +482,7 @@ export default function LeadPage() {
             <p className="mt-3 text-[10.5px] leading-relaxed text-muted">
               {isClosed
                 ? "This initiative is closed. The relationship continues only if someone proposes the next initiative."
-                : company.dormant
+                : dormant
                   ? "No new initiative for 180+ days. Dormancy is a symptom of the relationship, not the model target."
                   : "An initiative is open, so the relationship is active. Dormancy is flagged at 180 days without a new initiative."}
             </p>

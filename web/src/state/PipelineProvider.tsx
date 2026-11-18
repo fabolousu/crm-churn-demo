@@ -203,9 +203,11 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
       health: data.health,
       live: isLiveApi,
       error,
-      defaultActLeadId: isLiveApi
-        ? (data.pipeline.items[0]?.lead_id ?? DEFAULT_ACT_LEAD_ID)
-        : DEFAULT_ACT_LEAD_ID,
+      defaultActLeadId:
+        data.pipeline.items.find((item) => item.lead_id === DEFAULT_ACT_LEAD_ID)
+          ?.lead_id ??
+        data.pipeline.items[0]?.lead_id ??
+        DEFAULT_ACT_LEAD_ID,
       currentProbability,
       rankOf,
       loadLead,

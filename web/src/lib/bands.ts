@@ -1,18 +1,13 @@
 import type { Band } from "./types";
 
-// The OpenAPI Band enum does not define thresholds. In this product a band is
-// a *risk* band, so a low band means a healthy win probability. The cut points
-// live here, are used to re-band a re-scored lead, and are documented in the
-// README.
-//
-//   probability < 0.15  -> critical
-//   probability < 0.30  -> high
-//   probability < 0.50  -> medium
-//   otherwise           -> low
+// The API's model bands, stated once in ml/train.py:
+//   p < 0.20 -> low, < 0.40 -> medium, < 0.60 -> high, otherwise critical.
+// These are probability bands, not risk ratings. "Critical" is the highest
+// win-probability band, so it is styled as the strongest accent, not as danger.
 export function bandForProbability(probability: number): Band {
-  if (probability < 0.15) return "critical";
-  if (probability < 0.3) return "high";
-  if (probability < 0.5) return "medium";
+  if (probability >= 0.6) return "critical";
+  if (probability >= 0.4) return "high";
+  if (probability >= 0.2) return "medium";
   return "low";
 }
 
@@ -28,39 +23,41 @@ type BandStyle = {
 
 export const BAND_STYLES: Record<Band, BandStyle> = {
   low: {
-    label: "Low risk",
+    label: "Low",
     short: "Low",
-    dot: "bg-risk-low",
-    pill: "bg-[#E7F4EC] text-[#05603A] ring-[#B7E1C6]",
-    bar: "bg-risk-low",
-    text: "text-risk-low",
-    hex: "#067647",
+    dot: "bg-[#98A2B3]",
+    pill: "bg-[#F2F4F7] text-[#475467] ring-[#D0D5DD]",
+    bar: "bg-[#98A2B3]",
+    text: "text-[#475467]",
+    hex: "#98A2B3",
   },
   medium: {
-    label: "Medium risk",
+    label: "Medium",
     short: "Medium",
-    dot: "bg-risk-medium",
+    dot: "bg-copper",
     pill: "bg-[#FDF1E3] text-[#8A3A06] ring-[#F5D0A9]",
-    bar: "bg-risk-medium",
-    text: "text-risk-medium",
-    hex: "#B54708",
+    bar: "bg-copper",
+    text: "text-[#8A3A06]",
+    hex: "#B4693A",
   },
   high: {
-    label: "High risk",
+    label: "High",
     short: "High",
-    dot: "bg-risk-high",
-    pill: "bg-[#FDECEA] text-[#912018] ring-[#F5C2BC]",
-    bar: "bg-risk-high",
-    text: "text-risk-high",
-    hex: "#B42318",
+    dot: "bg-accent",
+    pill: "bg-[#E3EFEA] text-[#0A4A40] ring-[#BFDCD2]",
+    bar: "bg-accent",
+    text: "text-accent-deep",
+    hex: "#0F6B5C",
   },
   critical: {
-    label: "Critical risk",
-    short: "Critical",
-    dot: "bg-risk-critical",
-    pill: "bg-[#FCE9E5] text-[#6B1F15] ring-[#EDB8AD]",
-    bar: "bg-risk-critical",
-    text: "text-risk-critical",
-    hex: "#7A271A",
+    // The contract calls the highest probability band "critical"; on screen
+    // that reads as danger, so present it as the top band.
+    label: "Top",
+    short: "Top",
+    dot: "bg-accent-deep",
+    pill: "bg-accent text-paper ring-accent-deep",
+    bar: "bg-accent-deep",
+    text: "text-accent-deep",
+    hex: "#0A4A40",
   },
 };

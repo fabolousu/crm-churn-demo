@@ -18,7 +18,11 @@ import {
   PageHeader,
   ProbabilityMeter,
 } from "../components/ui";
-import { initialLeadDetail } from "../lib/api";
+import {
+  fixtureBestLever,
+  initialLeadDetail,
+  isLiveApi,
+} from "../lib/api";
 import { bandForProbability } from "../lib/bands";
 import {
   formatEUR,
@@ -59,7 +63,7 @@ const LEVERS: Array<{
     key: "discount",
     title: "Change the discount",
     description:
-      "Propose a different discount. The model treats a larger discount as friction, not persuasion.",
+      "What-if only. The model treats a larger discount as friction, and the action contract cannot record a proposed discount, so this is never ranked as leverage.",
     icon: <BoltIcon className="h-4 w-4" />,
   },
 ];
@@ -70,8 +74,9 @@ export default function LeverPage() {
   const [detail, setDetail] = useState<LeadDetail | null>(() =>
     initialLeadDetail(leadId),
   );
-  const [lever, setLever] = useState<Lever>("exec");
-  const [discount, setDiscount] = useState(20);
+  const initialBest = fixtureBestLever(leadId);
+  const [lever, setLever] = useState<Lever>(initialBest?.lever ?? "exec");
+  const [discount, setDiscount] = useState(initialBest?.discount_pct ?? 20);
   const [result, setResult] = useState<CounterfactualResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -98,9 +103,46 @@ export default function LeverPage() {
   }, [leadId, loadLead]);
 
   const lead = detail?.lead;
-  const maxLeverage =
-    pipeline.items.find((item) => item.lead_id === lead?.id)?.max_leverage ??
-    null;
+  const pipelineItem = pipeline.items.find((item) => item.lead_id === lead?.id);
+  const maxLeverage = pipelineItem?.max_leverage ?? null;
+  const discountUpside = pipelineItem?.discount_upside ?? null;
+  const topByEv = useMemo(
+    () =>
+      [...pipeline.items].sort(
+        (a, b) => b.expected_value - a.expected_value,
+      )[0] ?? null,
+    [pipeline.items],
+  );
+
+  useEffect(() => {
+    const best = fixtureBestLever(leadId);
+    if (best) {
+      setLever(best.lever);
+      setDiscount(best.discount_pct ?? 20);
+    }
+  }, [leadId]);
+
+  // Live mode has no precomputed best-lever map. Compare the two committable
+  // levers and open on the stronger one; discount is deliberately excluded.
+  useEffect(() => {
+    if (!isLiveApi || !lead) return;
+    let cancelled = false;
+    Promise.all([
+      counterfactual(lead.id, { exec_sponsor_meeting: true }),
+      counterfactual(lead.id, { discovery_meeting: true }),
+    ])
+      .then(([exec, discovery]) => {
+        if (!cancelled) {
+          setLever(discovery.delta > exec.delta ? "discovery" : "exec");
+        }
+      })
+      .catch(() => {
+        // Keep the current lever; the manual controls still work.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [lead, counterfactual]);
 
   useEffect(() => {
     if (!lead) return;
@@ -348,10 +390,22 @@ export default function LeverPage() {
               {maxLeverage !== null ? formatPoints(maxLeverage) : "—"}
             </p>
             <p className="mt-2 text-[10.5px] leading-relaxed text-muted">
-              Largest achievable lift for this initiative. Across the book the
-              median best lever is {formatPoints(LEVERAGE_BOOK.median, 2)}; the
-              90th percentile is {formatPoints(LEVERAGE_BOOK.p90)}.
+              Largest <span className="font-semibold text-ink">committable</span>{" "}
+              lift for this initiative. The book median is{" "}
+              {formatPoints(LEVERAGE_BOOK.median, 2)}; the 90th percentile is{" "}
+              {formatPoints(LEVERAGE_BOOK.p90, 2)}. {LEVERAGE_BOOK.noPositive.toLocaleString("en-GB")}{" "}
+              of {LEVERAGE_BOOK.leads.toLocaleString("en-GB")} leads have no
+              positive committable move — this one is a tail case, not a
+              typical one.
             </p>
+            {topByEv ? (
+              <p className="mt-2 border-t border-accent/20 pt-2 text-[10px] leading-relaxed text-muted">
+                Biggest deal on the page:{" "}
+                <span className="font-medium text-ink">{topByEv.company_name}</span>{" "}
+                — {formatPoints(topByEv.max_leverage ?? 0)} committable,{" "}
+                {formatPoints(topByEv.discount_upside ?? 0)} discount what-if.
+              </p>
+            ) : null}
             <Link
               to="/?sort=leverage"
               className="mt-2.5 inline-flex items-center gap-1.5 text-[10.5px] font-semibold text-accent transition hover:text-accent-deep"
@@ -399,6 +453,11 @@ export default function LeverPage() {
                   <span className="min-w-0 flex-1">
                     <span className="block text-[12.5px] font-semibold text-ink">
                       {option.title}
+                      {option.key === "discount" ? (
+                        <span className="ml-2 rounded-full bg-ink/[0.07] px-1.5 py-0.5 text-[8.5px] font-semibold uppercase tracking-[0.1em] text-muted">
+                          What-if
+                        </span>
+                      ) : null}
                     </span>
                     <span className="mt-1 block text-[10.5px] leading-relaxed text-muted">
                       {option.description}
@@ -448,8 +507,18 @@ export default function LeverPage() {
                     </div>
                     <p className="mt-2 text-[10px] leading-relaxed text-muted">
                       A discount changes the score through the same model. It is
-                      not a persuasion dial: a larger discount lowers it.
+                      not a persuasion dial: a larger discount lowers it. This
+                      lever is never ranked as leverage and cannot be committed.
                     </p>
+                    {discountUpside !== null ? (
+                      <p className="mt-2 rounded-md bg-ink/[0.04] px-2 py-1.5 text-[10px] leading-relaxed text-muted">
+                        Modeled discount upside:{" "}
+                        <span className="font-semibold text-ink">
+                          {formatPoints(discountUpside)}
+                        </span>{" "}
+                        — a what-if, not an action.
+                      </p>
+                    ) : null}
                   </div>
                 ) : null}
               </div>
@@ -457,10 +526,10 @@ export default function LeverPage() {
           })}
 
           <p className="px-1 text-[10px] leading-relaxed text-muted">
-            For contrast: discount removal on{" "}
-            <span className="font-medium text-ink">Serra Gruppo</span> is worth
-            +34.9 points. It is a real effect and deliberately not the hero —
-            leading with a discount is the weakest commercial story.
+            Discount is a what-if. It is never part of{" "}
+            <code>max_leverage</code>, never the queue's leverage sort, and
+            cannot be committed as an action. The queue ranks only levers a rep
+            can actually book.
           </p>
 
           <InlineNotice className="mt-1">
@@ -487,7 +556,7 @@ export default function LeverPage() {
         </p>
         <p>
           <span className="font-semibold text-ink">Not a promise.</span> A{" "}
-          {formatPercent(current, 0)} score means about {Math.round(current * 10)}{" "}
+          {formatPercent(current, 1)} score means about {Math.round(current * 10)}{" "}
           in 10 comparable initiatives win — not this one for certain.
         </p>
       </div>

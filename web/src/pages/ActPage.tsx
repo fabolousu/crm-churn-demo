@@ -300,7 +300,7 @@ export default function ActPage() {
                 Win probability
               </p>
               <p className="mt-1 font-display text-[26px] leading-none tabular-nums text-ink">
-                {formatPercent(selected.probability)}
+                {formatPercent(selected.probability, 1)}
               </p>
               <div className="mt-1.5">
                 <BandPill band={selected.band} compact />

@@ -1,0 +1,179 @@
+{
+  "C006963": {
+    "company": {
+      "id": "C006963",
+      "name": "Moretti Componenti S.a.s.",
+      "region": "nord-est",
+      "industry": "Energia",
+      "employees": 106,
+      "created_at": "2008-05-16"
+    },
+    "initiatives": [
+      {
+        "id": "L021037",
+        "status": "new",
+        "source": "outbound",
+        "created_at": "2025-08-03",
+        "closed_at": null,
+        "amount_arr": 237400,
+        "discount_pct": 3.6,
+        "lost_reason": null
+      },
+      {
+        "id": "L021036",
+        "status": "won",
+        "source": "outbound",
+        "created_at": "2024-08-25",
+        "closed_at": "2024-09-18",
+        "amount_arr": 14200,
+        "discount_pct": 12.2,
+        "lost_reason": null
+      }
+    ],
+    "signals": {
+      "dormant": false,
+      "days_since_last_initiative": 150,
+      "won": 1,
+      "lost": 0,
+      "lifetime_won_arr": 14200
+    }
+  },
+  "C007199": {
+    "company": {
+      "id": "C007199",
+      "name": "Russo Industrie S.p.A.",
+      "region": "sud",
+      "industry": "Energia",
+      "employees": 132,
+      "created_at": "2020-06-30"
+    },
+    "initiatives": [
+      {
+        "id": "L021729",
+        "status": "qualified",
+        "source": "outbound",
+        "created_at": "2025-11-21",
+        "closed_at": null,
+        "amount_arr": 112000,
+        "discount_pct": 0,
+        "lost_reason": null
+      },
+      {
+        "id": "L021728",
+        "status": "new",
+        "source": "outbound",
+        "created_at": "2025-10-07",
+        "closed_at": null,
+        "amount_arr": 43500,
+        "discount_pct": 0,
+        "lost_reason": null
+      },
+      {
+        "id": "L021727",
+        "status": "contacted",
+        "source": "outbound",
+        "created_at": "2025-02-17",
+        "closed_at": null,
+        "amount_arr": 22700,
+        "discount_pct": 3.1,
+        "lost_reason": null
+      },
+      {
+        "id": "L021726",
+        "status": "won",
+        "source": "inbound",
+        "created_at": "2024-09-01",
+        "closed_at": "2024-12-13",
+        "amount_arr": 28500,
+        "discount_pct": 0,
+        "lost_reason": null
+      },
+      {
+        "id": "L021725",
+        "status": "new",
+        "source": "outbound",
+        "created_at": "2024-06-25",
+        "closed_at": null,
+        "amount_arr": 32000,
+        "discount_pct": 6.6,
+        "lost_reason": null
+      },
+      {
+        "id": "L021724",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2024-05-22",
+        "closed_at": "2024-06-21",
+        "amount_arr": 33400,
+        "discount_pct": 7.8,
+        "lost_reason": "no_budget"
+      },
+      {
+        "id": "L021723",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2024-03-29",
+        "closed_at": "2024-05-02",
+        "amount_arr": 16500,
+        "discount_pct": 0,
+        "lost_reason": "price"
+      }
+    ],
+    "signals": {
+      "dormant": false,
+      "days_since_last_initiative": 40,
+      "won": 1,
+      "lost": 2,
+      "lifetime_won_arr": 28500
+    }
+  },
+  "C000006": {
+    "company": {
+      "id": "C000006",
+      "name": "Fontana Packaging S.n.c.",
+      "region": "sud",
+      "industry": "Farmaceutica",
+      "employees": 62,
+      "created_at": "2010-09-20"
+    },
+    "initiatives": [
+      {
+        "id": "L000010",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2025-08-01",
+        "closed_at": "2025-10-28",
+        "amount_arr": 67400,
+        "discount_pct": 18.9,
+        "lost_reason": "competitor"
+      },
+      {
+        "id": "L000009",
+        "status": "won",
+        "source": "outbound",
+        "created_at": "2025-07-12",
+        "closed_at": "2025-09-09",
+        "amount_arr": 57100,
+        "discount_pct": 11.4,
+        "lost_reason": null
+      },
+      {
+        "id": "L000008",
+        "status": "contacted",
+        "source": "inbound",
+        "created_at": "2025-04-21",
+        "closed_at": null,
+        "amount_arr": 19800,
+        "discount_pct": 0,
+        "lost_reason": null
+      }
+    ],
+    "signals": {
+      "dormant": false,
+      "days_since_last_initiative": 152,
+      "won": 1,
+      "lost": 1,
+      "lifetime_won_arr": 57100
+    }
+  }
+}
