@@ -18,6 +18,7 @@ from __future__ import annotations
 import hashlib
 import math
 import re
+import random
 import sqlite3
 import subprocess
 import sys
@@ -25,6 +26,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
+
+from data import generator
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 GENERATOR = REPO_ROOT / "data" / "generator.py"
@@ -499,6 +502,26 @@ def test_leads_first_response_at_consistency(demo_db: Path) -> None:
         ) > 0
 
 
+def test_answered_email_matches_first_response(demo_db: Path) -> None:
+    with connect(demo_db) as connection:
+        assert scalar(connection, """
+            SELECT COUNT(*) FROM interactions i JOIN leads l ON l.id = i.lead_id
+            WHERE i.kind = 'email' AND i.direction = 'inbound' AND i.answered = 1
+              AND (l.first_response_at IS NULL OR i.occurred_at < l.first_response_at)
+        """) == 0
+        assert scalar(connection, """
+            SELECT COUNT(*) FROM leads l
+            LEFT JOIN (
+                SELECT lead_id, MIN(occurred_at) AS first_answer
+                FROM interactions
+                WHERE kind = 'email' AND direction = 'inbound' AND answered = 1
+                GROUP BY lead_id
+            ) i ON i.lead_id = l.id
+            WHERE l.first_response_at IS NOT NULL
+              AND (i.first_answer IS NULL OR i.first_answer <> l.first_response_at)
+        """) == 0
+
+
 def test_raw_point_in_time_temporal_coherence(demo_db: Path) -> None:
     with connect(demo_db) as connection:
         # A lead can never exist before its company.
@@ -534,6 +557,12 @@ def test_raw_point_in_time_temporal_coherence(demo_db: Path) -> None:
             assert scalar(
                 connection, f"SELECT COUNT(*) FROM leads WHERE {condition}"
             ) == 0, condition
+
+        assert scalar(
+            connection,
+            "SELECT COUNT(*) FROM leads WHERE status = 'proposal' "
+            "AND proposal_at IS NULL",
+        ) == 0
 
         # Status/timestamp agreement.  Closed-without-qualified is allowed only
         # for the early-stage rep-history seeds, which never enter the label.
@@ -754,11 +783,11 @@ def test_no_nan_in_numeric_columns(demo_db: Path) -> None:
                 )
                 if not nullable:
                     assert null_count == 0, f"{table}.{column_name} is NULL"
-                sample = connection.execute(
+                values = connection.execute(
                     f"SELECT {column_name} FROM {table} "
-                    f"WHERE {column_name} IS NOT NULL LIMIT 200"
-                ).fetchall()
-                for (value,) in sample:
+                    f"WHERE {column_name} IS NOT NULL"
+                )
+                for (value,) in values:
                     assert isinstance(value, (int, float)), (
                         f"{table}.{column_name} contains non-numeric {value!r}"
                     )
@@ -797,6 +826,17 @@ def test_determinism(demo_db: Path, tmp_path: Path) -> None:
         assert _table_hash(first, "lead_outcomes", "lead_id") == _table_hash(
             second, "lead_outcomes", "lead_id"
         )
+        for table, primary_key in (
+            ("company_usage_weekly", "company_id, week_start"),
+            ("tickets", "id"),
+            ("invoices", "id"),
+            ("nps_surveys", "company_id, surveyed_at"),
+            ("interactions", "id"),
+        ):
+            assert _table_hash(first, table, primary_key) == _table_hash(
+                second, table, primary_key
+            ), table
+
 
 
 # ---------------------------------------------------------------------------
@@ -844,3 +884,79 @@ def _table_hash(connection: sqlite3.Connection, table: str, key: str) -> str:
         digest.update(repr(tuple(row)).encode("utf-8"))
         digest.update(b"\n")
     return digest.hexdigest()
+
+
+@pytest.fixture
+def small_world():
+    company = generator.generate_companies(random.Random(42), 1)[0]
+    world = generator.RawWorld(
+        companies=[company], company_by_id={company.id: company},
+        company_leads={company.id: []}, usage_by_company={company.id: {}},
+        week_starts=[], tickets_by_company={}, invoices_by_company={},
+        nps_by_company={}, meetings_by_lead={},
+    )
+    return company, world
+
+
+@pytest.mark.parametrize("resolution", [float("nan"), float("inf"), -float("inf")])
+def test_invalid_ticket_preserves_existing_database(tmp_path, small_world, resolution):
+    company, world = small_world
+    destination = tmp_path / "existing.db"
+    # A failure after schema creation must preserve even a non-SQLite destination.
+    destination.write_bytes(b"existing database")
+    tickets = [
+        (f"T{i}", company.id, T0, T0, "low", 0.0) for i in range(201)
+    ]
+    tickets.append(("invalid", company.id, T0, T0, "low", resolution))
+    with pytest.raises(ValueError, match="resolution_hours must be finite"):
+        generator.write_database(
+            destination, [company], [], world, [], tickets, [], [], overwrite=True
+        )
+    assert destination.read_bytes() == b"existing database"
+    assert list(tmp_path.iterdir()) == [destination]
+
+
+def test_nullable_resolution_and_failed_publication(tmp_path, small_world, monkeypatch):
+    company, world = small_world
+    destination = tmp_path / "existing.db"
+    tickets = [("T1", company.id, T0, None, "low", None)]
+    generator.write_database(destination, [company], [], world, [], tickets, [], [])
+    original = destination.read_bytes()
+
+    def fail_replace(source, target):
+        # The replacement is a committed database before publication.
+        with sqlite3.connect(source) as connection:
+            assert connection.execute("SELECT COUNT(*) FROM tickets").fetchone()[0] == 1
+        raise OSError("publication failed")
+
+    monkeypatch.setattr(generator.os, "replace", fail_replace)
+    with pytest.raises(OSError, match="publication failed"):
+        generator.write_database(
+            destination, [company], [], world, [], tickets, [], [], overwrite=True
+        )
+    assert destination.read_bytes() == original
+    assert list(tmp_path.iterdir()) == [destination]
+
+
+def test_signed_payment_delays(small_world):
+    company, world = small_world
+    lead = generator.Lead(
+        id="L1", company_id=company.id, created_at=T0_DT - timedelta(days=200),
+        source="inbound", owner_rep=company.owner_rep, first_response_hours=None,
+        first_response_at=None, qualified_at=None, proposal_at=None, closed_at=None,
+        amount_arr=1000.0, discount_pct=0.0,
+    )
+    due = T0_DT - timedelta(days=10)
+    world.invoices_by_company[company.id] = [
+        (due, due - timedelta(days=6)),  # early: -6
+        (due, due),  # on time: 0
+        (due, due + timedelta(days=2)),  # late: 2
+        (due, None),  # unpaid: 10
+        (due, T0_DT + timedelta(days=1)),  # future payment: 10
+        (T0_DT - timedelta(days=181), None),  # outside window
+        (T0_DT + timedelta(days=1), None),  # not due yet
+    ]
+    values = generator.compute_feature_values(
+        lead, company, T0_DT, "qualified", world, {}, {}
+    )
+    assert values["payment_delay_days_avg_180d"] == 3.2

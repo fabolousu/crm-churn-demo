@@ -43,20 +43,19 @@ Run::
     python data/generator.py --overwrite  # replace an existing demo.db
     python data/generator.py --db data/demo.db --seed 42 --companies 20000
 
-Known limitation (deferred, recorded on purpose): the database is written in
-place, so replacement is not atomic.  A crash leaves a partial ``demo.db`` and
-costs one rerun of a deterministic generator.  The existence check and unlink
-are also a TOCTOU window if two runs target the same path.  ``temp file +
-os.replace`` closes both; it is deliberately deferred, not forgotten.
+Database replacements are built in a sibling temporary file and published only
+after committing and closing the replacement.
 """
 
 from __future__ import annotations
 
 import argparse
 import math
+import os
 import random
 import sqlite3
 import sys
+import tempfile
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
@@ -991,6 +990,10 @@ def generate_interactions(
             occurred_at = random_dt(rng, lead.created_at, life_end)
             direction = "inbound" if rng.random() < 0.55 else "outbound"
             answered = 1 if rng.random() < 0.60 else 0
+            if direction == "inbound" and (
+                lead.first_response_at is None or occurred_at < lead.first_response_at
+            ):
+                answered = 0
             add(lead, "email", direction, occurred_at, answered)
 
         if (
@@ -1088,6 +1091,7 @@ def compute_feature_values(
     nps_value = nps_last
 
     low_180 = snapshot - timedelta(days=180)
+    # Signed calendar days: early payments are negative (LABEL.md).
     delays: list[int] = []
     for due_at, paid_at in world.invoices_by_company.get(company.id, []):
         if low_180 <= due_at <= snapshot:
@@ -1334,13 +1338,14 @@ def write_database(
         )
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    for suffix in ("", "-journal", "-wal", "-shm"):
-        candidate = Path(f"{db_path}{suffix}")
-        if candidate.exists():
-            candidate.unlink()
-
-    connection = sqlite3.connect(str(db_path.absolute()))
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{db_path.name}.", suffix=".tmp", dir=db_path.parent
+    )
+    os.close(descriptor)
+    temporary_path = Path(temporary_name)
+    connection: sqlite3.Connection | None = None
     try:
+        connection = sqlite3.connect(str(temporary_path.absolute()))
         connection.execute("PRAGMA foreign_keys = ON")
         connection.execute("PRAGMA synchronous = OFF")
         connection.execute("PRAGMA journal_mode = MEMORY")
@@ -1411,6 +1416,11 @@ def write_database(
             usage_batch,
         )
 
+        # SQLite converts NaN to NULL, so validate before binding nullable values.
+        for ticket in ticket_rows:
+            resolution = ticket[5]
+            if resolution is not None and not math.isfinite(resolution):
+                raise ValueError("ticket resolution_hours must be finite or None")
         insert_rows(
             connection,
             "INSERT INTO tickets VALUES (?, ?, ?, ?, ?, ?)",
@@ -1448,11 +1458,17 @@ def write_database(
         )
 
         connection.commit()
-    except Exception:
-        connection.rollback()
-        raise
-    finally:
         connection.close()
+        connection = None
+        if overwrite:
+            os.replace(temporary_path, db_path)
+        else:
+            # Publish without clobbering a destination created during the build.
+            os.link(temporary_path, db_path)
+    finally:
+        if connection is not None:
+            connection.close()
+        temporary_path.unlink(missing_ok=True)
 
 
 # ---------------------------------------------------------------------------

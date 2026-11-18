@@ -131,6 +131,23 @@ more human variance. Anyone who claims 0.95 on this task is measuring their own 
 | `meetings_before_scoring` | Meetings on this lead so far | int |
 | `owner_win_rate_180d` | Win rate of the assigned rep over the 180 days before the snapshot, **excluding the scored lead's own closure** | float |
 
+<!-- coderabbit-ai-generated:v1 -->
+
+<!-- coderabbit-ai-generated-section:v1:86073ea33b398afcb6902631eeb4593f1936a255aa135c0091ef63f005666b0d -->
+
+### Payment delay convention
+
+`payment_delay_days_avg_180d` uses signed calendar days for invoices due in the
+inclusive window `[snapshot_date - 180 days, snapshot_date]`. For invoices paid by
+the snapshot, use `date(paid_at) - date(due_at)`; otherwise use
+`date(snapshot_date) - date(due_at)`, including payments made after the snapshot.
+Negative means paid early, zero means paid on the due date (or due today and
+unpaid), and positive means late. Average all eligible invoices equally, including
+negative and zero delays, and round to two decimals. Return NULL if none qualify.
+The generator and feature materializer must both follow this convention.
+
+<!-- /coderabbit-ai-generated:v1 -->
+
 ### Conventions that must not drift
 
 1. **Snapshot-relative, not record-relative.** `days_since_last_initiative` measures from the
