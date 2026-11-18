@@ -1,0 +1,17 @@
+# CodeRabbit GitHub App configuration.
+#
+# The app auto-pauses after `auto_pause_after_reviewed_commits` reviewed commits (default 5)
+# to avoid comment storms on fast-moving branches. This build pushes a fix commit per review
+# round, so both PRs #1 and #2 tripped it: the check then reports `skipped` with the title
+# "Review paused" and every step skipped, which reads like a no-op rather than a pause.
+#
+# 0 disables the pause.
+#
+# Note what this implies for a multi-agent build: the GitHub App is not a reliable gate when
+# branches move quickly — by design, it stops reviewing. The CLI gate (tools/review.ps1) has
+# no such behaviour, runs on the exact commit, and returns blocking exit codes, so it is the
+# enforcing layer. The app exists for the human-visible comment thread.
+
+reviews:
+  auto_review:
+    auto_pause_after_reviewed_commits: 0
