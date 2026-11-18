@@ -647,8 +647,33 @@ def create_app(
         # health say "degraded" and the model-backed endpoints fail loudly.
         try:
             bundle = load_bundle(application.state.model_path)
+            required = {"model", "model_version", "features", "numeric_features",
+                        "categorical_features", "categories"}
+            if not isinstance(bundle, dict) or required - bundle.keys():
+                raise ValueError("model bundle is missing required fields")
+            if not isinstance(bundle["model_version"], str) or not bundle["model_version"]:
+                raise ValueError("model bundle has no model version")
+            for field in ("features", "numeric_features", "categorical_features"):
+                values = bundle[field]
+                if not isinstance(values, (list, tuple)) or any(
+                    not isinstance(value, str) or not value for value in values
+                ) or len(values) != len(set(values)):
+                    raise ValueError(f"model bundle has invalid {field}")
+            if not bundle["features"] or not isinstance(bundle["categories"], dict):
+                raise ValueError("model bundle has an invalid feature contract")
+            if set(bundle["features"]) != (
+                set(bundle["numeric_features"]) | set(bundle["categorical_features"])
+            ) or set(bundle["categories"]) != set(bundle["categorical_features"]):
+                raise ValueError("model bundle feature fields disagree")
+            if any(
+                not isinstance(levels, (list, tuple))
+                or any(not isinstance(level, str) for level in levels)
+                for levels in bundle["categories"].values()
+            ) or not callable(getattr(bundle["model"], "predict", None)):
+                raise ValueError("model bundle has invalid categories or model")
+            explainer = Explainer(bundle)
             application.state.bundle = bundle
-            application.state.explainer = Explainer(bundle)
+            application.state.explainer = explainer
         except Exception as exc:  # noqa: BLE001 - surfaced through /api/health
             application.state.load_error = f"{type(exc).__name__}: {exc}"
         yield
