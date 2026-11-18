@@ -190,9 +190,12 @@ def test_open_lead_detail_matches_contract(api: TestClient, demo_db: Path) -> No
     assert response.status_code == 200
     body = response.json()
     _validate(body, _response_schema("/api/leads/{lead_id}"))
-    # max_leverage is declared by the contract as nullable; an open lead must serve a number.
+    # max_leverage is declared by the contract as nullable; an open lead must serve a number,
+    # and discount_upside is a separate preview that may be larger.
     assert isinstance(body["max_leverage"], (int, float))
     assert 0.0 <= body["max_leverage"] <= 1.0
+    assert isinstance(body["discount_upside"], (int, float))
+    assert body["discount_upside"] >= 0.0
 
 
 def test_closed_lead_detail_matches_contract(api: TestClient, demo_db: Path) -> None:
@@ -202,15 +205,18 @@ def test_closed_lead_detail_matches_contract(api: TestClient, demo_db: Path) -> 
     body = response.json()
     _validate(body, _response_schema("/api/leads/{lead_id}"))
     assert body["max_leverage"] is None, "the contract declares max_leverage null for closed leads"
+    assert body["discount_upside"] is None
 
 
-def test_pipeline_items_declare_their_max_leverage(api: TestClient) -> None:
+def test_pipeline_items_declare_their_leverage(api: TestClient) -> None:
     body = api.get("/api/pipeline", params={"limit": 5}).json()
     assert body["items"]
     for item in body["items"]:
-        # PipelineItem.max_leverage is declared nullable, but an open lead is actionable.
+        # Both fields are declared nullable, but an open lead is actionable and has a preview.
         assert isinstance(item["max_leverage"], (int, float))
         assert 0.0 <= item["max_leverage"] <= 1.0
+        assert isinstance(item["discount_upside"], (int, float))
+        assert item["discount_upside"] >= 0.0
 
 
 def test_stored_drivers_parse_to_the_driver_shape(api: TestClient, demo_db: Path) -> None:

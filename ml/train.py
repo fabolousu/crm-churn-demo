@@ -55,8 +55,10 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import shutil
 import sqlite3
 import sys
+import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
@@ -502,13 +504,15 @@ def record_model_run(
     artifact_path: str,
 ) -> None:
     """Upsert one ``model_runs`` row so the demo can show which model scored the pipeline."""
+    owned = not connection.in_transaction
     connection.execute("DELETE FROM model_runs WHERE model_version = ?", (model_version,))
     connection.execute(
         "INSERT INTO model_runs (model_version, trained_at, metrics_json, artifact_path) "
         "VALUES (?, ?, ?, ?)",
         (model_version, trained_at, json.dumps(dict(metrics), ensure_ascii=False), artifact_path),
     )
-    connection.commit()
+    if owned:
+        connection.commit()
 
 
 # --------------------------------------------------------------------------------------
@@ -614,6 +618,9 @@ def run(
     metrics_path = artifact_dir / "metrics.json"
     shap_path = artifact_dir / "shap_sample.parquet"
 
+    staging = tempfile.TemporaryDirectory(prefix=".training-", dir=artifact_dir)
+    staged_dir = pathlib.Path(staging.name)
+    published: list[pathlib.Path] = []
     connection = connect(db_path)
     try:
         features = read_features(connection)
@@ -642,7 +649,7 @@ def run(
 
         model = fit_model(split.train, categories, rounds=rounds, params=params)
         bundle = bundle_from_model(model, categories)
-        joblib.dump(bundle, model_path)
+        joblib.dump(bundle, staged_dir / model_path.name)
 
         validation_probabilities = predict(bundle, split.validation)
         validation_labels = split.validation["won"].to_numpy()
@@ -667,10 +674,11 @@ def run(
 
         scores = score_open_leads(features, open_ids, bundle)
         scored_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+        connection.execute("BEGIN IMMEDIATE")
         scored_rows = write_scores(connection, scores, scored_at)
 
         shap_sample = build_shap_sample(bundle, split.validation, limit=shap_leads)
-        shap_sample.to_parquet(shap_path, index=False, compression="zstd")
+        shap_sample.to_parquet(staged_dir / shap_path.name, index=False, compression="zstd")
 
         metrics: dict[str, Any] = {
             # the four the gate and the pitch read -- all on the temporal validation split
@@ -706,7 +714,7 @@ def run(
         }
         # newline="\n" so the committed artifact is byte-identical whether it is regenerated on
         # Windows or Linux: the demo's "same seed, same bytes" claim should not depend on the OS.
-        with metrics_path.open("w", encoding="utf-8", newline="\n") as handle:
+        with (staged_dir / metrics_path.name).open("w", encoding="utf-8", newline="\n") as handle:
             handle.write(json.dumps(metrics, indent=2, ensure_ascii=False) + "\n")
         record_model_run(
             connection,
@@ -715,8 +723,27 @@ def run(
             metrics=metrics,
             artifact_path=_display_path(model_path),
         )
+        # All outputs are ready. Keep the previous generation until the database commit
+        # succeeds, so publication or commit errors can restore the complete old batch.
+        for path in (model_path, shap_path, metrics_path):
+            if path.exists():
+                shutil.copy2(path, staged_dir / (path.name + ".previous"))
+        for path in (model_path, shap_path, metrics_path):
+            (staged_dir / path.name).replace(path)
+            published.append(path)
+        connection.commit()
+    except BaseException:
+        connection.rollback()
+        for path in reversed(published):
+            previous = staged_dir / (path.name + ".previous")
+            if previous.exists():
+                previous.replace(path)
+            else:
+                path.unlink()
+        raise
     finally:
         connection.close()
+        staging.cleanup()
 
     if verbose:
         print(

@@ -506,43 +506,97 @@ def test_closed_lead_gets_a_consistent_score_on_its_360(
     assert detail["max_leverage"] is None, (
         "a closed lead is not actionable; its lead 360 must not promise a lever"
     )
+    assert detail["discount_upside"] is None
 
 
-def test_lead_detail_max_leverage_is_the_best_lever(
+def test_lead_detail_max_leverage_is_a_committable_lever(
     api: TestClient, bundle: dict, demo_db: Path
 ) -> None:
     lead_id = open_lead_ids(demo_db)[0]
     _, deltas = expected_leverage(bundle, feature_row(demo_db, lead_id))
-    best = max(max(deltas.values()), 0.0)
+    best_committable = max(
+        deltas["exec_sponsor_meeting"], deltas["discovery_meeting"], 0.0
+    )
 
     detail = api.get(f"/api/leads/{lead_id}").json()
-    assert detail["max_leverage"] is not None
-    assert detail["max_leverage"] == pytest.approx(best, abs=1e-9)
+    assert detail["max_leverage"] == pytest.approx(best_committable, abs=1e-9)
     assert detail["max_leverage"] >= 0.0
 
-    # The summary field must agree with the counterfactual endpoint it is computed from.
-    endpoint_deltas = []
-    for body in (
-        {"exec_sponsor_meeting": True},
-        {"discovery_meeting": True},
-        {"discount_pct": 0},
+    # The field must be reachable through one of the two action-backed levers, and the
+    # discount preview must match its own counterfactual without contaminating max_leverage.
+    endpoint_deltas: dict[str, float] = {}
+    for name, body in (
+        ("exec", {"exec_sponsor_meeting": True}),
+        ("discovery", {"discovery_meeting": True}),
+        ("discount", {"discount_pct": 0}),
     ):
         response = api.post(f"/api/leads/{lead_id}/counterfactual", json=body)
         assert response.status_code == 200
-        endpoint_deltas.append(response.json()["delta"])
-    assert max(endpoint_deltas) == pytest.approx(detail["max_leverage"], abs=1e-9)
+        endpoint_deltas[name] = response.json()["delta"]
+
+    assert max(endpoint_deltas["exec"], endpoint_deltas["discovery"], 0.0) == (
+        pytest.approx(detail["max_leverage"], abs=1e-9)
+    )
+    assert endpoint_deltas["discount"] == pytest.approx(
+        detail["discount_upside"], abs=1e-9
+    )
 
 
-def test_pipeline_items_carry_the_same_max_leverage_as_the_lead_360(
+def test_discount_upside_is_a_preview_and_may_exceed_committable_leverage(
+    api: TestClient, bundle: dict, demo_db: Path
+) -> None:
+    """Discount is not committable (ActionRequest has no discount value), so it is separate.
+
+    Two shapes must both exist in the fixture: a lead whose only move is discount
+    (``max_leverage`` near zero, ``discount_upside`` positive) and one where the preview
+    exceeds anything a rep can book.
+    """
+    discount_only: str | None = None
+    exceeds: str | None = None
+    for lead_id in open_lead_ids(demo_db):
+        row = feature_row(demo_db, lead_id)
+        _, deltas = expected_leverage(bundle, row)
+        committable = max(
+            deltas["exec_sponsor_meeting"], deltas["discovery_meeting"], 0.0
+        )
+        upside = max(deltas["discount_pct"], 0.0)
+        if discount_only is None and committable < 1e-9 and upside > 1e-6:
+            discount_only = lead_id
+        if exceeds is None and upside > committable + 1e-6:
+            exceeds = lead_id
+        if discount_only is not None and exceeds is not None:
+            break
+
+    assert discount_only is not None, (
+        "the fixture must contain a lead where only the non-committable discount move helps"
+    )
+    assert exceeds is not None, (
+        "the fixture must contain a lead where discount upside exceeds committable leverage"
+    )
+
+    only_discount = api.get(f"/api/leads/{discount_only}").json()
+    assert only_discount["max_leverage"] == pytest.approx(0.0, abs=1e-9)
+    assert only_discount["discount_upside"] > 0.0
+
+    preview = api.get(f"/api/leads/{exceeds}").json()
+    assert preview["discount_upside"] > preview["max_leverage"]
+
+
+def test_pipeline_items_carry_the_same_leverage_as_the_lead_360(
     api: TestClient, demo_db: Path
 ) -> None:
     items = api.get("/api/pipeline", params={"limit": 3}).json()["items"]
     assert items
     for item in items:
         assert item["max_leverage"] is not None
+        assert item["discount_upside"] is not None
         assert item["max_leverage"] >= 0.0
+        assert item["discount_upside"] >= 0.0
         detail = api.get(f"/api/leads/{item['lead_id']}").json()
         assert item["max_leverage"] == pytest.approx(detail["max_leverage"], abs=1e-12)
+        assert item["discount_upside"] == pytest.approx(
+            detail["discount_upside"], abs=1e-12
+        )
 
 
 def test_company_360_lists_initiatives_most_recent_first(api: TestClient, demo_db: Path) -> None:

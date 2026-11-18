@@ -691,3 +691,57 @@ def test_scrambling_latent_p_does_not_move_a_single_prediction(
     # the model did not.
     assert scrambled["latent_auc"] == pytest.approx(0.5, abs=1e-9)
     assert scrambled["auc"] == pytest.approx(trained["metrics"]["auc"])
+
+
+@pytest.mark.parametrize("failure", ["model", "shap", "metrics", "scores", "run", "publish", "commit"])
+def test_failed_retraining_preserves_generation(trained, tmp_path, monkeypatch, failure):
+    db = tmp_path / "demo.db"
+    artifacts = tmp_path / "artifacts"
+    shutil.copyfile(trained["db_path"], db)
+    shutil.copytree(trained["artifact_dir"], artifacts)
+    before = {path.name: path.read_bytes() for path in artifacts.iterdir()}
+    with sqlite3.connect(db) as connection:
+        old_scores = connection.execute("SELECT * FROM lead_scores").fetchall()
+        old_runs = connection.execute("SELECT * FROM model_runs").fetchall()
+
+    def fail(*args, **kwargs):
+        raise OSError("injected write failure")
+
+    if failure == "model":
+        monkeypatch.setattr(train.joblib, "dump", fail)
+    elif failure == "shap":
+        monkeypatch.setattr(pd.DataFrame, "to_parquet", fail)
+    elif failure == "metrics":
+        original = Path.open
+        def open_path(path, *args, **kwargs):
+            if path.name == "metrics.json" and args and args[0] == "w":
+                fail()
+            return original(path, *args, **kwargs)
+        monkeypatch.setattr(Path, "open", open_path)
+    elif failure in ("scores", "run"):
+        name = "write_scores" if failure == "scores" else "record_model_run"
+        original = getattr(train, name)
+        def write_then_fail(*args, **kwargs):
+            original(*args, **kwargs)
+            fail()
+        monkeypatch.setattr(train, name, write_then_fail)
+    elif failure == "publish":
+        original = Path.replace
+        def replace(path, target):
+            if path.name == "metrics.json":
+                fail()
+            return original(path, target)
+        monkeypatch.setattr(Path, "replace", replace)
+    else:
+        class FailedCommit(sqlite3.Connection):
+            def commit(self):
+                fail()
+        monkeypatch.setattr(train, "connect", lambda path: sqlite3.connect(path, factory=FailedCommit))
+
+    with pytest.raises(OSError, match="injected"):
+        train.run(db, artifacts, rounds=TINY_ROUNDS, shap_leads=10,
+                  params=TINY_PARAMS, verbose=False)
+    assert {path.name: path.read_bytes() for path in artifacts.iterdir()} == before
+    with sqlite3.connect(db) as connection:
+        assert connection.execute("SELECT * FROM lead_scores").fetchall() == old_scores
+        assert connection.execute("SELECT * FROM model_runs").fetchall() == old_runs

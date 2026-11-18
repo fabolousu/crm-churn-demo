@@ -47,11 +47,12 @@ Interpretations where the contract is silent (reported in the PR, contract untou
       Thresholds are the conventional 0.10 / 0.25. The response also carries the split's
       summary -- ``train_mean``, ``holdout_mean``, ``train_win_rate``, ``holdout_win_rate``
       -- so the executive screen never hardcodes a number the pipeline can compute.
-    * ``max_leverage`` is the largest single-action delta reachable with the three contract
-      levers (exec sponsor meeting, discovery meeting, discount to 0%). It is an **additive
-      extension**: ``api/openapi.yaml`` is deliberately untouched, so the schema still
-      validates these responses (additional properties are allowed) while lane D is told to
-      read the field. See the PR for why the contract owner may want to adopt it formally.
+    * ``max_leverage`` is the largest delta reachable by a lever a rep can **commit** through
+      ``POST /api/leads/{id}/actions`` -- an executive sponsor meeting or a discovery meeting.
+      Discount is excluded because ``ActionRequest`` carries no discount value: the hazard's
+      discount coefficient describes price-sensitive accounts being worth less, not a deal
+      that un-discounting saves. ``discount_upside`` reports that pricing what-if separately
+      and is explicitly a preview; it may exceed ``max_leverage`` and cannot be booked.
     * ``/api/health`` reports ``degraded`` when the artifact cannot be loaded or
       ``lead_scores`` is empty; it still answers, so the demo's liveness probe is honest
       about a half-built environment instead of returning a 500.
@@ -158,9 +159,10 @@ class PipelineItem(BaseModel):
     expected_value: float
     days_open: int
     top_driver: Driver
-    # Additive extension to the contract: the biggest single-lever gain for this lead. See
-    # the module docstring -- api/openapi.yaml is intentionally untouched.
+    # The two leverage fields the contract declares: max_leverage is committable (executive
+    # sponsor or discovery meeting), discount_upside is a preview of removing the discount.
     max_leverage: float | None = None
+    discount_upside: float | None = None
 
 
 class PipelineResponse(BaseModel):
@@ -211,9 +213,10 @@ class LeadDetail(BaseModel):
     drivers: list[Driver]
     prior_initiatives: list[Lead]
     open_actions: list[Action]
-    # Additive extension: the biggest single-lever delta available on this lead. See the
-    # module docstring -- api/openapi.yaml is intentionally untouched.
+    # Contract-declared leverage. ``max_leverage`` is reachable by an action a rep can
+    # commit; ``discount_upside`` is a preview what-if (no ActionRequest carries a discount).
     max_leverage: float | None = None
+    discount_upside: float | None = None
 
 
 class CompanySummary(BaseModel):
@@ -550,14 +553,14 @@ def _lever_from_action(kind: str) -> dict[str, Any]:
     return {}
 
 
-def _leverage_variants(frame: pd.DataFrame) -> dict[str, pd.DataFrame]:
-    """The three contract levers, each at its most favourable value.
+def _committable_levers(frame: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    """The two levers a rep can commit through ``POST /api/leads/{id}/actions``.
 
-    Every lever is one-directional in the hazard (``docs/LABEL.md``): a meeting and an NPS
-    lift can only raise the win probability, and a discount can only lower it -- so the
-    strongest discount lever is 0%. ``max_leverage`` is therefore the ceiling one simulated
-    action can reach, not a tuned number. ``nps_last`` stays ``NaN`` when it was never
-    measured, for the same reason the counterfactual leaves it unset.
+    ``exec_sponsor_meeting`` adds a meeting and the documented +5 NPS; ``discovery_meeting``
+    adds a meeting. ``nps_last`` stays ``NaN`` when it was never measured, exactly as the
+    counterfactual leaves it. Discount is deliberately absent: ``ActionRequest`` carries no
+    discount value, so a discount move cannot be booked, and the hazard's discount
+    coefficient describes price-sensitive accounts being worth less -- not a saveable deal.
     """
     variants: dict[str, pd.DataFrame] = {}
 
@@ -576,30 +579,46 @@ def _leverage_variants(frame: pd.DataFrame) -> dict[str, pd.DataFrame]:
         + 1.0
     )
     variants["discovery_meeting"] = discovery
-
-    discount = frame.copy()
-    discount["discount_pct"] = 0.0
-    variants["discount_pct"] = discount
-
     return variants
 
 
-def _max_leverage_deltas(bundle: Mapping[str, Any], frame: pd.DataFrame) -> np.ndarray:
-    """Largest single-lever probability gain per row, in probability (not log-odds) units."""
+def _discount_variant(frame: pd.DataFrame) -> pd.DataFrame:
+    """The preview lever: remove the current discount entirely (``discount_pct -> 0``)."""
+    variant = frame.copy()
+    variant["discount_pct"] = 0.0
+    return variant
+
+
+def _leverage_deltas(
+    bundle: Mapping[str, Any], frame: pd.DataFrame
+) -> tuple[np.ndarray, np.ndarray]:
+    """``(max committable delta, discount preview upside)`` per row, clipped to ``[0, 1]``.
+
+    Committable leverage takes the best of the two action-backed levers. Discount upside is
+    reported separately and may exceed it: it is a what-if for pricing, not an action anyone
+    can record. Doing nothing is always available, hence the zero floor on both.
+    """
     current = predict(bundle, frame)
     best = np.zeros(len(frame), dtype="float64")
-    for variant in _leverage_variants(frame).values():
+    for variant in _committable_levers(frame).values():
         best = np.maximum(best, predict(bundle, variant) - current)
-    return np.clip(best, 0.0, 1.0)
+    discount = predict(bundle, _discount_variant(frame)) - current
+    return np.clip(best, 0.0, 1.0), np.clip(discount, 0.0, 1.0)
 
 
-def _max_leverage_delta(bundle: Mapping[str, Any], feature_row: Mapping[str, Any]) -> float:
+def _leverage_for_row(
+    bundle: Mapping[str, Any], feature_row: Mapping[str, Any]
+) -> tuple[float, float]:
     frame = pd.DataFrame([dict(feature_row)])
-    return float(_max_leverage_deltas(bundle, frame)[0])
+    best, upside = _leverage_deltas(bundle, frame)
+    return float(best[0]), float(upside[0])
 
 
 def _pipeline_item(
-    row: Mapping[str, Any], as_of: date, max_leverage: float | None = None
+    row: Mapping[str, Any],
+    as_of: date,
+    max_leverage: float | None = None,
+    discount_upside: float | None = None,
 ) -> PipelineItem:
     drivers = _drivers_from_json(row["drivers_json"])
     top = drivers[0] if drivers else _fallback_driver(float(row["amount_arr"]))
@@ -616,6 +635,7 @@ def _pipeline_item(
         days_open=max(0, (as_of - _as_date(row["created_at"])).days),
         top_driver=top,
         max_leverage=max_leverage,
+        discount_upside=discount_upside,
     )
 
 
@@ -647,8 +667,33 @@ def create_app(
         # health say "degraded" and the model-backed endpoints fail loudly.
         try:
             bundle = load_bundle(application.state.model_path)
+            required = {"model", "model_version", "features", "numeric_features",
+                        "categorical_features", "categories"}
+            if not isinstance(bundle, dict) or required - bundle.keys():
+                raise ValueError("model bundle is missing required fields")
+            if not isinstance(bundle["model_version"], str) or not bundle["model_version"]:
+                raise ValueError("model bundle has no model version")
+            for field in ("features", "numeric_features", "categorical_features"):
+                values = bundle[field]
+                if not isinstance(values, (list, tuple)) or any(
+                    not isinstance(value, str) or not value for value in values
+                ) or len(values) != len(set(values)):
+                    raise ValueError(f"model bundle has invalid {field}")
+            if not bundle["features"] or not isinstance(bundle["categories"], dict):
+                raise ValueError("model bundle has an invalid feature contract")
+            if set(bundle["features"]) != (
+                set(bundle["numeric_features"]) | set(bundle["categorical_features"])
+            ) or set(bundle["categories"]) != set(bundle["categorical_features"]):
+                raise ValueError("model bundle feature fields disagree")
+            if any(
+                not isinstance(levels, (list, tuple))
+                or any(not isinstance(level, str) for level in levels)
+                for levels in bundle["categories"].values()
+            ) or not callable(getattr(bundle["model"], "predict", None)):
+                raise ValueError("model bundle has invalid categories or model")
+            explainer = Explainer(bundle)
             application.state.bundle = bundle
-            application.state.explainer = Explainer(bundle)
+            application.state.explainer = explainer
         except Exception as exc:  # noqa: BLE001 - surfaced through /api/health
             application.state.load_error = f"{type(exc).__name__}: {exc}"
         yield
@@ -786,9 +831,11 @@ def create_app(
                 (*params, int(limit)),
             ).fetchall()
 
-            # ``max_leverage`` is an additive extension, computed only for the page (<= 200
-            # leads), never for the whole queue, so opening the pipeline stays cheap.
+            # Leverage fields are computed only for the page (<= 200 leads), never for the
+            # whole queue, so opening the pipeline stays cheap. ``max_leverage`` is the
+            # committable ceiling; ``discount_upside`` is the non-committable preview.
             max_leverage_by_lead: dict[str, float] = {}
+            discount_upside_by_lead: dict[str, float] = {}
             if bundle is not None and rows:
                 lead_ids = [str(row["lead_id"]) for row in rows]
                 feature_placeholders = ", ".join("?" for _ in lead_ids)
@@ -801,13 +848,18 @@ def create_app(
                 ordered_ids = [lead_id for lead_id in lead_ids if lead_id in by_lead]
                 if ordered_ids:
                     frame = pd.DataFrame([by_lead[lead_id] for lead_id in ordered_ids])
-                    for lead_id, delta in zip(
-                        ordered_ids, _max_leverage_deltas(bundle, frame)
-                    ):
+                    best, upside = _leverage_deltas(bundle, frame)
+                    for lead_id, delta, discount in zip(ordered_ids, best, upside):
                         max_leverage_by_lead[lead_id] = float(delta)
+                        discount_upside_by_lead[lead_id] = float(discount)
 
         items = [
-            _pipeline_item(row, as_of, max_leverage_by_lead.get(str(row["lead_id"])))
+            _pipeline_item(
+                row,
+                as_of,
+                max_leverage_by_lead.get(str(row["lead_id"])),
+                discount_upside_by_lead.get(str(row["lead_id"])),
+            )
             for row in rows
         ]
         return PipelineResponse(
@@ -864,17 +916,18 @@ def create_app(
                     f"lead {lead_id} has neither a stored score nor a feature row",
                 )
 
-            # An open lead's ceiling: the biggest delta any single contract lever could reach.
-            # A closed lead is not actionable, so it reports null rather than a hypothetical
-            # gain nobody can book.
+            # An open lead's two numbers: the committable ceiling (a meeting a rep can book)
+            # and the discount preview (no ActionRequest can carry a discount). A closed lead
+            # reports null for both rather than a hypothetical nobody can act on.
             bundle = request.app.state.bundle
-            max_leverage = (
-                _max_leverage_delta(bundle, feature_row)
-                if bundle is not None
+            if (
+                bundle is not None
                 and feature_row is not None
                 and str(lead_row["status"]) not in ("won", "lost")
-                else None
-            )
+            ):
+                max_leverage, discount_upside = _leverage_for_row(bundle, feature_row)
+            else:
+                max_leverage, discount_upside = None, None
 
             prior_rows = connection.execute(
                 "SELECT * FROM leads WHERE company_id = ? AND created_at < ? AND id != ? "
@@ -913,6 +966,7 @@ def create_app(
                 for row in action_rows
             ],
             max_leverage=max_leverage,
+            discount_upside=discount_upside,
         )
 
     # ---------------------------------------------------------------- counterfactual
