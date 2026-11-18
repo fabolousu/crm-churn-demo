@@ -15,3 +15,5 @@ reports/
 
 .DS_Store
 Thumbs.db
+.tmp/
+web/dist/

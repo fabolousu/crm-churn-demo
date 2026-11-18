@@ -67,6 +67,26 @@ Follow `docs/PITCH.md`. The beats and the numbers on each screen match:
 | 3:30 | Act | probability updates, lead re-ranks |
 | 4:20 | Portfolio | calibration 0.0104 · stability Watch 0.171 |
 
+## Environment quirks on the demo laptop (both verified)
+
+1. **`pnpm install` is slow once** — 45 minutes on this machine (OneDrive + Defender). Do it
+   the day before, not five minutes before. `web/node_modules` is already installed.
+2. **The Vite build fails with `Access is denied` removing an `esbuild-*` file in `%TEMP%`.**
+   That is Defender/OneDrive locking esbuild's temp file, not a code error. Point the build's
+   temp directory into the repo:
+
+```powershell
+New-Item -ItemType Directory -Force -Path .tmp | Out-Null
+$env:TEMP = (Resolve-Path .tmp).Path
+$env:TMP = $env:TEMP
+$env:VITE_API_BASE = "http://127.0.0.1:8000"
+pnpm --dir web build
+pnpm --dir web preview --port 5173 --strictPort
+```
+
+Verified end to end on the merged tree: UI serves 200, bundle ~1.5 MB (300 kB gzip), the API
+base is baked in, and the page reaches the live API.
+
 ## Offline check
 
 Disconnect Wi-Fi (or turn off the adapter), reload the queue, click into a lead, toggle the
