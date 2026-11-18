@@ -1,77 +1,77 @@
 {
-  "total_expected_value": 205190000,
+  "total_expected_value": 282045124.5933173,
   "by_region": [
     {
       "region": "nord-ovest",
-      "open_leads": 2370,
-      "win_rate": 0.3198,
-      "expected_value": 27480000
+      "open_leads": 2281,
+      "win_rate": 0.2951859956236324,
+      "expected_value": 33455971.425547928
     },
     {
       "region": "nord-est",
-      "open_leads": 2370,
-      "win_rate": 0.3384,
-      "expected_value": 29070000
+      "open_leads": 2405,
+      "win_rate": 0.3093865788390284,
+      "expected_value": 36429996.70968209
     },
     {
       "region": "centro",
-      "open_leads": 3951,
-      "win_rate": 0.31,
-      "expected_value": 44400000
+      "open_leads": 3938,
+      "win_rate": 0.3001904761904762,
+      "expected_value": 57865087.147970915
     },
     {
       "region": "sud",
-      "open_leads": 5530,
-      "win_rate": 0.2711,
-      "expected_value": 54330000
+      "open_leads": 5569,
+      "win_rate": 0.28347962110019986,
+      "expected_value": 78658539.57652558
     },
     {
       "region": "isole",
-      "open_leads": 5531,
-      "win_rate": 0.249,
-      "expected_value": 49910000
+      "open_leads": 5559,
+      "win_rate": 0.2651687357929708,
+      "expected_value": 75635529.73359074
     }
   ],
   "calibration": [
     {
-      "predicted": 0.055,
-      "actual": 0.067
+      "predicted": 0.052656,
+      "actual": 0.026394
     },
     {
-      "predicted": 0.095,
-      "actual": 0.085
+      "predicted": 0.095696,
+      "actual": 0.068725
     },
     {
-      "predicted": 0.14,
-      "actual": 0.149
+      "predicted": 0.132347,
+      "actual": 0.101594
     },
     {
-      "predicted": 0.19,
-      "actual": 0.177
+      "predicted": 0.169646,
+      "actual": 0.135492
     },
     {
-      "predicted": 0.24,
-      "actual": 0.251
+      "predicted": 0.211675,
+      "actual": 0.204432
     },
     {
-      "predicted": 0.295,
-      "actual": 0.287
+      "predicted": 0.260983,
+      "actual": 0.249253
     },
     {
-      "predicted": 0.355,
-      "actual": 0.369
+      "predicted": 0.321918,
+      "actual": 0.329514
     },
     {
-      "predicted": 0.42,
-      "actual": 0.41
+      "predicted": 0.403053,
+      "actual": 0.422809
     },
     {
-      "predicted": 0.49,
-      "actual": 0.497
+      "predicted": 0.519196,
+      "actual": 0.560757
     },
     {
-      "predicted": 0.586,
-      "actual": 0.576
+      "predicted": 0.726003,
+      "actual": 0.76743
     }
   ],
   "drift": {
@@ -81,5 +81,7 @@
     "holdout_mean": 0.359924,
     "train_win_rate": 0.270497,
     "holdout_win_rate": 0.35122
-  }
+  },
+  "win_prevalence": 0.286643,
+  "total_open_arr": 720720300
 }

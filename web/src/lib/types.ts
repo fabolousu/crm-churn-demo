@@ -47,10 +47,10 @@ export interface PipelineItem {
   band: Band;
   expected_value: number;
   days_open: number;
-  // Contract v0.3 addition: largest achievable probability delta across the
-  // supported counterfactual levers. Nullable for closed leads; optional
-  // because the field was added to PipelineItem without being made required.
+  // Committable levers only (executive sponsor / discovery). The discount
+  // what-if is discount_upside and is never part of this ranking.
   max_leverage?: number | null;
+  discount_upside?: number | null;
   top_driver: Driver;
 }
 
@@ -58,6 +58,10 @@ export interface PipelineResponse {
   total: number;
   total_expected_value: number;
   items: PipelineItem[];
+  // Fixture/API extension: the sum of open proposed ARR. The API currently
+  // returns it only as a generated fixture field because the pipeline payload
+  // does not expose a whole-book ARR total.
+  total_open_arr?: number | null;
 }
 
 export interface CompanySummary {
@@ -96,6 +100,37 @@ export interface LeadDetail {
   open_actions: Action[];
   // Contract v0.3: null for closed leads, optional in the schema.
   max_leverage?: number | null;
+  discount_upside?: number | null;
+}
+
+export interface CompanySignals {
+  dormant: boolean;
+  days_since_last_initiative: number;
+  won: number;
+  lost: number;
+  lifetime_won_arr: number;
+}
+
+export interface CompanyDetail {
+  company: {
+    id: string;
+    name: string;
+    region: Region;
+    industry: string;
+    employees: number;
+    created_at: string;
+  };
+  initiatives: Lead[];
+  signals: CompanySignals;
+}
+
+export interface DemoDefaults {
+  top_lead_id: string;
+  lever_lead_id: string;
+  act_lead_id: string;
+  closed_lead_id: string;
+  model_version: string;
+  scored_at: string;
 }
 
 export interface CounterfactualRequest {
@@ -138,6 +173,9 @@ export interface Portfolio {
   total_expected_value: number;
   by_region: RegionPortfolio[];
   calibration: CalibrationPoint[];
+  // Generated fixture extension, from the labelled population.
+  win_prevalence?: number;
+  total_open_arr?: number;
   drift: {
     psi: number;
     status: "stable" | "watch" | "alert";

@@ -1,217 +1,3601 @@
 {
-  "L057056": {
+  "L021037": {
     "call": {
-      "probability_after": 0.5431,
+      "probability_after": 0.599396,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.7158,
-      "delta": 0.1727
+      "probability_after": 0.604068,
+      "delta": 0.004673
     },
     "discovery_meeting": {
-      "probability_after": 0.6039,
-      "delta": 0.0608
+      "probability_after": 0.599396,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.5431,
+      "probability_after": 0.599396,
       "delta": 0
     }
   },
-  "L052117": {
+  "L029491": {
     "call": {
-      "probability_after": 0.43,
+      "probability_after": 0.671734,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.5007,
-      "delta": 0.0707
+      "probability_after": 0.675571,
+      "delta": 0.003837
     },
     "discovery_meeting": {
-      "probability_after": 0.4918,
-      "delta": 0.0618
+      "probability_after": 0.671734,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.43,
+      "probability_after": 0.671734,
       "delta": 0
     }
   },
-  "L048322": {
+  "L049535": {
     "call": {
-      "probability_after": 0.56,
+      "probability_after": 0.694188,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.6285,
-      "delta": 0.0685
+      "probability_after": 0.714286,
+      "delta": 0.020098
     },
     "discovery_meeting": {
-      "probability_after": 0.6201,
-      "delta": 0.0601
+      "probability_after": 0.694188,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.56,
+      "probability_after": 0.694188,
       "delta": 0
     }
   },
-  "L061904": {
+  "L054619": {
     "call": {
-      "probability_after": 0.31,
+      "probability_after": 0.726254,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.3739,
-      "delta": 0.0639
+      "probability_after": 0.726254,
+      "delta": 0
     },
     "discovery_meeting": {
-      "probability_after": 0.3656,
-      "delta": 0.0556
+      "probability_after": 0.726254,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.31,
+      "probability_after": 0.726254,
       "delta": 0
     }
   },
-  "L043781": {
+  "L004764": {
     "call": {
-      "probability_after": 0.62,
+      "probability_after": 0.859671,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.6844,
-      "delta": 0.0644
+      "probability_after": 0.890258,
+      "delta": 0.030587
     },
     "discovery_meeting": {
-      "probability_after": 0.6767,
-      "delta": 0.0567
+      "probability_after": 0.889401,
+      "delta": 0.02973
     },
     "discount_review": {
-      "probability_after": 0.62,
+      "probability_after": 0.859671,
       "delta": 0
     }
   },
-  "L059233": {
+  "L038696": {
     "call": {
-      "probability_after": 0.27,
+      "probability_after": 0.783094,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.3296,
-      "delta": 0.0596
+      "probability_after": 0.784099,
+      "delta": 0.001005
     },
     "discovery_meeting": {
-      "probability_after": 0.3218,
-      "delta": 0.0518
+      "probability_after": 0.783094,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.27,
+      "probability_after": 0.783094,
       "delta": 0
     }
   },
-  "L050418": {
+  "L008955": {
     "call": {
-      "probability_after": 0.48,
+      "probability_after": 0.865201,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.551,
-      "delta": 0.071
+      "probability_after": 0.865635,
+      "delta": 0.000434
     },
     "discovery_meeting": {
-      "probability_after": 0.5421,
-      "delta": 0.0621
+      "probability_after": 0.865201,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.48,
+      "probability_after": 0.865201,
       "delta": 0
     }
   },
-  "L046677": {
+  "L041343": {
     "call": {
-      "probability_after": 0.38,
+      "probability_after": 0.844785,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.449,
-      "delta": 0.069
+      "probability_after": 0.85073,
+      "delta": 0.005945
     },
     "discovery_meeting": {
-      "probability_after": 0.4401,
-      "delta": 0.0601
+      "probability_after": 0.844785,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.38,
+      "probability_after": 0.844785,
       "delta": 0
     }
   },
-  "L057912": {
+  "L027304": {
     "call": {
-      "probability_after": 0.24,
+      "probability_after": 0.762882,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.2957,
-      "delta": 0.0557
+      "probability_after": 0.771839,
+      "delta": 0.008957
     },
     "discovery_meeting": {
-      "probability_after": 0.2883,
-      "delta": 0.0483
+      "probability_after": 0.762882,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.24,
+      "probability_after": 0.762882,
       "delta": 0
     }
   },
-  "L044105": {
+  "L030207": {
     "call": {
-      "probability_after": 0.52,
+      "probability_after": 0.86724,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.5902,
-      "delta": 0.0702
+      "probability_after": 0.871344,
+      "delta": 0.004104
     },
     "discovery_meeting": {
-      "probability_after": 0.5815,
-      "delta": 0.0615
+      "probability_after": 0.86724,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.52,
+      "probability_after": 0.86724,
       "delta": 0
     }
   },
-  "L060284": {
+  "L042640": {
     "call": {
-      "probability_after": 0.19,
+      "probability_after": 0.792107,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.2377,
-      "delta": 0.0477
+      "probability_after": 0.792837,
+      "delta": 0.00073
     },
     "discovery_meeting": {
-      "probability_after": 0.2313,
-      "delta": 0.0413
+      "probability_after": 0.792107,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.19,
+      "probability_after": 0.792107,
       "delta": 0
     }
   },
-  "L051639": {
+  "L011504": {
     "call": {
-      "probability_after": 0.35,
+      "probability_after": 0.691699,
       "delta": 0
     },
     "exec_sponsor_meeting": {
-      "probability_after": 0.4172,
-      "delta": 0.0672
+      "probability_after": 0.692644,
+      "delta": 0.000945
     },
     "discovery_meeting": {
-      "probability_after": 0.4085,
-      "delta": 0.0585
+      "probability_after": 0.691699,
+      "delta": 0
     },
     "discount_review": {
-      "probability_after": 0.35,
+      "probability_after": 0.691699,
+      "delta": 0
+    }
+  },
+  "L053371": {
+    "call": {
+      "probability_after": 0.803134,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.818255,
+      "delta": 0.015121
+    },
+    "discovery_meeting": {
+      "probability_after": 0.812318,
+      "delta": 0.009183
+    },
+    "discount_review": {
+      "probability_after": 0.803134,
+      "delta": 0
+    }
+  },
+  "L000521": {
+    "call": {
+      "probability_after": 0.869667,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.892449,
+      "delta": 0.022781
+    },
+    "discovery_meeting": {
+      "probability_after": 0.88869,
+      "delta": 0.019022
+    },
+    "discount_review": {
+      "probability_after": 0.869667,
+      "delta": 0
+    }
+  },
+  "L013772": {
+    "call": {
+      "probability_after": 0.405977,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.410228,
+      "delta": 0.004251
+    },
+    "discovery_meeting": {
+      "probability_after": 0.405977,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.405977,
+      "delta": 0
+    }
+  },
+  "L001774": {
+    "call": {
+      "probability_after": 0.769525,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.772209,
+      "delta": 0.002684
+    },
+    "discovery_meeting": {
+      "probability_after": 0.769525,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.769525,
+      "delta": 0
+    }
+  },
+  "L014412": {
+    "call": {
+      "probability_after": 0.911653,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.935648,
+      "delta": 0.023995
+    },
+    "discovery_meeting": {
+      "probability_after": 0.933345,
+      "delta": 0.021693
+    },
+    "discount_review": {
+      "probability_after": 0.911653,
+      "delta": 0
+    }
+  },
+  "L022805": {
+    "call": {
+      "probability_after": 0.640623,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.65041,
+      "delta": 0.009787
+    },
+    "discovery_meeting": {
+      "probability_after": 0.640623,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.640623,
+      "delta": 0
+    }
+  },
+  "L056916": {
+    "call": {
+      "probability_after": 0.753272,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.753272,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.753272,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.753272,
+      "delta": 0
+    }
+  },
+  "L009325": {
+    "call": {
+      "probability_after": 0.690866,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.704827,
+      "delta": 0.013961
+    },
+    "discovery_meeting": {
+      "probability_after": 0.690866,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.690866,
+      "delta": 0
+    }
+  },
+  "L020068": {
+    "call": {
+      "probability_after": 0.774689,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.806933,
+      "delta": 0.032245
+    },
+    "discovery_meeting": {
+      "probability_after": 0.806933,
+      "delta": 0.032245
+    },
+    "discount_review": {
+      "probability_after": 0.774689,
+      "delta": 0
+    }
+  },
+  "L030969": {
+    "call": {
+      "probability_after": 0.701629,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.746143,
+      "delta": 0.044514
+    },
+    "discovery_meeting": {
+      "probability_after": 0.746143,
+      "delta": 0.044514
+    },
+    "discount_review": {
+      "probability_after": 0.701629,
+      "delta": 0
+    }
+  },
+  "L003003": {
+    "call": {
+      "probability_after": 0.826587,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.828611,
+      "delta": 0.002024
+    },
+    "discovery_meeting": {
+      "probability_after": 0.826587,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.826587,
+      "delta": 0
+    }
+  },
+  "L048282": {
+    "call": {
+      "probability_after": 0.83662,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.837204,
+      "delta": 0.000584
+    },
+    "discovery_meeting": {
+      "probability_after": 0.83662,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.83662,
+      "delta": 0
+    }
+  },
+  "L012607": {
+    "call": {
+      "probability_after": 0.881824,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.9037,
+      "delta": 0.021876
+    },
+    "discovery_meeting": {
+      "probability_after": 0.898946,
+      "delta": 0.017122
+    },
+    "discount_review": {
+      "probability_after": 0.881824,
+      "delta": 0
+    }
+  },
+  "L040431": {
+    "call": {
+      "probability_after": 0.708495,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.727392,
+      "delta": 0.018897
+    },
+    "discovery_meeting": {
+      "probability_after": 0.708495,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.708495,
+      "delta": 0
+    }
+  },
+  "L035479": {
+    "call": {
+      "probability_after": 0.737627,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.739754,
+      "delta": 0.002127
+    },
+    "discovery_meeting": {
+      "probability_after": 0.737627,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.737627,
+      "delta": 0
+    }
+  },
+  "L012036": {
+    "call": {
+      "probability_after": 0.741005,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.746689,
+      "delta": 0.005684
+    },
+    "discovery_meeting": {
+      "probability_after": 0.741005,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.741005,
+      "delta": 0
+    }
+  },
+  "L015278": {
+    "call": {
+      "probability_after": 0.783487,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.796045,
+      "delta": 0.012558
+    },
+    "discovery_meeting": {
+      "probability_after": 0.783487,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.783487,
+      "delta": 0
+    }
+  },
+  "L033236": {
+    "call": {
+      "probability_after": 0.756584,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.756622,
+      "delta": 0.000039
+    },
+    "discovery_meeting": {
+      "probability_after": 0.756584,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.756584,
+      "delta": 0
+    }
+  },
+  "L004575": {
+    "call": {
+      "probability_after": 0.683653,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.759495,
+      "delta": 0.075843
+    },
+    "discovery_meeting": {
+      "probability_after": 0.750162,
+      "delta": 0.066509
+    },
+    "discount_review": {
+      "probability_after": 0.683653,
+      "delta": 0
+    }
+  },
+  "L015711": {
+    "call": {
+      "probability_after": 0.741132,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.74255,
+      "delta": 0.001418
+    },
+    "discovery_meeting": {
+      "probability_after": 0.741132,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.741132,
+      "delta": 0
+    }
+  },
+  "L013604": {
+    "call": {
+      "probability_after": 0.651793,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.651793,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.651793,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.651793,
+      "delta": 0
+    }
+  },
+  "L021305": {
+    "call": {
+      "probability_after": 0.864849,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.890599,
+      "delta": 0.02575
+    },
+    "discovery_meeting": {
+      "probability_after": 0.888973,
+      "delta": 0.024125
+    },
+    "discount_review": {
+      "probability_after": 0.864849,
+      "delta": 0
+    }
+  },
+  "L050160": {
+    "call": {
+      "probability_after": 0.794713,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.794713,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.794713,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.794713,
+      "delta": 0
+    }
+  },
+  "L045549": {
+    "call": {
+      "probability_after": 0.770316,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.799429,
+      "delta": 0.029114
+    },
+    "discovery_meeting": {
+      "probability_after": 0.797101,
+      "delta": 0.026786
+    },
+    "discount_review": {
+      "probability_after": 0.770316,
+      "delta": 0
+    }
+  },
+  "L054358": {
+    "call": {
+      "probability_after": 0.601235,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.601235,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.601235,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.601235,
+      "delta": 0
+    }
+  },
+  "L046314": {
+    "call": {
+      "probability_after": 0.833805,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.872269,
+      "delta": 0.038464
+    },
+    "discovery_meeting": {
+      "probability_after": 0.860729,
+      "delta": 0.026924
+    },
+    "discount_review": {
+      "probability_after": 0.833805,
+      "delta": 0
+    }
+  },
+  "L047782": {
+    "call": {
+      "probability_after": 0.579103,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.586918,
+      "delta": 0.007815
+    },
+    "discovery_meeting": {
+      "probability_after": 0.579103,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.579103,
+      "delta": 0
+    }
+  },
+  "L014119": {
+    "call": {
+      "probability_after": 0.786351,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.846193,
+      "delta": 0.059843
+    },
+    "discovery_meeting": {
+      "probability_after": 0.831019,
+      "delta": 0.044669
+    },
+    "discount_review": {
+      "probability_after": 0.786351,
+      "delta": 0
+    }
+  },
+  "L017645": {
+    "call": {
+      "probability_after": 0.653785,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.736145,
+      "delta": 0.08236
+    },
+    "discovery_meeting": {
+      "probability_after": 0.719954,
+      "delta": 0.066169
+    },
+    "discount_review": {
+      "probability_after": 0.653785,
+      "delta": 0
+    }
+  },
+  "L013317": {
+    "call": {
+      "probability_after": 0.762053,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.763419,
+      "delta": 0.001366
+    },
+    "discovery_meeting": {
+      "probability_after": 0.762053,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.762053,
+      "delta": 0
+    }
+  },
+  "L054530": {
+    "call": {
+      "probability_after": 0.73601,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.742647,
+      "delta": 0.006636
+    },
+    "discovery_meeting": {
+      "probability_after": 0.73601,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.73601,
+      "delta": 0
+    }
+  },
+  "L051263": {
+    "call": {
+      "probability_after": 0.82103,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.848098,
+      "delta": 0.027068
+    },
+    "discovery_meeting": {
+      "probability_after": 0.848098,
+      "delta": 0.027068
+    },
+    "discount_review": {
+      "probability_after": 0.82103,
+      "delta": 0
+    }
+  },
+  "L036354": {
+    "call": {
+      "probability_after": 0.716901,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.733431,
+      "delta": 0.01653
+    },
+    "discovery_meeting": {
+      "probability_after": 0.716901,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.716901,
+      "delta": 0
+    }
+  },
+  "L006716": {
+    "call": {
+      "probability_after": 0.445233,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.445233,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.445233,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.445233,
+      "delta": 0
+    }
+  },
+  "L056689": {
+    "call": {
+      "probability_after": 0.653412,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.656782,
+      "delta": 0.00337
+    },
+    "discovery_meeting": {
+      "probability_after": 0.653412,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.653412,
+      "delta": 0
+    }
+  },
+  "L008422": {
+    "call": {
+      "probability_after": 0.29279,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.297277,
+      "delta": 0.004487
+    },
+    "discovery_meeting": {
+      "probability_after": 0.29279,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.29279,
+      "delta": 0
+    }
+  },
+  "L024255": {
+    "call": {
+      "probability_after": 0.656115,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.656115,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.656115,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.656115,
+      "delta": 0
+    }
+  },
+  "L013208": {
+    "call": {
+      "probability_after": 0.832331,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.868539,
+      "delta": 0.036208
+    },
+    "discovery_meeting": {
+      "probability_after": 0.86657,
+      "delta": 0.034238
+    },
+    "discount_review": {
+      "probability_after": 0.832331,
+      "delta": 0
+    }
+  },
+  "L006286": {
+    "call": {
+      "probability_after": 0.733874,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.737911,
+      "delta": 0.004037
+    },
+    "discovery_meeting": {
+      "probability_after": 0.733874,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.733874,
+      "delta": 0
+    }
+  },
+  "L053762": {
+    "call": {
+      "probability_after": 0.787994,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.791558,
+      "delta": 0.003564
+    },
+    "discovery_meeting": {
+      "probability_after": 0.787994,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.787994,
+      "delta": 0
+    }
+  },
+  "L002291": {
+    "call": {
+      "probability_after": 0.762311,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.832206,
+      "delta": 0.069894
+    },
+    "discovery_meeting": {
+      "probability_after": 0.819984,
+      "delta": 0.057672
+    },
+    "discount_review": {
+      "probability_after": 0.762311,
+      "delta": 0
+    }
+  },
+  "L045953": {
+    "call": {
+      "probability_after": 0.675305,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.701885,
+      "delta": 0.02658
+    },
+    "discovery_meeting": {
+      "probability_after": 0.701885,
+      "delta": 0.02658
+    },
+    "discount_review": {
+      "probability_after": 0.675305,
+      "delta": 0
+    }
+  },
+  "L008094": {
+    "call": {
+      "probability_after": 0.577562,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.604853,
+      "delta": 0.027291
+    },
+    "discovery_meeting": {
+      "probability_after": 0.577562,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.577562,
+      "delta": 0
+    }
+  },
+  "L018537": {
+    "call": {
+      "probability_after": 0.881294,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.881997,
+      "delta": 0.000703
+    },
+    "discovery_meeting": {
+      "probability_after": 0.881294,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.881294,
+      "delta": 0
+    }
+  },
+  "L056396": {
+    "call": {
+      "probability_after": 0.307809,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.313536,
+      "delta": 0.005727
+    },
+    "discovery_meeting": {
+      "probability_after": 0.307809,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.307809,
+      "delta": 0
+    }
+  },
+  "L038431": {
+    "call": {
+      "probability_after": 0.462992,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.462992,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.462992,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.462992,
+      "delta": 0
+    }
+  },
+  "L008260": {
+    "call": {
+      "probability_after": 0.586497,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.589243,
+      "delta": 0.002746
+    },
+    "discovery_meeting": {
+      "probability_after": 0.586497,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.586497,
+      "delta": 0
+    }
+  },
+  "L016510": {
+    "call": {
+      "probability_after": 0.764669,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.790753,
+      "delta": 0.026084
+    },
+    "discovery_meeting": {
+      "probability_after": 0.764669,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.764669,
+      "delta": 0
+    }
+  },
+  "L045819": {
+    "call": {
+      "probability_after": 0.552181,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.577085,
+      "delta": 0.024904
+    },
+    "discovery_meeting": {
+      "probability_after": 0.552181,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.552181,
+      "delta": 0
+    }
+  },
+  "L054534": {
+    "call": {
+      "probability_after": 0.687163,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.690871,
+      "delta": 0.003708
+    },
+    "discovery_meeting": {
+      "probability_after": 0.687163,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.687163,
+      "delta": 0
+    }
+  },
+  "L017939": {
+    "call": {
+      "probability_after": 0.700007,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.718524,
+      "delta": 0.018517
+    },
+    "discovery_meeting": {
+      "probability_after": 0.700007,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.700007,
+      "delta": 0
+    }
+  },
+  "L056322": {
+    "call": {
+      "probability_after": 0.65376,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.657856,
+      "delta": 0.004096
+    },
+    "discovery_meeting": {
+      "probability_after": 0.65376,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.65376,
+      "delta": 0
+    }
+  },
+  "L055131": {
+    "call": {
+      "probability_after": 0.743735,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.743735,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.743735,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.743735,
+      "delta": 0
+    }
+  },
+  "L038081": {
+    "call": {
+      "probability_after": 0.631028,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.632129,
+      "delta": 0.001101
+    },
+    "discovery_meeting": {
+      "probability_after": 0.631028,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.631028,
+      "delta": 0
+    }
+  },
+  "L044785": {
+    "call": {
+      "probability_after": 0.682907,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.685045,
+      "delta": 0.002138
+    },
+    "discovery_meeting": {
+      "probability_after": 0.682907,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.682907,
+      "delta": 0
+    }
+  },
+  "L013607": {
+    "call": {
+      "probability_after": 0.694623,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.695179,
+      "delta": 0.000555
+    },
+    "discovery_meeting": {
+      "probability_after": 0.694623,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.694623,
+      "delta": 0
+    }
+  },
+  "L056450": {
+    "call": {
+      "probability_after": 0.891481,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.917826,
+      "delta": 0.026345
+    },
+    "discovery_meeting": {
+      "probability_after": 0.915644,
+      "delta": 0.024163
+    },
+    "discount_review": {
+      "probability_after": 0.891481,
+      "delta": 0
+    }
+  },
+  "L029798": {
+    "call": {
+      "probability_after": 0.676813,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.68854,
+      "delta": 0.011726
+    },
+    "discovery_meeting": {
+      "probability_after": 0.676813,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.676813,
+      "delta": 0
+    }
+  },
+  "L009931": {
+    "call": {
+      "probability_after": 0.705882,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.705882,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.705882,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.705882,
+      "delta": 0
+    }
+  },
+  "L047494": {
+    "call": {
+      "probability_after": 0.840948,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.842384,
+      "delta": 0.001435
+    },
+    "discovery_meeting": {
+      "probability_after": 0.840948,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.840948,
+      "delta": 0
+    }
+  },
+  "L027308": {
+    "call": {
+      "probability_after": 0.47913,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.48546,
+      "delta": 0.00633
+    },
+    "discovery_meeting": {
+      "probability_after": 0.47913,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.47913,
+      "delta": 0
+    }
+  },
+  "L006036": {
+    "call": {
+      "probability_after": 0.402663,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.421892,
+      "delta": 0.019229
+    },
+    "discovery_meeting": {
+      "probability_after": 0.421892,
+      "delta": 0.019229
+    },
+    "discount_review": {
+      "probability_after": 0.402663,
+      "delta": 0
+    }
+  },
+  "L015477": {
+    "call": {
+      "probability_after": 0.58849,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.596014,
+      "delta": 0.007525
+    },
+    "discovery_meeting": {
+      "probability_after": 0.58849,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.58849,
+      "delta": 0
+    }
+  },
+  "L035865": {
+    "call": {
+      "probability_after": 0.630196,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.630196,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.630196,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.630196,
+      "delta": 0
+    }
+  },
+  "L001063": {
+    "call": {
+      "probability_after": 0.661487,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.666269,
+      "delta": 0.004782
+    },
+    "discovery_meeting": {
+      "probability_after": 0.661487,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.661487,
+      "delta": 0
+    }
+  },
+  "L045813": {
+    "call": {
+      "probability_after": 0.6645,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.666006,
+      "delta": 0.001506
+    },
+    "discovery_meeting": {
+      "probability_after": 0.6645,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.6645,
+      "delta": 0
+    }
+  },
+  "L045348": {
+    "call": {
+      "probability_after": 0.723147,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.72554,
+      "delta": 0.002393
+    },
+    "discovery_meeting": {
+      "probability_after": 0.723147,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.723147,
+      "delta": 0
+    }
+  },
+  "L036115": {
+    "call": {
+      "probability_after": 0.662858,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.6677,
+      "delta": 0.004842
+    },
+    "discovery_meeting": {
+      "probability_after": 0.662858,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.662858,
+      "delta": 0
+    }
+  },
+  "L025433": {
+    "call": {
+      "probability_after": 0.33633,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.33633,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.33633,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.33633,
+      "delta": 0
+    }
+  },
+  "L038458": {
+    "call": {
+      "probability_after": 0.555184,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.555184,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.555184,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.555184,
+      "delta": 0
+    }
+  },
+  "L038725": {
+    "call": {
+      "probability_after": 0.760041,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.779071,
+      "delta": 0.01903
+    },
+    "discovery_meeting": {
+      "probability_after": 0.760041,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.760041,
+      "delta": 0
+    }
+  },
+  "L042980": {
+    "call": {
+      "probability_after": 0.839842,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.890826,
+      "delta": 0.050983
+    },
+    "discovery_meeting": {
+      "probability_after": 0.88929,
+      "delta": 0.049447
+    },
+    "discount_review": {
+      "probability_after": 0.839842,
+      "delta": 0
+    }
+  },
+  "L046697": {
+    "call": {
+      "probability_after": 0.884522,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.884522,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.884522,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.884522,
+      "delta": 0
+    }
+  },
+  "L001261": {
+    "call": {
+      "probability_after": 0.552959,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.557133,
+      "delta": 0.004174
+    },
+    "discovery_meeting": {
+      "probability_after": 0.552959,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.552959,
+      "delta": 0
+    }
+  },
+  "L009130": {
+    "call": {
+      "probability_after": 0.815094,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.815094,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.815094,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.815094,
+      "delta": 0
+    }
+  },
+  "L042351": {
+    "call": {
+      "probability_after": 0.757133,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.760594,
+      "delta": 0.003461
+    },
+    "discovery_meeting": {
+      "probability_after": 0.757133,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.757133,
+      "delta": 0
+    }
+  },
+  "L043203": {
+    "call": {
+      "probability_after": 0.702398,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.713258,
+      "delta": 0.01086
+    },
+    "discovery_meeting": {
+      "probability_after": 0.702398,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.702398,
+      "delta": 0
+    }
+  },
+  "L030595": {
+    "call": {
+      "probability_after": 0.524329,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.533956,
+      "delta": 0.009628
+    },
+    "discovery_meeting": {
+      "probability_after": 0.524329,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.524329,
+      "delta": 0
+    }
+  },
+  "L005328": {
+    "call": {
+      "probability_after": 0.444296,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.444296,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.444296,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.444296,
+      "delta": 0
+    }
+  },
+  "L057344": {
+    "call": {
+      "probability_after": 0.663551,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.663551,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.663551,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.663551,
+      "delta": 0
+    }
+  },
+  "L036677": {
+    "call": {
+      "probability_after": 0.599572,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.629227,
+      "delta": 0.029655
+    },
+    "discovery_meeting": {
+      "probability_after": 0.624452,
+      "delta": 0.02488
+    },
+    "discount_review": {
+      "probability_after": 0.599572,
+      "delta": 0
+    }
+  },
+  "L044776": {
+    "call": {
+      "probability_after": 0.676312,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.681732,
+      "delta": 0.00542
+    },
+    "discovery_meeting": {
+      "probability_after": 0.676312,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.676312,
+      "delta": 0
+    }
+  },
+  "L038360": {
+    "call": {
+      "probability_after": 0.858521,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.890796,
+      "delta": 0.032275
+    },
+    "discovery_meeting": {
+      "probability_after": 0.885428,
+      "delta": 0.026907
+    },
+    "discount_review": {
+      "probability_after": 0.858521,
+      "delta": 0
+    }
+  },
+  "L002955": {
+    "call": {
+      "probability_after": 0.672442,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.672805,
+      "delta": 0.000363
+    },
+    "discovery_meeting": {
+      "probability_after": 0.672442,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.672442,
+      "delta": 0
+    }
+  },
+  "L018575": {
+    "call": {
+      "probability_after": 0.810313,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.842306,
+      "delta": 0.031992
+    },
+    "discovery_meeting": {
+      "probability_after": 0.840759,
+      "delta": 0.030446
+    },
+    "discount_review": {
+      "probability_after": 0.810313,
+      "delta": 0
+    }
+  },
+  "L046381": {
+    "call": {
+      "probability_after": 0.303372,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.312842,
+      "delta": 0.00947
+    },
+    "discovery_meeting": {
+      "probability_after": 0.303372,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.303372,
+      "delta": 0
+    }
+  },
+  "L005536": {
+    "call": {
+      "probability_after": 0.338308,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.339225,
+      "delta": 0.000917
+    },
+    "discovery_meeting": {
+      "probability_after": 0.338308,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.338308,
+      "delta": 0
+    }
+  },
+  "L009813": {
+    "call": {
+      "probability_after": 0.797849,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.805577,
+      "delta": 0.007728
+    },
+    "discovery_meeting": {
+      "probability_after": 0.797849,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.797849,
+      "delta": 0
+    }
+  },
+  "L017646": {
+    "call": {
+      "probability_after": 0.86357,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.86357,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.86357,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.86357,
+      "delta": 0
+    }
+  },
+  "L025807": {
+    "call": {
+      "probability_after": 0.858063,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.858209,
+      "delta": 0.000146
+    },
+    "discovery_meeting": {
+      "probability_after": 0.858063,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.858063,
+      "delta": 0
+    }
+  },
+  "L040800": {
+    "call": {
+      "probability_after": 0.665543,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.672607,
+      "delta": 0.007063
+    },
+    "discovery_meeting": {
+      "probability_after": 0.665543,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.665543,
+      "delta": 0
+    }
+  },
+  "L035050": {
+    "call": {
+      "probability_after": 0.584117,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.619394,
+      "delta": 0.035277
+    },
+    "discovery_meeting": {
+      "probability_after": 0.618055,
+      "delta": 0.033938
+    },
+    "discount_review": {
+      "probability_after": 0.584117,
+      "delta": 0
+    }
+  },
+  "L047034": {
+    "call": {
+      "probability_after": 0.721759,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.728904,
+      "delta": 0.007145
+    },
+    "discovery_meeting": {
+      "probability_after": 0.721759,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.721759,
+      "delta": 0
+    }
+  },
+  "L021861": {
+    "call": {
+      "probability_after": 0.85995,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.862732,
+      "delta": 0.002782
+    },
+    "discovery_meeting": {
+      "probability_after": 0.85995,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.85995,
+      "delta": 0
+    }
+  },
+  "L030796": {
+    "call": {
+      "probability_after": 0.838724,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.847641,
+      "delta": 0.008917
+    },
+    "discovery_meeting": {
+      "probability_after": 0.838724,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.838724,
+      "delta": 0
+    }
+  },
+  "L035748": {
+    "call": {
+      "probability_after": 0.631577,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.631659,
+      "delta": 0.000082
+    },
+    "discovery_meeting": {
+      "probability_after": 0.631577,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.631577,
+      "delta": 0
+    }
+  },
+  "L013407": {
+    "call": {
+      "probability_after": 0.228214,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.228214,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.228214,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.228214,
+      "delta": 0
+    }
+  },
+  "L038581": {
+    "call": {
+      "probability_after": 0.876144,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.876551,
+      "delta": 0.000407
+    },
+    "discovery_meeting": {
+      "probability_after": 0.876144,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.876144,
+      "delta": 0
+    }
+  },
+  "L029500": {
+    "call": {
+      "probability_after": 0.544139,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.544139,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.544139,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.544139,
+      "delta": 0
+    }
+  },
+  "L004145": {
+    "call": {
+      "probability_after": 0.762278,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.762278,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.762278,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.762278,
+      "delta": 0
+    }
+  },
+  "L000330": {
+    "call": {
+      "probability_after": 0.616083,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.61948,
+      "delta": 0.003397
+    },
+    "discovery_meeting": {
+      "probability_after": 0.616083,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.616083,
+      "delta": 0
+    }
+  },
+  "L033591": {
+    "call": {
+      "probability_after": 0.837319,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.840863,
+      "delta": 0.003544
+    },
+    "discovery_meeting": {
+      "probability_after": 0.837319,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.837319,
+      "delta": 0
+    }
+  },
+  "L004867": {
+    "call": {
+      "probability_after": 0.911883,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.911883,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.911883,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.911883,
+      "delta": 0
+    }
+  },
+  "L037787": {
+    "call": {
+      "probability_after": 0.740399,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.751332,
+      "delta": 0.010934
+    },
+    "discovery_meeting": {
+      "probability_after": 0.740399,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.740399,
+      "delta": 0
+    }
+  },
+  "L033208": {
+    "call": {
+      "probability_after": 0.49944,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.499597,
+      "delta": 0.000157
+    },
+    "discovery_meeting": {
+      "probability_after": 0.49944,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.49944,
+      "delta": 0
+    }
+  },
+  "L040746": {
+    "call": {
+      "probability_after": 0.618188,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.639991,
+      "delta": 0.021803
+    },
+    "discovery_meeting": {
+      "probability_after": 0.618188,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.618188,
+      "delta": 0
+    }
+  },
+  "L055561": {
+    "call": {
+      "probability_after": 0.689082,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.695856,
+      "delta": 0.006775
+    },
+    "discovery_meeting": {
+      "probability_after": 0.689082,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.689082,
+      "delta": 0
+    }
+  },
+  "L042947": {
+    "call": {
+      "probability_after": 0.675926,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.682017,
+      "delta": 0.006091
+    },
+    "discovery_meeting": {
+      "probability_after": 0.675926,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.675926,
+      "delta": 0
+    }
+  },
+  "L045153": {
+    "call": {
+      "probability_after": 0.936542,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.93714,
+      "delta": 0.000598
+    },
+    "discovery_meeting": {
+      "probability_after": 0.936542,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.936542,
+      "delta": 0
+    }
+  },
+  "L039419": {
+    "call": {
+      "probability_after": 0.559973,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.570508,
+      "delta": 0.010535
+    },
+    "discovery_meeting": {
+      "probability_after": 0.559973,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.559973,
+      "delta": 0
+    }
+  },
+  "L000954": {
+    "call": {
+      "probability_after": 0.846777,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.847535,
+      "delta": 0.000758
+    },
+    "discovery_meeting": {
+      "probability_after": 0.846777,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.846777,
+      "delta": 0
+    }
+  },
+  "L018344": {
+    "call": {
+      "probability_after": 0.764637,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.764637,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.764637,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.764637,
+      "delta": 0
+    }
+  },
+  "L059346": {
+    "call": {
+      "probability_after": 0.388308,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.407902,
+      "delta": 0.019594
+    },
+    "discovery_meeting": {
+      "probability_after": 0.388308,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.388308,
+      "delta": 0
+    }
+  },
+  "L024270": {
+    "call": {
+      "probability_after": 0.499319,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.500536,
+      "delta": 0.001218
+    },
+    "discovery_meeting": {
+      "probability_after": 0.499319,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.499319,
+      "delta": 0
+    }
+  },
+  "L021586": {
+    "call": {
+      "probability_after": 0.805661,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.805921,
+      "delta": 0.00026
+    },
+    "discovery_meeting": {
+      "probability_after": 0.805661,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.805661,
+      "delta": 0
+    }
+  },
+  "L027498": {
+    "call": {
+      "probability_after": 0.78542,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.78542,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.78542,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.78542,
+      "delta": 0
+    }
+  },
+  "L038701": {
+    "call": {
+      "probability_after": 0.669954,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.680943,
+      "delta": 0.010989
+    },
+    "discovery_meeting": {
+      "probability_after": 0.669954,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.669954,
+      "delta": 0
+    }
+  },
+  "L010066": {
+    "call": {
+      "probability_after": 0.432891,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.434563,
+      "delta": 0.001672
+    },
+    "discovery_meeting": {
+      "probability_after": 0.432891,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.432891,
+      "delta": 0
+    }
+  },
+  "L029728": {
+    "call": {
+      "probability_after": 0.80986,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.825423,
+      "delta": 0.015563
+    },
+    "discovery_meeting": {
+      "probability_after": 0.80986,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.80986,
+      "delta": 0
+    }
+  },
+  "L002273": {
+    "call": {
+      "probability_after": 0.871024,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.871503,
+      "delta": 0.00048
+    },
+    "discovery_meeting": {
+      "probability_after": 0.871024,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.871024,
+      "delta": 0
+    }
+  },
+  "L014917": {
+    "call": {
+      "probability_after": 0.854822,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.858224,
+      "delta": 0.003402
+    },
+    "discovery_meeting": {
+      "probability_after": 0.854822,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.854822,
+      "delta": 0
+    }
+  },
+  "L015938": {
+    "call": {
+      "probability_after": 0.9069,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.909359,
+      "delta": 0.002459
+    },
+    "discovery_meeting": {
+      "probability_after": 0.9069,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.9069,
+      "delta": 0
+    }
+  },
+  "L021540": {
+    "call": {
+      "probability_after": 0.467768,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.467768,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.467768,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.467768,
+      "delta": 0
+    }
+  },
+  "L043399": {
+    "call": {
+      "probability_after": 0.458086,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.458086,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.458086,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.458086,
+      "delta": 0
+    }
+  },
+  "L040702": {
+    "call": {
+      "probability_after": 0.924674,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.924974,
+      "delta": 0.0003
+    },
+    "discovery_meeting": {
+      "probability_after": 0.924674,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.924674,
+      "delta": 0
+    }
+  },
+  "L014323": {
+    "call": {
+      "probability_after": 0.464827,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.464827,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.464827,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.464827,
+      "delta": 0
+    }
+  },
+  "L056740": {
+    "call": {
+      "probability_after": 0.809738,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.809738,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.809738,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.809738,
+      "delta": 0
+    }
+  },
+  "L032018": {
+    "call": {
+      "probability_after": 0.473543,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.473543,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.473543,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.473543,
+      "delta": 0
+    }
+  },
+  "L000037": {
+    "call": {
+      "probability_after": 0.800354,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.814893,
+      "delta": 0.01454
+    },
+    "discovery_meeting": {
+      "probability_after": 0.800354,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.800354,
+      "delta": 0
+    }
+  },
+  "L003472": {
+    "call": {
+      "probability_after": 0.599595,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.614586,
+      "delta": 0.014991
+    },
+    "discovery_meeting": {
+      "probability_after": 0.599595,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.599595,
+      "delta": 0
+    }
+  },
+  "L042381": {
+    "call": {
+      "probability_after": 0.430064,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.507856,
+      "delta": 0.077792
+    },
+    "discovery_meeting": {
+      "probability_after": 0.50181,
+      "delta": 0.071746
+    },
+    "discount_review": {
+      "probability_after": 0.430064,
+      "delta": 0
+    }
+  },
+  "L046436": {
+    "call": {
+      "probability_after": 0.777608,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.781139,
+      "delta": 0.003531
+    },
+    "discovery_meeting": {
+      "probability_after": 0.777608,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.777608,
+      "delta": 0
+    }
+  },
+  "L026194": {
+    "call": {
+      "probability_after": 0.747767,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.751192,
+      "delta": 0.003424
+    },
+    "discovery_meeting": {
+      "probability_after": 0.747767,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.747767,
+      "delta": 0
+    }
+  },
+  "L030000": {
+    "call": {
+      "probability_after": 0.764956,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.764956,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.764956,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.764956,
+      "delta": 0
+    }
+  },
+  "L019122": {
+    "call": {
+      "probability_after": 0.841638,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.884986,
+      "delta": 0.043348
+    },
+    "discovery_meeting": {
+      "probability_after": 0.875774,
+      "delta": 0.034136
+    },
+    "discount_review": {
+      "probability_after": 0.841638,
+      "delta": 0
+    }
+  },
+  "L016440": {
+    "call": {
+      "probability_after": 0.522377,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.534398,
+      "delta": 0.012021
+    },
+    "discovery_meeting": {
+      "probability_after": 0.522377,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.522377,
+      "delta": 0
+    }
+  },
+  "L042247": {
+    "call": {
+      "probability_after": 0.902872,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.931158,
+      "delta": 0.028286
+    },
+    "discovery_meeting": {
+      "probability_after": 0.929587,
+      "delta": 0.026715
+    },
+    "discount_review": {
+      "probability_after": 0.902872,
+      "delta": 0
+    }
+  },
+  "L021524": {
+    "call": {
+      "probability_after": 0.785973,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.789771,
+      "delta": 0.003798
+    },
+    "discovery_meeting": {
+      "probability_after": 0.785973,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.785973,
+      "delta": 0
+    }
+  },
+  "L026309": {
+    "call": {
+      "probability_after": 0.586586,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.589855,
+      "delta": 0.00327
+    },
+    "discovery_meeting": {
+      "probability_after": 0.586586,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.586586,
+      "delta": 0
+    }
+  },
+  "L047239": {
+    "call": {
+      "probability_after": 0.49515,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.497854,
+      "delta": 0.002703
+    },
+    "discovery_meeting": {
+      "probability_after": 0.49515,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.49515,
+      "delta": 0
+    }
+  },
+  "L016269": {
+    "call": {
+      "probability_after": 0.586196,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.590597,
+      "delta": 0.004401
+    },
+    "discovery_meeting": {
+      "probability_after": 0.586196,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.586196,
+      "delta": 0
+    }
+  },
+  "L014270": {
+    "call": {
+      "probability_after": 0.637812,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.638769,
+      "delta": 0.000957
+    },
+    "discovery_meeting": {
+      "probability_after": 0.637812,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.637812,
+      "delta": 0
+    }
+  },
+  "L038608": {
+    "call": {
+      "probability_after": 0.83448,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.84023,
+      "delta": 0.00575
+    },
+    "discovery_meeting": {
+      "probability_after": 0.83448,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.83448,
+      "delta": 0
+    }
+  },
+  "L027275": {
+    "call": {
+      "probability_after": 0.28781,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.346638,
+      "delta": 0.058828
+    },
+    "discovery_meeting": {
+      "probability_after": 0.344414,
+      "delta": 0.056604
+    },
+    "discount_review": {
+      "probability_after": 0.28781,
+      "delta": 0
+    }
+  },
+  "L007708": {
+    "call": {
+      "probability_after": 0.887446,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.890309,
+      "delta": 0.002863
+    },
+    "discovery_meeting": {
+      "probability_after": 0.887446,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.887446,
+      "delta": 0
+    }
+  },
+  "L043581": {
+    "call": {
+      "probability_after": 0.76943,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.76943,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.76943,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.76943,
+      "delta": 0
+    }
+  },
+  "L020476": {
+    "call": {
+      "probability_after": 0.799295,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.803895,
+      "delta": 0.0046
+    },
+    "discovery_meeting": {
+      "probability_after": 0.799295,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.799295,
+      "delta": 0
+    }
+  },
+  "L034140": {
+    "call": {
+      "probability_after": 0.88488,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.904314,
+      "delta": 0.019434
+    },
+    "discovery_meeting": {
+      "probability_after": 0.90097,
+      "delta": 0.01609
+    },
+    "discount_review": {
+      "probability_after": 0.88488,
+      "delta": 0
+    }
+  },
+  "L017373": {
+    "call": {
+      "probability_after": 0.66547,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.66547,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.66547,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.66547,
+      "delta": 0
+    }
+  },
+  "L001072": {
+    "call": {
+      "probability_after": 0.530945,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.550784,
+      "delta": 0.019838
+    },
+    "discovery_meeting": {
+      "probability_after": 0.550784,
+      "delta": 0.019838
+    },
+    "discount_review": {
+      "probability_after": 0.530945,
+      "delta": 0
+    }
+  },
+  "L010676": {
+    "call": {
+      "probability_after": 0.709398,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.717514,
+      "delta": 0.008116
+    },
+    "discovery_meeting": {
+      "probability_after": 0.709398,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.709398,
+      "delta": 0
+    }
+  },
+  "L036714": {
+    "call": {
+      "probability_after": 0.34537,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.347264,
+      "delta": 0.001893
+    },
+    "discovery_meeting": {
+      "probability_after": 0.34537,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.34537,
+      "delta": 0
+    }
+  },
+  "L002818": {
+    "call": {
+      "probability_after": 0.47071,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.47071,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.47071,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.47071,
+      "delta": 0
+    }
+  },
+  "L057597": {
+    "call": {
+      "probability_after": 0.744902,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.745821,
+      "delta": 0.000919
+    },
+    "discovery_meeting": {
+      "probability_after": 0.744902,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.744902,
+      "delta": 0
+    }
+  },
+  "L044719": {
+    "call": {
+      "probability_after": 0.45812,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.486241,
+      "delta": 0.028121
+    },
+    "discovery_meeting": {
+      "probability_after": 0.45812,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.45812,
+      "delta": 0
+    }
+  },
+  "L014221": {
+    "call": {
+      "probability_after": 0.545402,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.593795,
+      "delta": 0.048393
+    },
+    "discovery_meeting": {
+      "probability_after": 0.593795,
+      "delta": 0.048393
+    },
+    "discount_review": {
+      "probability_after": 0.545402,
+      "delta": 0
+    }
+  },
+  "L015087": {
+    "call": {
+      "probability_after": 0.660017,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.664325,
+      "delta": 0.004308
+    },
+    "discovery_meeting": {
+      "probability_after": 0.660017,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.660017,
+      "delta": 0
+    }
+  },
+  "L021729": {
+    "call": {
+      "probability_after": 0.505,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.606587,
+      "delta": 0.101586
+    },
+    "discovery_meeting": {
+      "probability_after": 0.591652,
+      "delta": 0.086651
+    },
+    "discount_review": {
+      "probability_after": 0.505,
+      "delta": 0
+    }
+  },
+  "L030697": {
+    "call": {
+      "probability_after": 0.764241,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.833819,
+      "delta": 0.069579
+    },
+    "discovery_meeting": {
+      "probability_after": 0.825208,
+      "delta": 0.060967
+    },
+    "discount_review": {
+      "probability_after": 0.764241,
+      "delta": 0
+    }
+  },
+  "L003725": {
+    "call": {
+      "probability_after": 0.676404,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.69165,
+      "delta": 0.015246
+    },
+    "discovery_meeting": {
+      "probability_after": 0.676404,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.676404,
+      "delta": 0
+    }
+  },
+  "L045346": {
+    "call": {
+      "probability_after": 0.475166,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.476091,
+      "delta": 0.000925
+    },
+    "discovery_meeting": {
+      "probability_after": 0.475166,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.475166,
+      "delta": 0
+    }
+  },
+  "L036366": {
+    "call": {
+      "probability_after": 0.383098,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.383098,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.383098,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.383098,
+      "delta": 0
+    }
+  },
+  "L025743": {
+    "call": {
+      "probability_after": 0.453334,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.453334,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.453334,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.453334,
+      "delta": 0
+    }
+  },
+  "L016014": {
+    "call": {
+      "probability_after": 0.561316,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.561316,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.561316,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.561316,
+      "delta": 0
+    }
+  },
+  "L017277": {
+    "call": {
+      "probability_after": 0.919901,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.922932,
+      "delta": 0.003031
+    },
+    "discovery_meeting": {
+      "probability_after": 0.919901,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.919901,
+      "delta": 0
+    }
+  },
+  "L025090": {
+    "call": {
+      "probability_after": 0.459451,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.46278,
+      "delta": 0.003329
+    },
+    "discovery_meeting": {
+      "probability_after": 0.459451,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.459451,
+      "delta": 0
+    }
+  },
+  "L011000": {
+    "call": {
+      "probability_after": 0.749859,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.75338,
+      "delta": 0.003522
+    },
+    "discovery_meeting": {
+      "probability_after": 0.749859,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.749859,
+      "delta": 0
+    }
+  },
+  "L041876": {
+    "call": {
+      "probability_after": 0.766035,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.766035,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.766035,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.766035,
+      "delta": 0
+    }
+  },
+  "L014020": {
+    "call": {
+      "probability_after": 0.877385,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.878962,
+      "delta": 0.001577
+    },
+    "discovery_meeting": {
+      "probability_after": 0.877385,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.877385,
+      "delta": 0
+    }
+  },
+  "L052704": {
+    "call": {
+      "probability_after": 0.680905,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.680905,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.680905,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.680905,
+      "delta": 0
+    }
+  },
+  "L031395": {
+    "call": {
+      "probability_after": 0.598548,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.621353,
+      "delta": 0.022804
+    },
+    "discovery_meeting": {
+      "probability_after": 0.598548,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.598548,
+      "delta": 0
+    }
+  },
+  "L012266": {
+    "call": {
+      "probability_after": 0.576561,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.576561,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.576561,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.576561,
+      "delta": 0
+    }
+  },
+  "L023245": {
+    "call": {
+      "probability_after": 0.534875,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.537902,
+      "delta": 0.003027
+    },
+    "discovery_meeting": {
+      "probability_after": 0.534875,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.534875,
+      "delta": 0
+    }
+  },
+  "L008183": {
+    "call": {
+      "probability_after": 0.456205,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.461447,
+      "delta": 0.005242
+    },
+    "discovery_meeting": {
+      "probability_after": 0.456205,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.456205,
+      "delta": 0
+    }
+  },
+  "L020763": {
+    "call": {
+      "probability_after": 0.4959,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.555867,
+      "delta": 0.059967
+    },
+    "discovery_meeting": {
+      "probability_after": 0.550977,
+      "delta": 0.055077
+    },
+    "discount_review": {
+      "probability_after": 0.4959,
+      "delta": 0
+    }
+  },
+  "L042750": {
+    "call": {
+      "probability_after": 0.862123,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.862123,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.862123,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.862123,
+      "delta": 0
+    }
+  },
+  "L055958": {
+    "call": {
+      "probability_after": 0.57746,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.648369,
+      "delta": 0.070909
+    },
+    "discovery_meeting": {
+      "probability_after": 0.638723,
+      "delta": 0.061263
+    },
+    "discount_review": {
+      "probability_after": 0.57746,
+      "delta": 0
+    }
+  },
+  "L011245": {
+    "call": {
+      "probability_after": 0.876811,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.881095,
+      "delta": 0.004285
+    },
+    "discovery_meeting": {
+      "probability_after": 0.876811,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.876811,
+      "delta": 0
+    }
+  },
+  "L004400": {
+    "call": {
+      "probability_after": 0.705533,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.706022,
+      "delta": 0.000489
+    },
+    "discovery_meeting": {
+      "probability_after": 0.705533,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.705533,
+      "delta": 0
+    }
+  },
+  "L003533": {
+    "call": {
+      "probability_after": 0.760372,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.760372,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.760372,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.760372,
+      "delta": 0
+    }
+  },
+  "L005480": {
+    "call": {
+      "probability_after": 0.784106,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.789799,
+      "delta": 0.005694
+    },
+    "discovery_meeting": {
+      "probability_after": 0.784106,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.784106,
+      "delta": 0
+    }
+  },
+  "L052306": {
+    "call": {
+      "probability_after": 0.803801,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.826106,
+      "delta": 0.022304
+    },
+    "discovery_meeting": {
+      "probability_after": 0.817277,
+      "delta": 0.013476
+    },
+    "discount_review": {
+      "probability_after": 0.803801,
+      "delta": 0
+    }
+  },
+  "L041457": {
+    "call": {
+      "probability_after": 0.791072,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.839288,
+      "delta": 0.048216
+    },
+    "discovery_meeting": {
+      "probability_after": 0.829686,
+      "delta": 0.038615
+    },
+    "discount_review": {
+      "probability_after": 0.791072,
+      "delta": 0
+    }
+  },
+  "L058678": {
+    "call": {
+      "probability_after": 0.630124,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.637228,
+      "delta": 0.007104
+    },
+    "discovery_meeting": {
+      "probability_after": 0.630124,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.630124,
+      "delta": 0
+    }
+  },
+  "L018585": {
+    "call": {
+      "probability_after": 0.559997,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.559997,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.559997,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.559997,
+      "delta": 0
+    }
+  },
+  "L029819": {
+    "call": {
+      "probability_after": 0.546504,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.556449,
+      "delta": 0.009945
+    },
+    "discovery_meeting": {
+      "probability_after": 0.546504,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.546504,
+      "delta": 0
+    }
+  },
+  "L031815": {
+    "call": {
+      "probability_after": 0.792332,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.79822,
+      "delta": 0.005889
+    },
+    "discovery_meeting": {
+      "probability_after": 0.792332,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.792332,
+      "delta": 0
+    }
+  },
+  "L032601": {
+    "call": {
+      "probability_after": 0.4453,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.4453,
+      "delta": 0
+    },
+    "discovery_meeting": {
+      "probability_after": 0.4453,
+      "delta": 0
+    },
+    "discount_review": {
+      "probability_after": 0.4453,
       "delta": 0
     }
   }

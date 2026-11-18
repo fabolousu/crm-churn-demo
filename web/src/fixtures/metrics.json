@@ -1,0 +1,7 @@
+{
+  "auc": 0.772915,
+  "calibration_error": 0.010442,
+  "lift_at_10": 2.262173,
+  "latent_auc": 0.788589,
+  "model_version": "lead-win-lgbm-v1"
+}

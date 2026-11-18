@@ -20,19 +20,17 @@ import {
   Stat,
 } from "../components/ui";
 import { formatEURCompact, formatPercent, regionLabel } from "../lib/format";
-import {
-  MODEL_METRICS,
-  OPEN_LEADS,
-  winPrevalence,
-} from "../lib/model";
+import { MODEL_METRICS } from "../lib/metrics";
+import { winPrevalence } from "../lib/model";
 import { stabilityBreakdown } from "../lib/stability";
 import { usePipeline } from "../state/PipelineProvider";
 
 const CALIBRATION_DOMAIN: [number, number] = [0, 0.7];
 
 export default function PortfolioPage() {
-  const { portfolio, health } = usePipeline();
-  const prevalence = winPrevalence(portfolio.by_region);
+  const { portfolio, health, pipeline } = usePipeline();
+  const prevalence =
+    portfolio.win_prevalence ?? winPrevalence(portfolio.by_region);
   const maxExpected = Math.max(
     ...portfolio.by_region.map((region) => region.expected_value),
   );
@@ -66,7 +64,7 @@ export default function PortfolioPage() {
           <Stat
             label="Expected pipeline value"
             value={formatEURCompact(portfolio.total_expected_value)}
-            hint={`${OPEN_LEADS.toLocaleString("en-GB")} open initiatives`}
+            hint={`${pipeline.total.toLocaleString("en-GB")} open initiatives`}
           />
         </div>
         <div className="border-l border-line pl-5 sm:border-0 sm:px-6 sm:py-6">
@@ -439,13 +437,19 @@ export default function PortfolioPage() {
               <div className="flex justify-between gap-3">
                 <span className="text-muted">Coverage</span>
                 <span className="font-medium tabular-nums text-ink">
-                  {OPEN_LEADS.toLocaleString("en-GB")} leads
+                  {pipeline.total.toLocaleString("en-GB")} leads
                 </span>
               </div>
               <div className="flex justify-between gap-3">
                 <span className="text-muted">Win prevalence</span>
                 <span className="font-medium tabular-nums text-ink">
                   {formatPercent(prevalence, 2)}
+                </span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-muted">Lift@10%</span>
+                <span className="font-medium tabular-nums text-ink">
+                  {MODEL_METRICS.liftAt10.toFixed(2)}× vs random
                 </span>
               </div>
               <div className="flex justify-between gap-3">

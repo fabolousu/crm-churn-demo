@@ -19,11 +19,7 @@ import {
   formatPoints,
   regionLabel,
 } from "../lib/format";
-import {
-  LEVERAGE_BOOK,
-  pipelineAtRisk,
-  winPrevalence,
-} from "../lib/model";
+import { LEVERAGE_BOOK, winPrevalence } from "../lib/model";
 import { usePipeline } from "../state/PipelineProvider";
 
 type SortKey = "expected_value" | "at_risk" | "leverage";
@@ -44,7 +40,12 @@ export default function PipelinePage() {
     else setSearchParams({ sort: next });
   };
 
-  const prevalence = winPrevalence(portfolio.by_region);
+  const prevalence = portfolio.win_prevalence ?? winPrevalence(portfolio.by_region);
+  const openArr = pipeline.total_open_arr ?? null;
+  const atRisk =
+    openArr !== null
+      ? Math.max(0, openArr - pipeline.total_expected_value)
+      : null;
 
   const items = useMemo(() => {
     const filtered =
@@ -91,29 +92,33 @@ export default function PipelinePage() {
         <div className="lg:px-6 lg:py-6">
           <Stat
             label="Expected pipeline value"
-            value={formatEURCompact(portfolio.total_expected_value)}
+            value={formatEURCompact(pipeline.total_expected_value)}
             hint={`across ${pipeline.total.toLocaleString("en-GB")} open initiatives`}
           />
         </div>
         <div className="lg:px-6 lg:py-6">
           <Stat
-            label="Proposed ARR at risk"
-            value={formatEURCompact(pipelineAtRisk(portfolio.total_expected_value))}
-            hint="open ARR not expected to convert"
+            label="Open pipeline"
+            value={openArr !== null ? formatEURCompact(openArr) : "—"}
+            hint={
+              atRisk !== null
+                ? `${formatEURCompact(atRisk)} at risk`
+                : "open ARR not in the pipeline payload"
+            }
           />
         </div>
         <div className="lg:px-6 lg:py-6">
           <Stat
             label="Win rate"
             value={formatPercent(prevalence, 2)}
-            hint="model-calibrated prevalence, five regions"
+            hint="labelled prevalence, five regions"
           />
         </div>
         <div className="lg:px-6 lg:py-6">
           <Stat
             label="Median best lever"
             value={formatPoints(LEVERAGE_BOOK.median, 2)}
-            hint={`90th percentile ${formatPoints(LEVERAGE_BOOK.p90)}`}
+            hint={`90th percentile ${formatPoints(LEVERAGE_BOOK.p90, 2)}`}
           />
         </div>
       </Card>
@@ -204,10 +209,11 @@ export default function PipelinePage() {
 
       <div className="mt-8 grid gap-4 border-t border-line pt-5 text-[10.5px] leading-relaxed text-muted md:grid-cols-[1fr_1fr_auto]">
         <p>
-          Risk bands: critical below 15% probability, high below 30%, medium below
-          50%, low at 50% or above. The contract defines the band names, not the
-          cut points; the UI applies them consistently and re-bands every
-          re-score.
+          Probability bands follow the model: low below 20%, medium below 40%,
+          high below 60%, and the contract's critical band (shown as{" "}
+          <span className="font-medium text-ink">Top</span>) at 60% or above.
+          They are win-probability bands, not risk ratings; the UI re-bands
+          every re-score from the same cut-points.
         </p>
         <p>
           Leverage is the contract's <code>max_leverage</code>: the largest
@@ -217,9 +223,10 @@ export default function PipelinePage() {
           </span>
           ; the 90th percentile is{" "}
           <span className="font-medium text-ink">
-            {formatPoints(LEVERAGE_BOOK.p90)}
+            {formatPoints(LEVERAGE_BOOK.p90, 2)}
           </span>
-          . Sort by it to see where effort pays off.
+          . Sort by it to see where effort pays off — the median is only +0.43
+          points, so the tail is the point.
         </p>
         <Link
           to="/act"

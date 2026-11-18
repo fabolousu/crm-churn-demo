@@ -1,1020 +1,444 @@
-// Builds the checked-in demo fixtures from one authored world.
+// Generate the web fixtures from the running API and its database.
 //
-//   node scripts/build-fixtures.mjs
+//   python tools/run_pipeline.py
+//   python -m uvicorn api.app:app --host 127.0.0.1 --port 8000
+//   pnpm --dir web fixtures
 //
-// The JSON in src/fixtures/ is committed; this script exists so the queue,
-// lead pages, levers, actions and portfolio cannot drift apart. It is never
-// imported by the app.
+// Nothing in src/fixtures/ is authored here. The queue, lead details, company
+// details, counterfactuals, action re-scores, portfolio, model metrics and
+// demo defaults all come from the live responses. The only database reads are
+// the totals the API does not expose (total open ARR, closed-lead selection,
+// labelled win prevalence).
 //
-// Numbers come from the real build:
-//   * 19,752 open initiatives
-//   * 28.66% win prevalence
-//   * mean proposed ARR €36,246 (data/generator.py CALIBRATED_Z.amount_arr)
-//   * model AUC 0.773, calibration error 0.0104, latent ceiling 0.789
-//   * five Italian macro-regions
+// Environment:
+//   API_BASE             default http://127.0.0.1:8000
+//   DB_PATH              default <repo>/data/demo.db
+//   FIXTURE_CONCURRENCY  default 6
 //
-// Counterfactual fixtures are precomputed with the documented feature effects
-// in docs/LABEL.md (one meeting +0.25 logit, +5 NPS +0.20 logit, discount
-// -0.20 logit per z). With VITE_API_BASE set, the app calls the real model
-// instead and these values are unused.
+// The script is deliberately a build step, never imported by the app. The app
+// only reads the committed JSON.
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { DatabaseSync } from "node:sqlite";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = resolve(HERE, "..", "..");
 const OUT = resolve(HERE, "..", "src", "fixtures");
+const API_BASE = (process.env.API_BASE ?? "http://127.0.0.1:8000").replace(/\/+$/, "");
+const DB_PATH = process.env.DB_PATH ?? resolve(ROOT, "data", "demo.db");
+const CONCURRENCY = Number(process.env.FIXTURE_CONCURRENCY ?? 6);
+const DISCOUNTS = [0, 5, 10, 15, 20, 25, 30];
+const OPEN_STATUSES = ["new", "contacted", "qualified", "proposal"];
 
-// The stability fields are optional in the contract. The fixture copy is
-// read from one committed snapshot (the contract example) so the panel cannot
-// drift from the API values; the build validates the output against it.
-const STABILITY = JSON.parse(
-  readFileSync(resolve(HERE, "stability-snapshot.json"), "utf8"),
+const errors = [];
+const warnings = [];
+const check = (ok, message) => {
+  if (!ok) errors.push(message);
+};
+
+async function api(path, init) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      Accept: "application/json",
+      ...(init?.body ? { "Content-Type": "application/json" } : {}),
+    },
+  });
+  if (!response.ok) {
+    throw new Error(
+      `${init?.method ?? "GET"} ${path} -> ${response.status}: ${(await response.text()).slice(0, 300)}`,
+    );
+  }
+  return response.json();
+}
+
+const get = (path) => api(path);
+const post = (path, body) =>
+  api(path, { method: "POST", body: JSON.stringify(body) });
+
+async function mapLimit(items, limit, fn) {
+  const out = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (true) {
+      const index = next++;
+      if (index >= items.length) return;
+      out[index] = await fn(items[index], index);
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, () => worker()),
+  );
+  return out;
+}
+
+const round = (value, places = 6) => Number(value.toFixed(places));
+
+// ---------------------------------------------------------------------------
+// Live service + database facts the API does not expose
+// ---------------------------------------------------------------------------
+
+console.log(`API ${API_BASE}`);
+const health = await get("/api/health");
+console.log(`health: ${health.status} ${health.model_version}`);
+
+const pipeline = await get("/api/pipeline?limit=200");
+const portfolio = await get("/api/portfolio");
+const metricsRaw = JSON.parse(
+  readFileSync(resolve(ROOT, "ml", "artifacts", "metrics.json"), "utf8"),
 );
 
-// ---------------------------------------------------------------------------
-// Snapshot and model facts
-// ---------------------------------------------------------------------------
+const db = new DatabaseSync(DB_PATH, { readOnly: true });
+const openArr = db
+  .prepare(
+    `SELECT COALESCE(SUM(amount_arr), 0) AS total
+     FROM leads WHERE status IN (${OPEN_STATUSES.map(() => "?").join(",")})`,
+  )
+  .get(...OPEN_STATUSES).total;
+const labelled = db
+  .prepare("SELECT SUM(won) AS won, COUNT(*) AS n FROM lead_outcomes")
+  .get();
+const closed = db
+  .prepare(
+    `SELECT l.id
+     FROM leads AS l
+     WHERE l.status IN ('won', 'lost')
+       AND l.amount_arr >= 50000
+       AND (SELECT COUNT(*) FROM leads AS p
+            WHERE p.company_id = l.company_id AND p.created_at < l.created_at) >= 2
+     ORDER BY l.id
+     LIMIT 1`,
+  )
+  .get();
+db.close();
 
-const SNAPSHOT = "2026-11-18";
-const SNAPSHOT_ISO = "2026-11-18T06:00:00+01:00";
-const MODEL_VERSION = "lead-win-gbm-0.3.0";
-const MEAN_ARR = 36246.04918124; // generator reference mean, used for the portfolio roll-up
+if (!closed) throw new Error("the database has no closed lead with prior initiatives");
+const winPrevalence = round(Number(labelled.won) / Number(labelled.n));
+console.log(
+  `open ARR €${openArr.toLocaleString("en-GB")} · labelled prevalence ${(winPrevalence * 100).toFixed(3)}%`,
+);
 
-const OPEN_LEADS = 19_752;
-const PREVALENCE = 0.2866;
-const TOTAL_EXPECTED_VALUE = 205_190_000;
-
-const MODEL = {
-  auc: 0.773,
-  calibration_error: 0.0104,
-  latent_auc: 0.789,
-};
-
-// Portfolio is authored from the same facts: expected value per region is
-// open_leads x win_rate x mean proposed ARR, rounded to €10k. Sum = 205.19M.
-const REGIONS = [
-  { region: "nord-ovest", open_leads: 2370, wins: 758, expected_value: 27_480_000 },
-  { region: "nord-est", open_leads: 2370, wins: 802, expected_value: 29_070_000 },
-  { region: "centro", open_leads: 3951, wins: 1225, expected_value: 44_400_000 },
-  { region: "sud", open_leads: 5530, wins: 1499, expected_value: 54_330_000 },
-  { region: "isole", open_leads: 5531, wins: 1377, expected_value: 49_910_000 },
-];
-
-// Ten decile bins. Predicted means average to prevalence; the weighted
-// absolute gap is exactly 0.0104 (the calibration error the model reports).
-const CALIBRATION = [
-  { predicted: 0.055, actual: 0.067 },
-  { predicted: 0.095, actual: 0.085 },
-  { predicted: 0.14, actual: 0.149 },
-  { predicted: 0.19, actual: 0.177 },
-  { predicted: 0.24, actual: 0.251 },
-  { predicted: 0.295, actual: 0.287 },
-  { predicted: 0.355, actual: 0.369 },
-  { predicted: 0.42, actual: 0.41 },
-  { predicted: 0.49, actual: 0.497 },
-  { predicted: 0.586, actual: 0.576 },
-];
-
-// STABILITY comes from scripts/stability-snapshot.json. The holdout genuinely
-// scores higher (mean p 0.360 vs 0.272, win rate 35.1% vs 27.0%), so "watch"
-// is the honest status, not a degradation.
-
-// The updated pitch uses this real lead on the lever screen. Its executive
-// sponsor counterfactual is the model's actual re-score, not the fixture
-// approximation used for the other leads.
-const REAL_DEMO = {
-  leadId: "L057056",
-  exec: {
-    current_probability: 0.5431,
-    hypothetical_probability: 0.7158,
-    delta: 0.1727,
-  },
-};
+const items = pipeline.items;
+const ids = items.map((item) => item.lead_id);
 
 // ---------------------------------------------------------------------------
-// Model arithmetic for the fixture counterfactuals
-// ---------------------------------------------------------------------------
-
-const Z_REFERENCE_SCALE = 1.25;
-const Z = {
-  meetings: 1.25527411,
-  nps: 34.99411608,
-  discount: 8.35726263,
-};
-const BETA = { meetings: 0.25, nps: 0.2, discount: -0.2 };
-
-const EXEC_DELTA =
-  (Z_REFERENCE_SCALE / Z.meetings) * BETA.meetings +
-  (5 * Z_REFERENCE_SCALE) / Z.nps * BETA.nps;
-const DISCOVERY_DELTA = (Z_REFERENCE_SCALE / Z.meetings) * BETA.meetings;
-
-const sigmoid = (x) => 1 / (1 + Math.exp(-x));
-const logit = (p) => Math.log(p / (1 - p));
-const round = (x, places = 4) => Number(x.toFixed(places));
-
-function rescore(p, logitDelta) {
-  const next = sigmoid(logit(p) + logitDelta);
-  return {
-    current_probability: round(p),
-    hypothetical_probability: round(next),
-    delta: round(next - p),
-  };
-}
-
-function discountLogitDelta(currentPct, nextPct) {
-  return (
-    BETA.discount *
-    ((nextPct - currentPct) * Z_REFERENCE_SCALE) /
-    Z.discount
-  );
-}
-
-function band(p) {
-  if (p < 0.15) return "critical";
-  if (p < 0.3) return "high";
-  if (p < 0.5) return "medium";
-  return "low";
-}
-
-function daysBetween(from, to) {
-  const a = Date.parse(`${from}T00:00:00Z`);
-  const b = Date.parse(`${to}T00:00:00Z`);
-  return Math.round((b - a) / 86_400_000);
-}
-
-// ---------------------------------------------------------------------------
-// The authored world: 12 initiatives, enough for every region and every state
-// ---------------------------------------------------------------------------
-
-const leads = [
-  {
-    // The real demo lead from the updated pitch: 54.31% -> 71.58% with an
-    // executive sponsor meeting (+17.27 points, the contract's max_leverage).
-    lead_id: "L057056",
-    company_id: "C-01142",
-    company_name: "Farina Vetri S.r.l.",
-    region: "nord-est",
-    industry: "Manifattura",
-    employees: 240,
-    source: "referral",
-    status: "proposal",
-    created_at: "2026-10-15",
-    amount_arr: 280_000,
-    discount_pct: 8,
-    probability: 0.5431,
-    drivers: [
-      {
-        feature: "first_response_hours",
-        label: "First response",
-        contribution: -0.33,
-        value: "11 hours to first response",
-        direction: "decreases",
-      },
-      {
-        feature: "meetings_before_scoring",
-        label: "Executive access",
-        contribution: -0.28,
-        value: "No executive sponsor meeting yet",
-        direction: "decreases",
-      },
-      {
-        feature: "prior_lost_initiatives",
-        label: "Lost initiatives",
-        contribution: -0.25,
-        value: "2 of the last 4 initiatives lost",
-        direction: "decreases",
-      },
-    ],
-    open_actions: [
-      {
-        id: "ACT-0571",
-        kind: "call",
-        status: "open",
-        created_at: "2026-11-14T10:20:00+01:00",
-        created_by: "Giulia Bianchi",
-        note: "Technical review booked; the executive sponsor has not met the buyer yet.",
-      },
-    ],
-    history: [
-      { id: "L049901", status: "won", source: "referral", created_at: "2026-09-18", closed_at: "2026-10-30", amount_arr: 420_000, discount_pct: 5, lost_reason: null },
-      { id: "L041277", status: "lost", source: "outbound", created_at: "2026-05-02", closed_at: "2026-06-18", amount_arr: 260_000, discount_pct: 12, lost_reason: "price" },
-      { id: "L033118", status: "won", source: "partner", created_at: "2025-11-10", closed_at: "2025-12-22", amount_arr: 290_000, discount_pct: 4, lost_reason: null },
-      { id: "L026604", status: "lost", source: "outbound", created_at: "2025-06-15", closed_at: "2025-07-30", amount_arr: 180_000, discount_pct: 9, lost_reason: "competitor" },
-    ],
-  },
-  {
-    lead_id: "L052117",
-    company_id: "C-00542",
-    company_name: "Cantieri Marini S.p.A.",
-    region: "nord-est",
-    industry: "Costruzioni",
-    employees: 280,
-    source: "partner",
-    status: "proposal",
-    created_at: "2026-10-20",
-    amount_arr: 320_000,
-    discount_pct: 6,
-    probability: 0.43,
-    drivers: [
-      {
-        feature: "meetings_before_scoring",
-        label: "Meetings held",
-        contribution: 0.33,
-        value: "Six meetings already held",
-        direction: "increases",
-      },
-      {
-        feature: "prior_won_initiatives",
-        label: "Won initiatives",
-        contribution: 0.24,
-        value: "Two initiatives won together",
-        direction: "increases",
-      },
-      {
-        feature: "amount_arr",
-        label: "Deal size",
-        contribution: -0.18,
-        value: "€320,000 proposed — larger initiatives close less often",
-        direction: "decreases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09602", status: "won", source: "partner", created_at: "2026-07-21", closed_at: "2026-09-02", amount_arr: 420_000, discount_pct: 4, lost_reason: null },
-      { id: "L-08277", status: "won", source: "referral", created_at: "2026-02-10", closed_at: "2026-03-30", amount_arr: 320_000, discount_pct: 5, lost_reason: null },
-      { id: "L-07119", status: "lost", source: "outbound", created_at: "2025-05-12", closed_at: "2025-06-25", amount_arr: 180_000, discount_pct: 8, lost_reason: "competitor" },
-    ],
-  },
-  {
-    lead_id: "L048322",
-    company_id: "C-00271",
-    company_name: "Tecnoimpianti Sabina S.r.l.",
-    region: "centro",
-    industry: "Elettronica",
-    employees: 150,
-    source: "referral",
-    status: "qualified",
-    created_at: "2026-09-28",
-    amount_arr: 215_000,
-    discount_pct: 12,
-    probability: 0.56,
-    drivers: [
-      {
-        feature: "prior_won_initiatives",
-        label: "Won initiatives",
-        contribution: 0.3,
-        value: "Three initiatives won together",
-        direction: "increases",
-      },
-      {
-        feature: "source",
-        label: "Lead source",
-        contribution: 0.27,
-        value: "Referral from an existing customer",
-        direction: "increases",
-      },
-      {
-        feature: "discount_pct",
-        label: "Discount",
-        contribution: -0.14,
-        value: "12% discount requested",
-        direction: "decreases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09003", status: "won", source: "referral", created_at: "2026-06-03", closed_at: "2026-07-15", amount_arr: 210_000, discount_pct: 6, lost_reason: null },
-      { id: "L-07841", status: "won", source: "inbound", created_at: "2025-10-20", closed_at: "2025-12-01", amount_arr: 200_000, discount_pct: 3, lost_reason: null },
-      { id: "L-06214", status: "lost", source: "outbound", created_at: "2025-03-05", closed_at: "2025-04-10", amount_arr: 90_000, discount_pct: 10, lost_reason: "no_budget" },
-    ],
-  },
-  {
-    lead_id: "L061904",
-    company_id: "C-00786",
-    company_name: "Officine Bertolini S.p.A.",
-    region: "nord-ovest",
-    industry: "Meccanica",
-    employees: 510,
-    source: "outbound",
-    status: "proposal",
-    created_at: "2026-08-24",
-    amount_arr: 380_000,
-    discount_pct: 10,
-    probability: 0.31,
-    drivers: [
-      {
-        feature: "amount_arr",
-        label: "Deal size",
-        contribution: -0.38,
-        value: "€380,000 proposed — larger initiatives close less often",
-        direction: "decreases",
-      },
-      {
-        feature: "days_since_last_initiative",
-        label: "Relationship gap",
-        contribution: -0.26,
-        value: "172 days without a new initiative",
-        direction: "decreases",
-      },
-      {
-        feature: "tickets_90d",
-        label: "Support friction",
-        contribution: -0.19,
-        value: "4 support tickets in 90 days",
-        direction: "decreases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09418", status: "won", source: "outbound", created_at: "2026-05-30", closed_at: "2026-07-10", amount_arr: 720_000, discount_pct: 7, lost_reason: null },
-      { id: "L-07455", status: "won", source: "partner", created_at: "2025-09-01", closed_at: "2025-10-20", amount_arr: 600_000, discount_pct: 4, lost_reason: null },
-      { id: "L-05602", status: "lost", source: "outbound", created_at: "2024-12-10", closed_at: "2025-01-30", amount_arr: 250_000, discount_pct: 11, lost_reason: "timing" },
-    ],
-  },
-  {
-    lead_id: "L043781",
-    company_id: "C-00409",
-    company_name: "Logistica Mediterranea S.r.l.",
-    region: "sud",
-    industry: "Logistica",
-    employees: 190,
-    source: "inbound",
-    status: "qualified",
-    created_at: "2026-10-15",
-    amount_arr: 175_000,
-    discount_pct: 5,
-    probability: 0.62,
-    drivers: [
-      {
-        feature: "source",
-        label: "Lead source",
-        contribution: 0.24,
-        value: "Inbound interest from the website",
-        direction: "increases",
-      },
-      {
-        feature: "meetings_before_scoring",
-        label: "Meetings held",
-        contribution: 0.23,
-        value: "Four meetings already held",
-        direction: "increases",
-      },
-      {
-        feature: "first_response_hours",
-        label: "First response",
-        contribution: 0.19,
-        value: "2 hours to first response",
-        direction: "increases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09740", status: "won", source: "inbound", created_at: "2026-08-01", closed_at: "2026-09-15", amount_arr: 180_000, discount_pct: 2, lost_reason: null },
-      { id: "L-08105", status: "lost", source: "outbound", created_at: "2026-01-20", closed_at: "2026-03-01", amount_arr: 120_000, discount_pct: 9, lost_reason: "price" },
-      { id: "L-07022", status: "won", source: "partner", created_at: "2025-04-15", closed_at: "2025-05-30", amount_arr: 150_000, discount_pct: 3, lost_reason: null },
-    ],
-  },
-  {
-    lead_id: "L059233",
-    company_id: "C-00812",
-    company_name: "Agrumi di Sicilia S.r.l.",
-    region: "isole",
-    industry: "Alimentare",
-    employees: 120,
-    source: "outbound",
-    status: "contacted",
-    created_at: "2026-09-02",
-    amount_arr: 395_000,
-    discount_pct: 9,
-    probability: 0.27,
-    drivers: [
-      {
-        feature: "days_since_last_initiative",
-        label: "Relationship gap",
-        contribution: -0.33,
-        value: "212 days without a new initiative",
-        direction: "decreases",
-      },
-      {
-        feature: "amount_arr",
-        label: "Deal size",
-        contribution: -0.29,
-        value: "€395,000 proposed — larger initiatives close less often",
-        direction: "decreases",
-      },
-      {
-        feature: "prior_lost_initiatives",
-        label: "Lost initiatives",
-        contribution: -0.12,
-        value: "1 of the last 3 initiatives lost",
-        direction: "decreases",
-      },
-    ],
-    open_actions: [
-      {
-        id: "ACT-0388",
-        kind: "call",
-        status: "open",
-        created_at: "2026-11-12T11:40:00+01:00",
-        created_by: "Giulia Bianchi",
-        note: "Re-open the conversation after the harvest season.",
-      },
-    ],
-    history: [
-      { id: "L-08612", status: "lost", source: "outbound", created_at: "2026-04-20", closed_at: "2026-06-01", amount_arr: 140_000, discount_pct: 13, lost_reason: "no_budget" },
-      { id: "L-07230", status: "won", source: "outbound", created_at: "2025-08-10", closed_at: "2025-09-20", amount_arr: 180_000, discount_pct: 6, lost_reason: null },
-    ],
-  },
-  {
-    lead_id: "L050418",
-    company_id: "C-00596",
-    company_name: "Serigrafia Veneta S.r.l.",
-    region: "nord-est",
-    industry: "Grafica",
-    employees: 85,
-    source: "event",
-    status: "proposal",
-    created_at: "2026-10-05",
-    amount_arr: 210_000,
-    discount_pct: 22,
-    probability: 0.48,
-    drivers: [
-      {
-        feature: "discount_pct",
-        label: "Discount",
-        contribution: -0.31,
-        value: "22% discount requested",
-        direction: "decreases",
-      },
-      {
-        feature: "meetings_before_scoring",
-        label: "Meetings held",
-        contribution: 0.21,
-        value: "Five meetings already held",
-        direction: "increases",
-      },
-      {
-        feature: "owner_win_rate_180d",
-        label: "Rep track record",
-        contribution: 0.18,
-        value: "Rep wins 39% of initiatives",
-        direction: "increases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09755", status: "won", source: "event", created_at: "2026-08-25", closed_at: "2026-10-01", amount_arr: 90_000, discount_pct: 5, lost_reason: null },
-      { id: "L-08008", status: "won", source: "inbound", created_at: "2026-01-12", closed_at: "2026-02-20", amount_arr: 120_000, discount_pct: 4, lost_reason: null },
-      { id: "L-06518", status: "lost", source: "outbound", created_at: "2025-03-18", closed_at: "2025-04-22", amount_arr: 60_000, discount_pct: 7, lost_reason: "no_fit" },
-    ],
-  },
-  {
-    lead_id: "L046677",
-    company_id: "C-00633",
-    company_name: "Studio Medico Appia S.r.l.",
-    region: "centro",
-    industry: "Sanità",
-    employees: 60,
-    source: "outbound",
-    status: "qualified",
-    created_at: "2026-09-19",
-    amount_arr: 260_000,
-    discount_pct: 7,
-    probability: 0.38,
-    drivers: [
-      {
-        feature: "tickets_90d",
-        label: "Support friction",
-        contribution: -0.3,
-        value: "5 support tickets in 90 days",
-        direction: "decreases",
-      },
-      {
-        feature: "first_response_hours",
-        label: "First response",
-        contribution: -0.22,
-        value: "24 hours to first response",
-        direction: "decreases",
-      },
-      {
-        feature: "owner_win_rate_180d",
-        label: "Rep track record",
-        contribution: 0.17,
-        value: "Rep wins 39% of initiatives",
-        direction: "increases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09510", status: "won", source: "outbound", created_at: "2026-07-02", closed_at: "2026-08-10", amount_arr: 80_000, discount_pct: 5, lost_reason: null },
-      { id: "L-07644", status: "lost", source: "outbound", created_at: "2025-11-05", closed_at: "2025-12-15", amount_arr: 60_000, discount_pct: 10, lost_reason: "competitor" },
-    ],
-  },
-  {
-    lead_id: "L057912",
-    company_id: "C-00847",
-    company_name: "Salumi Irpini S.p.A.",
-    region: "sud",
-    industry: "Alimentare",
-    employees: 210,
-    source: "outbound",
-    status: "contacted",
-    created_at: "2026-10-08",
-    amount_arr: 390_000,
-    discount_pct: 11,
-    probability: 0.24,
-    drivers: [
-      {
-        feature: "first_response_hours",
-        label: "First response",
-        contribution: -0.36,
-        value: "38 hours to first response",
-        direction: "decreases",
-      },
-      {
-        feature: "amount_arr",
-        label: "Deal size",
-        contribution: -0.28,
-        value: "€390,000 proposed — larger initiatives close less often",
-        direction: "decreases",
-      },
-      {
-        feature: "days_since_last_initiative",
-        label: "Relationship gap",
-        contribution: -0.18,
-        value: "141 days without a new initiative",
-        direction: "decreases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09320", status: "won", source: "outbound", created_at: "2026-06-30", closed_at: "2026-08-08", amount_arr: 160_000, discount_pct: 6, lost_reason: null },
-      { id: "L-07798", status: "lost", source: "outbound", created_at: "2025-12-02", closed_at: "2026-01-15", amount_arr: 100_000, discount_pct: 9, lost_reason: "timing" },
-      { id: "L-05884", status: "won", source: "partner", created_at: "2025-02-14", closed_at: "2025-03-28", amount_arr: 100_000, discount_pct: 4, lost_reason: null },
-    ],
-  },
-  {
-    lead_id: "L044105",
-    company_id: "C-00471",
-    company_name: "Hotel Riviera del Sud S.r.l.",
-    region: "isole",
-    industry: "Turismo",
-    employees: 140,
-    source: "referral",
-    status: "qualified",
-    created_at: "2026-10-26",
-    amount_arr: 178_000,
-    discount_pct: 4,
-    probability: 0.52,
-    drivers: [
-      {
-        feature: "nps_last",
-        label: "Relationship health",
-        contribution: 0.27,
-        value: "NPS 62 — a strong relationship",
-        direction: "increases",
-      },
-      {
-        feature: "source",
-        label: "Lead source",
-        contribution: 0.25,
-        value: "Referral from an existing customer",
-        direction: "increases",
-      },
-      {
-        feature: "prior_won_initiatives",
-        label: "Won initiatives",
-        contribution: 0.14,
-        value: "One initiative won together",
-        direction: "increases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09964", status: "won", source: "referral", created_at: "2026-09-10", closed_at: "2026-10-22", amount_arr: 105_000, discount_pct: 3, lost_reason: null },
-      { id: "L-08331", status: "won", source: "inbound", created_at: "2026-02-18", closed_at: "2026-03-30", amount_arr: 90_000, discount_pct: 2, lost_reason: null },
-    ],
-  },
-  {
-    lead_id: "L060284",
-    company_id: "C-00903",
-    company_name: "Cooperativa Edilizia Tevere S.r.l.",
-    region: "centro",
-    industry: "Costruzioni",
-    employees: 95,
-    source: "outbound",
-    status: "contacted",
-    created_at: "2026-11-07",
-    amount_arr: 400_000,
-    discount_pct: 25,
-    probability: 0.19,
-    drivers: [
-      {
-        feature: "first_response_hours",
-        label: "First response",
-        contribution: -0.34,
-        value: "No first response yet",
-        direction: "decreases",
-      },
-      {
-        feature: "discount_pct",
-        label: "Discount",
-        contribution: -0.22,
-        value: "25% discount already offered",
-        direction: "decreases",
-      },
-      {
-        feature: "amount_arr",
-        label: "Deal size",
-        contribution: -0.2,
-        value: "€400,000 proposed — larger initiatives close less often",
-        direction: "decreases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09845", status: "lost", source: "outbound", created_at: "2026-08-20", closed_at: "2026-09-28", amount_arr: 55_000, discount_pct: 8, lost_reason: "price" },
-      { id: "L-08011", status: "won", source: "outbound", created_at: "2026-01-12", closed_at: "2026-02-20", amount_arr: 88_000, discount_pct: 5, lost_reason: null },
-    ],
-  },
-  {
-    lead_id: "L051639",
-    company_id: "C-00724",
-    company_name: "Mobilificio Salentino S.r.l.",
-    region: "sud",
-    industry: "Manifattura",
-    employees: 130,
-    source: "outbound",
-    status: "proposal",
-    created_at: "2026-09-12",
-    amount_arr: 205_000,
-    discount_pct: 7,
-    probability: 0.35,
-    drivers: [
-      {
-        feature: "owner_win_rate_180d",
-        label: "Rep track record",
-        contribution: 0.26,
-        value: "Rep wins 44% of initiatives",
-        direction: "increases",
-      },
-      {
-        feature: "days_since_last_initiative",
-        label: "Relationship gap",
-        contribution: -0.21,
-        value: "133 days without a new initiative",
-        direction: "decreases",
-      },
-      {
-        feature: "tickets_90d",
-        label: "Support friction",
-        contribution: -0.09,
-        value: "2 support tickets in 90 days",
-        direction: "decreases",
-      },
-    ],
-    open_actions: [],
-    history: [
-      { id: "L-09528", status: "won", source: "outbound", created_at: "2026-07-08", closed_at: "2026-08-20", amount_arr: 125_000, discount_pct: 5, lost_reason: null },
-      { id: "L-07512", status: "lost", source: "outbound", created_at: "2025-10-01", closed_at: "2025-11-10", amount_arr: 80_000, discount_pct: 9, lost_reason: "no_fit" },
-      { id: "L-06109", status: "won", source: "inbound", created_at: "2025-01-20", closed_at: "2025-03-01", amount_arr: 80_000, discount_pct: 2, lost_reason: null },
-    ],
-  },
-];
-
-// ---------------------------------------------------------------------------
-// Derive every view from the authored world
+// Lead details (every queue row must open) + one real closed lead
 // ---------------------------------------------------------------------------
 
 const details = {};
-const pipelineItems = [];
+let leadsDone = 0;
+await mapLimit(ids, CONCURRENCY, async (id) => {
+  details[id] = await get(`/api/leads/${id}`);
+  leadsDone += 1;
+  if (leadsDone % 25 === 0) console.log(`lead details ${leadsDone}/${ids.length}`);
+});
+const closedDetail = await get(`/api/leads/${closed.id}`);
+details[closed.id] = closedDetail;
+console.log(`lead details: ${Object.keys(details).length} (incl. closed ${closed.id})`);
 
-function maxLeverageFor(lead) {
-  if (lead.lead_id === REAL_DEMO.leadId) return REAL_DEMO.exec.delta;
-  const p = lead.probability;
-  const deltas = [EXEC_DELTA, DISCOVERY_DELTA];
-  for (let pct = 0; pct <= 30; pct += 5) {
-    deltas.push(discountLogitDelta(lead.discount_pct, pct));
-  }
-  return round(
-    Math.max(...deltas.map((delta) => sigmoid(logit(p) + delta) - p)),
-  );
-}
+// ---------------------------------------------------------------------------
+// Counterfactuals: all three levers for every queue row, so any row's lever
+// screen is live rather than a dead fixture.
+// ---------------------------------------------------------------------------
 
-for (const lead of leads) {
-  const daysOpen = daysBetween(lead.created_at, SNAPSHOT);
-  const lastInitiative = lead.history[0].created_at;
-  const daysSinceLast = daysBetween(lastInitiative, SNAPSHOT);
-  const lifetimeWon = lead.history
-    .filter((h) => h.status === "won")
-    .reduce((sum, h) => sum + h.amount_arr, 0);
-
-  const drivers = [...lead.drivers].sort(
-    (a, b) => Math.abs(b.contribution) - Math.abs(a.contribution),
-  );
-
-  const score = {
-    probability: lead.probability,
-    band: band(lead.probability),
-    model_version: MODEL_VERSION,
-    scored_at: SNAPSHOT_ISO,
-    expected_value: Math.round(lead.probability * lead.amount_arr),
-  };
-
-  details[lead.lead_id] = {
-    lead: {
-      id: lead.lead_id,
-      status: lead.status,
-      source: lead.source,
-      created_at: lead.created_at,
-      closed_at: null,
-      amount_arr: lead.amount_arr,
-      discount_pct: lead.discount_pct,
-      lost_reason: null,
-    },
-    company: {
-      id: lead.company_id,
-      name: lead.company_name,
-      region: lead.region,
-      industry: lead.industry,
-      employees: lead.employees,
-      lifetime_won_arr: lifetimeWon,
-      dormant: daysSinceLast >= 180,
-    },
-    score,
-    drivers,
-    prior_initiatives: lead.history,
-    open_actions: lead.open_actions,
-    max_leverage: maxLeverageFor(lead),
-  };
-
-  pipelineItems.push({
-    lead_id: lead.lead_id,
-    company_name: lead.company_name,
-    region: lead.region,
-    source: lead.source,
-    status: lead.status,
-    amount_arr: lead.amount_arr,
-    probability: lead.probability,
-    band: band(lead.probability),
-    expected_value: score.expected_value,
-    days_open: daysOpen,
-    max_leverage: maxLeverageFor(lead),
-    top_driver: drivers[0],
-  });
-}
-
-pipelineItems.sort((a, b) => b.expected_value - a.expected_value);
-
-// A closed lead, outside the queue, exists to exercise the contract's
-// max_leverage: null state on the 360. The page must not show a lever.
-const CLOSED_LEAD_ID = "L030001";
-details[CLOSED_LEAD_ID] = {
-  lead: {
-    id: CLOSED_LEAD_ID,
-    status: "won",
-    source: "referral",
-    created_at: "2025-03-01",
-    closed_at: "2025-06-30",
-    amount_arr: 150_000,
-    discount_pct: 4,
-    lost_reason: null,
-  },
-  company: {
-    id: "C-00011",
-    name: "Vetreria del Po S.r.l.",
-    region: "nord-ovest",
-    industry: "Manifattura",
-    employees: 90,
-    lifetime_won_arr: 150_000,
-    dormant: true,
-  },
-  score: {
-    probability: 0.66,
-    band: band(0.66),
-    model_version: MODEL_VERSION,
-    scored_at: SNAPSHOT_ISO,
-    expected_value: Math.round(0.66 * 150_000),
-  },
-  drivers: [
-    {
-      feature: "prior_won_initiatives",
-      label: "Won initiatives",
-      contribution: 0.31,
-      value: "One initiative won together",
-      direction: "increases",
-    },
-    {
-      feature: "first_response_hours",
-      label: "First response",
-      contribution: 0.24,
-      value: "3 hours to first response",
-      direction: "increases",
-    },
-    {
-      feature: "nps_last",
-      label: "Relationship health",
-      contribution: 0.2,
-      value: "NPS 55 — a strong relationship",
-      direction: "increases",
-    },
-  ],
-  prior_initiatives: [
-    {
-      id: "L020044",
-      status: "won",
-      source: "referral",
-      created_at: "2024-08-01",
-      closed_at: "2024-10-15",
-      amount_arr: 150_000,
-      discount_pct: 4,
-      lost_reason: null,
-    },
-  ],
-  open_actions: [],
-  max_leverage: null,
-};
-
-// Counterfactuals: one lever at a time, exactly what the UI offers.
 const counterfactuals = {};
-const actions = {};
-
-for (const lead of leads) {
-  const p = lead.probability;
-  const cf = {
-    "exec_sponsor_meeting=true": {
-      ...rescore(p, EXEC_DELTA),
-      explanation:
-        "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative.",
-    },
-    "discovery_meeting=true": {
-      ...rescore(p, DISCOVERY_DELTA),
-      explanation:
-        "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative.",
-    },
+let cfDone = 0;
+await mapLimit(ids, CONCURRENCY, async (id) => {
+  const entry = {
+    "exec_sponsor_meeting=true": await post(
+      `/api/leads/${id}/counterfactual`,
+      { exec_sponsor_meeting: true },
+    ),
+    "discovery_meeting=true": await post(
+      `/api/leads/${id}/counterfactual`,
+      { discovery_meeting: true },
+    ),
   };
+  for (const pct of DISCOUNTS) {
+    entry[`discount_pct=${pct}`] = await post(
+      `/api/leads/${id}/counterfactual`,
+      { discount_pct: pct },
+    );
+  }
+  counterfactuals[id] = entry;
+  cfDone += 1;
+  if (cfDone % 10 === 0) {
+    console.log(`counterfactuals ${cfDone}/${ids.length}`);
+  }
+});
+console.log(`counterfactuals: ${Object.keys(counterfactuals).length} leads x 9 states`);
 
-  for (let pct = 0; pct <= 30; pct += 5) {
-    const delta = discountLogitDelta(lead.discount_pct, pct);
-    const result = rescore(p, delta);
-    const points = Math.abs(result.delta * 100).toFixed(1);
-    cf[`discount_pct=${pct}`] = {
-      ...result,
-      explanation:
-        pct === lead.discount_pct
-          ? "The proposed discount is unchanged."
-          : pct > lead.discount_pct
-            ? `Raising the proposed discount to ${pct}% lowers the score by ${points} points — a discount does not buy the win.`
-            : `Lowering the proposed discount to ${pct}% raises the score by ${points} points.`,
-    };
+// Lane C is redefining max_leverage to the best *committable* lever and adding
+// discount_upside for the what-if. When the running API has those fields, use
+// them. Until it does, derive exactly the same quantities from the API's own
+// counterfactual responses — the two committable levers and the discount
+// states. No number is authored here.
+const apiHasRedefinition = items.some(
+  (item) => typeof item.discount_upside === "number",
+);
+if (!apiHasRedefinition) {
+  console.warn(
+    "API predates the max_leverage redefinition; deriving committable leverage and discount_upside from the API counterfactual responses.",
+  );
+}
+
+for (const item of items) {
+  const states = counterfactuals[item.lead_id];
+  const exec = states["exec_sponsor_meeting=true"];
+  const discovery = states["discovery_meeting=true"];
+  const committableMax = Math.max(exec.delta, discovery.delta, 0);
+  const discountUpside = Math.max(
+    ...DISCOUNTS.map((pct) => states[`discount_pct=${pct}`].delta),
+    0,
+  );
+
+  if (apiHasRedefinition) {
+    if (typeof item.max_leverage !== "number") {
+      errors.push(`${item.lead_id}: API is missing max_leverage`);
+    } else if (Math.abs(item.max_leverage - committableMax) > 1e-6) {
+      warnings.push(
+        `${item.lead_id}: API max_leverage ${item.max_leverage} vs committable ${committableMax}`,
+      );
+    }
+    if (
+      typeof item.discount_upside !== "number" ||
+      Math.abs(item.discount_upside - discountUpside) > 1e-6
+    ) {
+      warnings.push(
+        `${item.lead_id}: API discount_upside ${item.discount_upside} vs ${discountUpside}`,
+      );
+    }
+  } else {
+    item.max_leverage = round(committableMax);
+    item.discount_upside = round(discountUpside);
   }
 
-  if (lead.lead_id === REAL_DEMO.leadId) {
-    cf["exec_sponsor_meeting=true"] = {
-      ...REAL_DEMO.exec,
-      explanation:
-        "An executive sponsor meeting moves this initiative from 54.3% to 71.6% — the largest lever on the lead.",
-    };
+  const detail = details[item.lead_id];
+  detail.max_leverage = item.max_leverage;
+  detail.discount_upside = item.discount_upside;
+  if (typeof item.max_leverage !== "number") {
+    errors.push(`${item.lead_id}: no committable max_leverage`);
   }
+  if (typeof item.discount_upside !== "number") {
+    errors.push(`${item.lead_id}: no discount_upside`);
+  }
+}
 
-  counterfactuals[lead.lead_id] = cf;
+// ---------------------------------------------------------------------------
+// Best lever, actions, demo defaults
+// ---------------------------------------------------------------------------
 
-  const execAfter =
-    lead.lead_id === REAL_DEMO.leadId
-      ? REAL_DEMO.exec.hypothetical_probability
-      : sigmoid(logit(p) + EXEC_DELTA);
-  const execDelta =
-    lead.lead_id === REAL_DEMO.leadId
-      ? REAL_DEMO.exec.delta
-      : round(execAfter - p);
+function bestLeverFor(states) {
+  // Committable levers only. Discount is a what-if and must never be the
+  // default lever or the queue's leverage ranking.
+  let best = {
+    lever: "exec",
+    discount_pct: null,
+    delta: states["exec_sponsor_meeting=true"].delta,
+  };
+  const discovery = states["discovery_meeting=true"];
+  if (discovery.delta > best.delta) {
+    best = { lever: "discovery", discount_pct: null, delta: discovery.delta };
+  }
+  return { lever: best.lever, discount_pct: best.discount_pct };
+}
 
-  actions[lead.lead_id] = {
-    call: { probability_after: round(p), delta: 0 },
+const bestLevers = {};
+for (const item of items) {
+  bestLevers[item.lead_id] = bestLeverFor(counterfactuals[item.lead_id]);
+}
+
+const actions = {};
+for (const item of items) {
+  const states = counterfactuals[item.lead_id];
+  actions[item.lead_id] = {
+    call: { probability_after: round(item.probability), delta: 0 },
     exec_sponsor_meeting: {
-      probability_after: round(execAfter),
-      delta: round(execDelta),
+      probability_after: round(
+        states["exec_sponsor_meeting=true"].hypothetical_probability,
+      ),
+      delta: round(states["exec_sponsor_meeting=true"].delta),
     },
     discovery_meeting: {
-      probability_after: round(sigmoid(logit(p) + DISCOVERY_DELTA)),
-      delta: round(sigmoid(logit(p) + DISCOVERY_DELTA) - p),
+      probability_after: round(
+        states["discovery_meeting=true"].hypothetical_probability,
+      ),
+      delta: round(states["discovery_meeting=true"].delta),
     },
-    discount_review: { probability_after: round(p), delta: 0 },
+    discount_review: { probability_after: round(item.probability), delta: 0 },
   };
 }
 
-const portfolio = {
-  total_expected_value: TOTAL_EXPECTED_VALUE,
-  by_region: REGIONS.map((r) => ({
-    region: r.region,
-    open_leads: r.open_leads,
-    win_rate: round(r.wins / r.open_leads),
-    expected_value: r.expected_value,
-  })),
-  calibration: CALIBRATION,
-  drift: STABILITY,
+const byEv = [...items].sort(
+  (a, b) => b.expected_value - a.expected_value || a.lead_id.localeCompare(b.lead_id),
+);
+const topItem = byEv[0];
+const leverItem = [...items].sort(
+  (a, b) =>
+    (b.max_leverage ?? -Infinity) - (a.max_leverage ?? -Infinity) ||
+    a.lead_id.localeCompare(b.lead_id),
+)[0];
+const actItem = [...items].sort(
+  (a, b) =>
+    actions[b.lead_id].exec_sponsor_meeting.delta -
+      actions[a.lead_id].exec_sponsor_meeting.delta ||
+    a.lead_id.localeCompare(b.lead_id),
+)[0];
+
+const rankOf = (leadId) => byEv.findIndex((item) => item.lead_id === leadId) + 1;
+const actAction = actions[actItem.lead_id].exec_sponsor_meeting;
+const actEvAfter = actAction.probability_after * actItem.amount_arr;
+const actRankAfter =
+  [...byEv]
+    .map((item) =>
+      item.lead_id === actItem.lead_id
+        ? { ...item, expected_value: actEvAfter }
+        : item,
+    )
+    .sort((a, b) => b.expected_value - a.expected_value)
+    .findIndex((item) => item.lead_id === actItem.lead_id) + 1;
+
+console.log(
+  `top: ${topItem.lead_id} ${topItem.company_name} EV €${topItem.expected_value.toFixed(0)} | ` +
+    `leverage: ${leverItem.lead_id} ${(leverItem.max_leverage * 100).toFixed(2)} pts | ` +
+    `act: ${actItem.lead_id} +${(actAction.delta * 100).toFixed(2)} pts rank ${rankOf(actItem.lead_id)} -> ${actRankAfter}`,
+);
+
+// ---------------------------------------------------------------------------
+// Company details for the demo leads (the 360 uses signals + full history)
+// ---------------------------------------------------------------------------
+
+const demoLeads = [topItem, leverItem, actItem];
+const demoCompanyIds = new Set(
+  [...demoLeads.map((item) => details[item.lead_id]), closedDetail]
+    .map((entry) => entry?.company?.id)
+    .filter(Boolean),
+);
+const companies = {};
+await mapLimit([...demoCompanyIds], Math.min(4, CONCURRENCY), async (id) => {
+  companies[id] = await get(`/api/companies/${id}`);
+});
+console.log(`company details: ${Object.keys(companies).length}`);
+
+// ---------------------------------------------------------------------------
+// Files
+// ---------------------------------------------------------------------------
+
+const metrics = {
+  auc: metricsRaw.auc,
+  calibration_error: metricsRaw.calibration_error,
+  lift_at_10: metricsRaw.lift_at_10,
+  latent_auc: metricsRaw.latent_auc,
+  model_version: metricsRaw.model_version,
 };
 
-const health = {
-  status: "ok",
-  model_version: MODEL_VERSION,
-  scored_at: SNAPSHOT_ISO,
+const pipelineOut = {
+  ...pipeline,
+  total_open_arr: openArr,
 };
 
-const pipeline = {
-  total: OPEN_LEADS,
-  total_expected_value: TOTAL_EXPECTED_VALUE,
-  items: pipelineItems,
+const portfolioOut = {
+  ...portfolio,
+  win_prevalence: winPrevalence,
+  total_open_arr: openArr,
+};
+
+const demo = {
+  top_lead_id: topItem.lead_id,
+  lever_lead_id: leverItem.lead_id,
+  act_lead_id: actItem.lead_id,
+  closed_lead_id: closedDetail.lead.id,
+  model_version: health.model_version,
+  scored_at: health.scored_at,
 };
 
 // ---------------------------------------------------------------------------
-// Validate before writing: the fixtures are the demo, so they must add up
+// Validate before writing: the fixture is the demo, so it must match the API
 // ---------------------------------------------------------------------------
 
-const errors = [];
-const sum = (xs) => xs.reduce((a, b) => a + b, 0);
+check(pipeline.items.length === 200, `expected 200 queue rows, got ${pipeline.items.length}`);
+check(pipeline.total === 19752, `pipeline total ${pipeline.total}`);
+check(
+  Math.abs(pipeline.total_expected_value - 282045124.593317) < 1,
+  `total_expected_value ${pipeline.total_expected_value}`,
+);
+check(Math.abs(openArr - 720720300) < 1, `open ARR ${openArr}`);
+check(
+  Math.abs(portfolio.total_expected_value - pipeline.total_expected_value) < 1,
+  "portfolio and pipeline totals disagree",
+);
+check(
+  topItem.lead_id === "L021037" &&
+    topItem.company_name === "Moretti Componenti S.a.s.",
+  `top lead is ${topItem.lead_id} ${topItem.company_name}`,
+);
+check(
+  Math.abs(topItem.expected_value - 142296.58065847863) < 0.01,
+  `top EV ${topItem.expected_value}`,
+);
+check(
+  Math.abs((topItem.max_leverage ?? 0) - 0.0046725362530714) < 1e-6,
+  `Moretti committable max_leverage ${topItem.max_leverage}`,
+);
+check(
+  Math.abs((topItem.discount_upside ?? 0) - 0.00888692922447532) < 1e-9,
+  `Moretti discount_upside ${topItem.discount_upside}`,
+);
+check(
+  leverItem.lead_id === "L021729" &&
+    leverItem.company_name === "Russo Industrie S.p.A.",
+  `lever lead is ${leverItem.lead_id} ${leverItem.company_name}`,
+);
+check(
+  Math.abs((leverItem.max_leverage ?? 0) - 0.101566) < 0.001,
+  `Russo committable max_leverage ${leverItem.max_leverage}`,
+);
+check(
+  bestLevers[leverItem.lead_id]?.lever !== "discount",
+  "the demo lever default must be a committable lever",
+);
+check(
+  actItem.lead_id === leverItem.lead_id,
+  `the Act lead ${actItem.lead_id} is not the lever lead ${leverItem.lead_id}`,
+);
+check(
+  actAction.delta > 0.05 && actRankAfter < rankOf(actItem.lead_id),
+  `act lead ${actItem.lead_id} does not move on an exec meeting`,
+);
+check(
+  closedDetail.lead.status === "won" || closedDetail.lead.status === "lost",
+  "closed lead is not closed",
+);
+check(
+  closedDetail.max_leverage === null,
+  `closed lead max_leverage ${closedDetail.max_leverage}`,
+);
+check(
+  ["psi", "status", "train_mean", "holdout_mean", "train_win_rate", "holdout_win_rate"].every(
+    (key) => portfolio.drift[key] !== undefined,
+  ),
+  "portfolio drift is missing stability fields",
+);
+check(Object.keys(details).length === 201, `detail count ${Object.keys(details).length}`);
+check(
+  Object.keys(counterfactuals).length === 200,
+  `counterfactual count ${Object.keys(counterfactuals).length}`,
+);
+check(
+  Object.keys(actions).length === 200,
+  `action count ${Object.keys(actions).length}`,
+);
 
-if (pipelineItems.length !== leads.length) errors.push("pipeline item count");
-const evs = pipelineItems.map((i) => i.expected_value);
-for (let i = 1; i < evs.length; i += 1) {
-  if (evs[i] > evs[i - 1]) errors.push(`queue not ranked at ${i}`);
+if (warnings.length) {
+  console.warn("\nwarnings:");
+  for (const warning of warnings.slice(0, 20)) console.warn(` - ${warning}`);
+  if (warnings.length > 20) console.warn(` - … ${warnings.length - 20} more`);
 }
-for (const item of pipelineItems) {
-  const detail = details[item.lead_id];
-  if (!detail) errors.push(`missing detail ${item.lead_id}`);
-  if (detail.score.expected_value !== item.expected_value) errors.push(`EV drift ${item.lead_id}`);
-  if (detail.drivers[0].feature !== item.top_driver.feature) errors.push(`top driver drift ${item.lead_id}`);
-  if (detail.score.band !== item.band) errors.push(`band drift ${item.lead_id}`);
-  if (typeof item.max_leverage !== "number") {
-    errors.push(`missing max_leverage ${item.lead_id}`);
-  }
-  if (detail.max_leverage !== item.max_leverage) {
-    errors.push(`detail max_leverage drift ${item.lead_id}`);
-  }
-}
-if (!details[CLOSED_LEAD_ID]) {
-  errors.push("closed lead fixture missing");
-} else if (details[CLOSED_LEAD_ID].max_leverage !== null) {
-  errors.push("closed lead max_leverage should be null");
-}
-const demoItem = pipelineItems.find((item) => item.lead_id === REAL_DEMO.leadId);
-if (!demoItem) {
-  errors.push("demo lead missing");
-} else {
-  if (pipelineItems[0].lead_id !== REAL_DEMO.leadId) {
-    errors.push("demo lead is not the top of the queue");
-  }
-  if (Math.abs(demoItem.probability - 0.5431) > 1e-9) {
-    errors.push(`demo lead probability ${demoItem.probability}`);
-  }
-  if (Math.abs(demoItem.max_leverage - 0.1727) > 1e-9) {
-    errors.push(`demo lead max_leverage ${demoItem.max_leverage}`);
-  }
-}
-const stabilityKeys = [
-  "psi",
-  "status",
-  "train_mean",
-  "holdout_mean",
-  "train_win_rate",
-  "holdout_win_rate",
-];
-for (const key of stabilityKeys) {
-  if (portfolio.drift[key] !== STABILITY[key]) {
-    errors.push(`stability drift: ${key}`);
-  }
-}
-if (Object.keys(STABILITY).length !== stabilityKeys.length) {
-  errors.push("stability snapshot has unexpected fields");
-}
-for (const key of ["train_mean", "holdout_mean", "train_win_rate", "holdout_win_rate"]) {
-  if (typeof STABILITY[key] !== "number") {
-    errors.push(`stability snapshot missing ${key}`);
-  }
-}
-if (STABILITY.status !== "watch") errors.push("stability status should be watch");
-if (sum(REGIONS.map((r) => r.open_leads)) !== OPEN_LEADS) errors.push("region leads do not sum to 19,752");
-if (Math.abs(sum(REGIONS.map((r) => r.wins)) / OPEN_LEADS - PREVALENCE) > 1e-4) {
-  errors.push(`prevalence ${sum(REGIONS.map((r) => r.wins)) / OPEN_LEADS}`);
-}
-if (sum(REGIONS.map((r) => r.expected_value)) !== TOTAL_EXPECTED_VALUE) {
-  errors.push("region EV does not sum to total");
-}
-for (const r of REGIONS) {
-  const implied = (r.open_leads * (r.wins / r.open_leads) * MEAN_ARR) / 1_000_000;
-  const shown = r.expected_value / 1_000_000;
-  if (Math.abs(implied - shown) > 0.08) errors.push(`region EV off: ${r.region}`);
-}
-const ece =
-  CALIBRATION.reduce((acc, b) => acc + Math.abs(b.actual - b.predicted), 0) /
-  CALIBRATION.length;
-if (Math.abs(ece - MODEL.calibration_error) > 1e-9) errors.push(`ECE ${ece}`);
-const meanPredicted = sum(CALIBRATION.map((b) => b.predicted)) / CALIBRATION.length;
-if (Math.abs(meanPredicted - PREVALENCE) > 0.0001) errors.push(`calibration mean ${meanPredicted}`);
-
 if (errors.length) {
-  console.error("fixture validation failed:");
-  for (const e of errors) console.error(" -", e);
+  console.error("\nfixture validation failed:");
+  for (const error of errors) console.error(` - ${error}`);
   process.exit(1);
 }
 
@@ -1023,20 +447,25 @@ if (errors.length) {
 // ---------------------------------------------------------------------------
 
 mkdirSync(OUT, { recursive: true });
-
 function write(name, value) {
   writeFileSync(resolve(OUT, name), `${JSON.stringify(value, null, 2)}\n`, "utf8");
   console.log(`wrote src/fixtures/${name}`);
 }
 
-write("pipeline.json", pipeline);
+write("pipeline.json", pipelineOut);
 write("leads.json", details);
+write("companies.json", companies);
 write("counterfactuals.json", counterfactuals);
 write("actions.json", actions);
-write("portfolio.json", portfolio);
+write("best-levers.json", bestLevers);
+write("portfolio.json", portfolioOut);
 write("health.json", health);
+write("metrics.json", metrics);
+write("demo.json", demo);
 
 console.log(
-  `\n${pipelineItems.length} queue items | €${(TOTAL_EXPECTED_VALUE / 1e6).toFixed(2)}M expected | ` +
-    `${(PREVALENCE * 100).toFixed(2)}% prevalence | ECE ${MODEL.calibration_error} | AUC ${MODEL.auc}`,
+  `\n${pipeline.items.length} queue rows | total ${pipeline.total.toLocaleString("en-GB")} | ` +
+    `expected €${(pipeline.total_expected_value / 1e6).toFixed(2)}M | open €${(openArr / 1e6).toFixed(2)}M | ` +
+    `top ${topItem.company_name} | leverage ${leverItem.company_name} ${(leverItem.max_leverage * 100).toFixed(2)} pts | ` +
+    `act ${actItem.company_name}`,
 );
