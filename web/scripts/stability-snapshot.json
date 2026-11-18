@@ -1,0 +1,8 @@
+{
+  "psi": 0.170665,
+  "status": "watch",
+  "train_mean": 0.271667,
+  "holdout_mean": 0.359924,
+  "train_win_rate": 0.270497,
+  "holdout_win_rate": 0.35122
+}

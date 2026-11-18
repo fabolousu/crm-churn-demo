@@ -69,7 +69,20 @@ def main() -> int:
         banner("generate (skipped)")
     else:
         banner("generate")
-        run(["python", "data/generator.py", "--companies", str(args.companies), "--seed", str(args.seed)])
+        # --overwrite: the runner's generate step is explicitly a regeneration. The
+        # generator refuses to clobber an existing database by default (it guards against a
+        # typo'd --db path destroying a tracked file), so the flag belongs here.
+        run(
+            [
+                "python",
+                "data/generator.py",
+                "--companies",
+                str(args.companies),
+                "--seed",
+                str(args.seed),
+                "--overwrite",
+            ]
+        )
 
     banner("features")
     started = time.time()
