@@ -203,6 +203,12 @@ components:
         band: { $ref: '#/components/schemas/Band' }
         expected_value: { type: number, description: probability * amount_arr }
         days_open: { type: integer }
+        max_leverage:
+          type: [number, 'null']
+          description: |
+            Largest achievable probability delta across the supported counterfactual levers
+            for this lead. Null for closed leads. The queue can be read as "where effort pays
+            off", which is the honest version of a lever demo that cannot promise a big jump.
         top_driver: { $ref: '#/components/schemas/Driver' }
 
     LeadDetail:
