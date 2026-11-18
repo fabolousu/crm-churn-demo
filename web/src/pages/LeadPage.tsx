@@ -44,7 +44,7 @@ import type { LeadDetail } from "../lib/types";
 
 export default function LeadPage() {
   const { leadId = "" } = useParams();
-  const { loadLead, rankOf, portfolio, pipeline } = usePipeline();
+  const { loadLead, rankOf, portfolio } = usePipeline();
   const prevalence = winPrevalence(portfolio.by_region);
   const [detail, setDetail] = useState<LeadDetail | null>(() =>
     initialLeadDetail(leadId),
@@ -102,11 +102,11 @@ export default function LeadPage() {
   );
 
   const rank = detail ? rankOf(detail.lead.id) : null;
-  // max_leverage lives on PipelineItem. The contract update did not add it to
-  // LeadDetail, so the lead page reads it from the queue item in context.
-  const maxLeverage =
-    pipeline.items.find((item) => item.lead_id === detail?.lead.id)
-      ?.max_leverage ?? null;
+  // Contract v0.3 puts max_leverage on LeadDetail too, nullable for closed
+  // leads. Treat a missing value the same as null: no lever is offered.
+  const maxLeverage = detail?.max_leverage ?? null;
+  const isClosed =
+    detail?.lead.status === "won" || detail?.lead.status === "lost";
 
   if (error) {
     return (
@@ -189,7 +189,9 @@ export default function LeadPage() {
             <span className="text-line">·</span>
             <span className="inline-flex items-center gap-1">
               <CalendarIcon className="h-3.5 w-3.5" />
-              {daysOpen} days open
+              {isClosed
+                ? `Closed${lead.closed_at ? ` ${formatDate(lead.closed_at)}` : ""}`
+                : `${daysOpen} days open`}
             </span>
             {company.dormant ? (
               <span className="rounded-full bg-[#FDECEA] px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.1em] text-risk-high">
@@ -199,18 +201,24 @@ export default function LeadPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Link to={`/leads/${lead.id}/lever`} className={buttonPrimary}>
-            <BoltIcon className="h-4 w-4" />
-            Test a lever
-          </Link>
-          <Link to={`/act/${lead.id}`} className={buttonSecondary}>
-            Log an action
-          </Link>
-        </div>
+        {isClosed ? (
+          <span className="inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-4 py-2.5 text-[12px] font-medium text-muted">
+            Closed initiative · no lever
+          </span>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            <Link to={`/leads/${lead.id}/lever`} className={buttonPrimary}>
+              <BoltIcon className="h-4 w-4" />
+              Test a lever
+            </Link>
+            <Link to={`/act/${lead.id}`} className={buttonSecondary}>
+              Log an action
+            </Link>
+          </div>
+        )}
       </div>
 
-      <LeadTabs leadId={lead.id} active="overview" />
+      {isClosed ? null : <LeadTabs leadId={lead.id} active="overview" />}
 
       <div className="mt-7 grid gap-6 lg:grid-cols-[minmax(0,1.62fr)_minmax(270px,0.78fr)]">
         <div className="space-y-7">
@@ -235,9 +243,10 @@ export default function LeadPage() {
               <p className="mt-3 max-w-md text-[12.5px] leading-relaxed text-muted">
                 About one in three comparable initiatives win. This one sits{" "}
                 {score.probability >= prevalence ? "above" : "below"} the{" "}
-                {formatPercent(prevalence, 2)} portfolio average. The three
-                drivers below explain the score, in order of influence — and the
-                lever shows what changing one is worth.
+                {formatPercent(prevalence, 2)} portfolio average.{" "}
+                {isClosed
+                  ? "The three drivers below explain the final score; this initiative is closed, so no lever is offered."
+                  : "The three drivers below explain the score, in order of influence — and the lever shows what changing one is worth."}
               </p>
 
               <div className="mt-5 grid grid-cols-2 gap-5">
@@ -435,9 +444,11 @@ export default function LeadPage() {
               />
             </dl>
             <p className="mt-3 text-[10.5px] leading-relaxed text-muted">
-              {company.dormant
-                ? "No new initiative for 180+ days. Dormancy is a symptom of the relationship, not the model target."
-                : "An initiative is open, so the relationship is active. Dormancy is flagged at 180 days without a new initiative."}
+              {isClosed
+                ? "This initiative is closed. The relationship continues only if someone proposes the next initiative."
+                : company.dormant
+                  ? "No new initiative for 180+ days. Dormancy is a symptom of the relationship, not the model target."
+                  : "An initiative is open, so the relationship is active. Dormancy is flagged at 180 days without a new initiative."}
             </p>
           </Card>
 
@@ -448,7 +459,16 @@ export default function LeadPage() {
             <dl className="mt-3 divide-y divide-line border-t border-line">
               <MetaRow label="Stage" value={statusLabel(lead.status)} />
               <MetaRow label="Source" value={sourceLabel(lead.source)} />
-              <MetaRow label="Days open" value={`${daysOpen} days`} />
+              <MetaRow
+                label={isClosed ? "Closed" : "Days open"}
+                value={
+                  isClosed
+                    ? lead.closed_at
+                      ? formatDate(lead.closed_at)
+                      : "—"
+                    : `${daysOpen} days`
+                }
+              />
               <MetaRow
                 label="Discount"
                 value={`${(lead.discount_pct ?? 0).toFixed(1)}%`}
@@ -458,6 +478,12 @@ export default function LeadPage() {
                 value={formatEURCompact(score.expected_value)}
               />
             </dl>
+            {isClosed ? (
+              <p className="mt-3 border-t border-line pt-3 text-[10.5px] leading-relaxed text-muted">
+                Closed initiative. <code>max_leverage</code> is null, so the
+                score has no lever and no action can be logged.
+              </p>
+            ) : null}
           </Card>
 
           <Card className="p-5">
@@ -494,17 +520,21 @@ export default function LeadPage() {
               </div>
             ) : (
               <p className="mt-3 text-[11.5px] leading-relaxed text-muted">
-                No action open yet. The queue re-ranks the moment one is logged.
+                {isClosed
+                  ? "This initiative is closed. Its action history is final."
+                  : "No action open yet. The queue re-ranks the moment one is logged."}
               </p>
             )}
 
-            <Link
-              to={`/act/${lead.id}`}
-              className="mt-4 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-accent transition hover:text-accent-deep"
-            >
-              Log an action
-              <ArrowUpRightIcon className="h-3.5 w-3.5" />
-            </Link>
+            {isClosed ? null : (
+              <Link
+                to={`/act/${lead.id}`}
+                className="mt-4 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-accent transition hover:text-accent-deep"
+              >
+                Log an action
+                <ArrowUpRightIcon className="h-3.5 w-3.5" />
+              </Link>
+            )}
           </Card>
 
           <InlineNotice>

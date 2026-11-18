@@ -94,6 +94,8 @@ export interface LeadDetail {
   drivers: Driver[];
   prior_initiatives: Lead[];
   open_actions: Action[];
+  // Contract v0.3: null for closed leads, optional in the schema.
+  max_leverage?: number | null;
 }
 
 export interface CounterfactualRequest {
@@ -139,6 +141,12 @@ export interface Portfolio {
   drift: {
     psi: number;
     status: "stable" | "watch" | "alert";
+    // Optional: omitted when the labelled population cannot be split into
+    // train and holdout. The UI must show "not measurable", never a fallback.
+    train_mean?: number;
+    holdout_mean?: number;
+    train_win_rate?: number;
+    holdout_win_rate?: number;
   };
 }
 

@@ -87,12 +87,13 @@ and portfolio cannot drift apart.
 ```
 src/fixtures/
   pipeline.json        # GET /api/pipeline — 12 top-of-queue items, total 19,752
-  leads.json           # GET /api/leads/{id} — one LeadDetail per queue item
-  counterfactuals.json # POST /counterfactual — lever states per lead
-  actions.json         # POST /actions — re-score per lead × action kind
+  leads.json           # GET /api/leads/{id} — 12 queue items + 1 closed lead
+  counterfactuals.json # POST /counterfactual — lever states per open lead
+  actions.json         # POST /actions — re-score per open lead × action kind
   portfolio.json       # GET /api/portfolio — regions, calibration, stability
   health.json          # GET /api/health
-scripts/build-fixtures.mjs  # single authoring source + validation
+scripts/build-fixtures.mjs      # single authoring source + validation
+scripts/stability-snapshot.json # committed stability example (one source)
 ```
 
 ### The numbers and where they come from
@@ -111,7 +112,7 @@ only inputs:
 | Regions | 5 | Nord-Ovest, Nord-Est, Centro, Sud, Isole |
 | Median best lever | **+4.19 pts** | Queue stat + lever context |
 | 90th-percentile lever | **+16.9 pts** | Queue stat + lever context |
-| Model stability | **PSI 0.1707, watch** | Holdout vs train in the synthetic world |
+| Model stability | **PSI 0.170665, watch** | Holdout vs train in the synthetic world |
 
 The portfolio is rolled up consistently:
 
@@ -158,20 +159,18 @@ Marini S.p.A.) is the second queue item, at 43% on €320,000; its
 executive-sponsor action is **43.0% → 50.1%**, enough to take it past `L057056`
 to #1.
 
-### The remaining stale pitch number
+### The pitch numbers
 
-The updated pitch now matches the UI on the lever: **54% → 71%**, median action
-**4 points**. The 0:30 line still says "€4.2M of pipeline". That figure would
-imply €213 of expected value per open initiative; the generator's mean proposed
-ARR is €36,246 at 28.66% prevalence, so the book is **€205.2M**. The screen shows
-the derived number. If the pitch wants €4.2M, it needs to be scoped to a defined
-subset (and that subset needs to exist in the data).
+The updated 0:30 line says "€510M of pipeline, €205M of it expected". The queue
+shows the same derived figures: **€510.7M proposed ARR at risk** and **€205.2M
+expected value**. The lever beat **54% → 71%** and the **4-point** median match
+too. No stale number remains in the UI.
 
 ### Model stability, not "drift"
 
 The portfolio's stability panel is **holdout vs train**, not a production drift
-monitor. PSI **0.1707** is in the watch band, and it is correct: the holdout
-genuinely scores higher than the training set.
+monitor. PSI **0.170665** (displayed 0.171) is in the watch band, and it is
+correct: the holdout genuinely scores higher than the training set.
 
 | Metric | Train | Holdout |
 |---|---|---|
@@ -181,6 +180,18 @@ genuinely scores higher than the training set.
 The UI labels this "Model stability · holdout vs train" and says explicitly that
 it is a real base-rate shift in the synthetic world, not a model fault. It is one
 panel, not a monitoring stack.
+
+### Stability source of truth
+
+- `scripts/stability-snapshot.json` is the committed contract example: PSI
+  `0.170665`, `watch`, `train_mean 0.271667`, `holdout_mean 0.359924`,
+  `train_win_rate 0.270497`, `holdout_win_rate 0.35122`.
+- `build-fixtures.mjs` reads that one file, writes the same six fields into
+  `portfolio.json`, and validates them on regeneration. The fixture panel cannot
+  drift from the committed values.
+- In live mode the four optional fields are read from `/api/portfolio`. If the
+  labelled population cannot be split, the API omits them; the panel renders
+  **Not measurable** and never falls back to a constant.
 
 ---
 
@@ -219,6 +230,11 @@ panel, not a monitoring stack.
   "2 of the last 4 lost" auditable.
 - One open action: a technical review call. The executive sponsor has not met the
   buyer yet — which is the lever.
+- A closed initiative (`L030001`) exercises the contract's nullable
+  `max_leverage`: no best-lever chip, no lever/act CTAs and no lever tabs. The
+  360 still shows the score and the company history.
+
+![Closed Lead 360](./screenshots/lead-closed.png)
 
 ### The lever
 
@@ -273,9 +289,14 @@ leading with a discount is the weakest commercial story.
   with the 28.66% portfolio benchmark marked on every row.
 - Calibration chart: ten decile bins, predicted vs actual, with the
   perfect-calibration diagonal; mean calibration error 0.0104.
-- **Model stability · holdout vs train**: PSI 0.1707, **Watch**, with the
+- **Model stability · holdout vs train**: PSI 0.171, **Watch**, with the
   holdout's higher mean probability (36.0% vs 27.2%) and win rate (35.1% vs
   27.0%) shown as the explanation. One panel; not presented as a problem.
+- When `/api/portfolio` omits the four optional stability fields (the labelled
+  population could not be split), the panel says **Not measurable** and shows no
+  fallback values.
+
+![Portfolio with no stability split](./screenshots/portfolio-not-measurable.png)
 
 ---
 
@@ -297,30 +318,32 @@ They live in `src/lib/bands.ts`; changing them changes the fixture output via
 
 ## Model numbers the API does not carry
 
-`/api/portfolio` returns the calibration bins and the stability PSI/status. It
-does **not** return AUC, ECE, the latent ceiling, or the holdout/train means and
-win rates. The Portfolio screen reads those from `src/lib/model.ts`, sourced from
-the measured build facts (`ml/artifacts/metrics.json` in the full project). The
-UI labels them as measured build facts rather than inventing fields on the wire.
+`/api/portfolio` returns the calibration bins, the stability PSI/status, and —
+when the labelled population can be split — the four optional train/holdout
+fields. It does **not** return AUC, ECE, the latent ceiling, or the proposed-ARR
+total. The Portfolio screen reads those from `src/lib/model.ts`, sourced from the
+measured build facts (`ml/artifacts/metrics.json` in the full project). The UI
+labels them as measured build facts rather than inventing fields on the wire.
 
 ---
 
-## What the contract does not carry
+## Contract edges and what the UI does
 
-These are the places where a screen needed something the OpenAPI file does not
-provide. None of them is hidden behind a made-up number.
+These are the places where a screen needed something the contract does not
+provide, plus the nullable/optional edges it now declares. None of them is hidden
+behind a made-up number.
 
 | Gap | Screen impact | What this build does |
 |---|---|---|
-| `max_leverage` is on `PipelineItem` but **not** on `LeadDetail` | The Lead 360 cannot read the lead's leverage from its own detail payload | The queue item in context supplies it; the Lead 360 shows "Best lever +17.3 pts" from the pipeline item |
+| `Portfolio` stability fields are optional | A population that cannot be split has no train/holdout comparison | The panel shows **Not measurable** and never falls back to a constant |
 | `Portfolio` has no AUC, ECE or latent ceiling | The "three numbers to have ready" are not in the payload | Constants in `src/lib/model.ts`, shown as build metrics |
-| `Portfolio` has no holdout/train means or win rates | The stability panel cannot explain the PSI from the payload | Constants in `src/lib/model.ts`; the API only carries `psi` and `status` |
 | `Portfolio` has no time series | No honest trend chart can be drawn | Region bars + calibration (Recharts) + one stability panel; no fabricated trend |
 | `Band` thresholds are undefined | Risk colouring is ambiguous | Documented cut points above; the UI re-bands every re-score |
-| `Lead` has no stage-entry timestamp | The old pitch's "six days into the proposal stage" cannot be rendered | Stage is shown; it is not a driver, because it is constant in training and unlearnable |
+| `Lead` has no stage-entry timestamp | Stage duration cannot be rendered | Stage is shown as a state; it is not a driver or a lever |
 | `ActionRequest` has no `discount_pct` field | A discount preview cannot be committed exactly | Discount lever is labelled "Preview only"; meeting levers commit and carry their kind into Act |
 | `ActionResponse` has no expected value, rank or drivers | The loop cannot read the new queue position from the write | Expected value = `probability_after × amount_arr` from the queue item; rank re-computed client-side |
 | `PipelineItem` has no open-action state | The API cannot say which lead is the "next call" | Act defaults to the second queue row in fixtures and offers a picker; a live build defaults to the first |
+| `LeadDetail.max_leverage` is nullable | A closed lead has no lever | The 360 hides the leverage chip, the lever/act CTAs and the lever tabs; see `lead-closed.png` |
 | `by_region.win_rate` is undefined (closed win rate vs open expected rate) | Labelling risk | Shown as the calibrated win rate, with the raw open-lead counts beside it |
 | `total_expected_value` scope is undefined (all matches vs returned page) | Headline could be misread | Fixtures define it as all 19,752 matches; the queue says "12 shown of 19,752" |
 | No lift@10% or top-decile metric | The pitch's third "number to have ready" is missing | Omitted; the README does not estimate it |
@@ -343,6 +366,7 @@ web/
                  format, model, narratives
     state/       PipelineProvider (queue, lead overrides, action re-rank)
     fixtures/    committed JSON
+    lib/stability.ts  optional stability fields -> breakdown | null
   screenshots/   captures from the fixture build
 ```
 
@@ -362,7 +386,7 @@ Last build:
 ```
 dist/index.html                   0.62 kB │ gzip:   0.37 kB
 dist/assets/index-aZv5RZA3.css   30.49 kB │ gzip:   6.55 kB
-dist/assets/index-IL9nnlRI.js   676.02 kB │ gzip: 188.56 kB
+dist/assets/index-C1rOWY9E.js   679.15 kB │ gzip: 189.18 kB
 ✓ built
 ```
 

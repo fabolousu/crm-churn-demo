@@ -18,12 +18,19 @@
 // -0.20 logit per z). With VITE_API_BASE set, the app calls the real model
 // instead and these values are unused.
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(HERE, "..", "src", "fixtures");
+
+// The stability fields are optional in the contract. The fixture copy is
+// read from one committed snapshot (the contract example) so the panel cannot
+// drift from the API values; the build validates the output against it.
+const STABILITY = JSON.parse(
+  readFileSync(resolve(HERE, "stability-snapshot.json"), "utf8"),
+);
 
 // ---------------------------------------------------------------------------
 // Snapshot and model facts
@@ -69,10 +76,9 @@ const CALIBRATION = [
   { predicted: 0.586, actual: 0.576 },
 ];
 
-// Model stability: train vs holdout score distributions. The holdout genuinely
+// STABILITY comes from scripts/stability-snapshot.json. The holdout genuinely
 // scores higher (mean p 0.360 vs 0.272, win rate 35.1% vs 27.0%), so "watch"
 // is the honest status, not a degradation.
-const DRIFT = { psi: 0.1707, status: "watch" };
 
 // The updated pitch uses this real lead on the lever screen. Its executive
 // sponsor counterfactual is the model's actual re-score, not the fixture
@@ -740,6 +746,7 @@ for (const lead of leads) {
     drivers,
     prior_initiatives: lead.history,
     open_actions: lead.open_actions,
+    max_leverage: maxLeverageFor(lead),
   };
 
   pipelineItems.push({
@@ -759,6 +766,75 @@ for (const lead of leads) {
 }
 
 pipelineItems.sort((a, b) => b.expected_value - a.expected_value);
+
+// A closed lead, outside the queue, exists to exercise the contract's
+// max_leverage: null state on the 360. The page must not show a lever.
+const CLOSED_LEAD_ID = "L030001";
+details[CLOSED_LEAD_ID] = {
+  lead: {
+    id: CLOSED_LEAD_ID,
+    status: "won",
+    source: "referral",
+    created_at: "2025-03-01",
+    closed_at: "2025-06-30",
+    amount_arr: 150_000,
+    discount_pct: 4,
+    lost_reason: null,
+  },
+  company: {
+    id: "C-00011",
+    name: "Vetreria del Po S.r.l.",
+    region: "nord-ovest",
+    industry: "Manifattura",
+    employees: 90,
+    lifetime_won_arr: 150_000,
+    dormant: true,
+  },
+  score: {
+    probability: 0.66,
+    band: band(0.66),
+    model_version: MODEL_VERSION,
+    scored_at: SNAPSHOT_ISO,
+    expected_value: Math.round(0.66 * 150_000),
+  },
+  drivers: [
+    {
+      feature: "prior_won_initiatives",
+      label: "Won initiatives",
+      contribution: 0.31,
+      value: "One initiative won together",
+      direction: "increases",
+    },
+    {
+      feature: "first_response_hours",
+      label: "First response",
+      contribution: 0.24,
+      value: "3 hours to first response",
+      direction: "increases",
+    },
+    {
+      feature: "nps_last",
+      label: "Relationship health",
+      contribution: 0.2,
+      value: "NPS 55 — a strong relationship",
+      direction: "increases",
+    },
+  ],
+  prior_initiatives: [
+    {
+      id: "L020044",
+      status: "won",
+      source: "referral",
+      created_at: "2024-08-01",
+      closed_at: "2024-10-15",
+      amount_arr: 150_000,
+      discount_pct: 4,
+      lost_reason: null,
+    },
+  ],
+  open_actions: [],
+  max_leverage: null,
+};
 
 // Counterfactuals: one lever at a time, exactly what the UI offers.
 const counterfactuals = {};
@@ -836,7 +912,7 @@ const portfolio = {
     expected_value: r.expected_value,
   })),
   calibration: CALIBRATION,
-  drift: DRIFT,
+  drift: STABILITY,
 };
 
 const health = {
@@ -872,6 +948,14 @@ for (const item of pipelineItems) {
   if (typeof item.max_leverage !== "number") {
     errors.push(`missing max_leverage ${item.lead_id}`);
   }
+  if (detail.max_leverage !== item.max_leverage) {
+    errors.push(`detail max_leverage drift ${item.lead_id}`);
+  }
+}
+if (!details[CLOSED_LEAD_ID]) {
+  errors.push("closed lead fixture missing");
+} else if (details[CLOSED_LEAD_ID].max_leverage !== null) {
+  errors.push("closed lead max_leverage should be null");
 }
 const demoItem = pipelineItems.find((item) => item.lead_id === REAL_DEMO.leadId);
 if (!demoItem) {
@@ -887,9 +971,28 @@ if (!demoItem) {
     errors.push(`demo lead max_leverage ${demoItem.max_leverage}`);
   }
 }
-if (DRIFT.status !== "watch" || Math.abs(DRIFT.psi - 0.1707) > 1e-9) {
-  errors.push("model stability fixture");
+const stabilityKeys = [
+  "psi",
+  "status",
+  "train_mean",
+  "holdout_mean",
+  "train_win_rate",
+  "holdout_win_rate",
+];
+for (const key of stabilityKeys) {
+  if (portfolio.drift[key] !== STABILITY[key]) {
+    errors.push(`stability drift: ${key}`);
+  }
 }
+if (Object.keys(STABILITY).length !== stabilityKeys.length) {
+  errors.push("stability snapshot has unexpected fields");
+}
+for (const key of ["train_mean", "holdout_mean", "train_win_rate", "holdout_win_rate"]) {
+  if (typeof STABILITY[key] !== "number") {
+    errors.push(`stability snapshot missing ${key}`);
+  }
+}
+if (STABILITY.status !== "watch") errors.push("stability status should be watch");
 if (sum(REGIONS.map((r) => r.open_leads)) !== OPEN_LEADS) errors.push("region leads do not sum to 19,752");
 if (Math.abs(sum(REGIONS.map((r) => r.wins)) / OPEN_LEADS - PREVALENCE) > 1e-4) {
   errors.push(`prevalence ${sum(REGIONS.map((r) => r.wins)) / OPEN_LEADS}`);

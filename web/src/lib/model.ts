@@ -29,16 +29,6 @@ export const LEVERAGE_BOOK = {
   p90: 0.169,
 } as const;
 
-// Train vs holdout score distributions. The holdout genuinely scores higher;
-// "watch" is a base-rate shift in the synthetic world, not a model fault.
-// /api/portfolio carries psi/status, not these means and win rates.
-export const MODEL_STABILITY = {
-  trainMeanProbability: 0.272,
-  holdoutMeanProbability: 0.36,
-  trainWinRate: 0.27,
-  holdoutWinRate: 0.351,
-} as const;
-
 export const OPEN_PIPELINE_ARR = OPEN_LEADS * MEAN_PROPOSED_ARR;
 
 export function pipelineAtRisk(totalExpectedValue: number): number {

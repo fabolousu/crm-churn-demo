@@ -22,10 +22,10 @@ import {
 import { formatEURCompact, formatPercent, regionLabel } from "../lib/format";
 import {
   MODEL_METRICS,
-  MODEL_STABILITY,
   OPEN_LEADS,
   winPrevalence,
 } from "../lib/model";
+import { stabilityBreakdown } from "../lib/stability";
 import { usePipeline } from "../state/PipelineProvider";
 
 const CALIBRATION_DOMAIN: [number, number] = [0, 0.7];
@@ -44,6 +44,7 @@ export default function PortfolioPage() {
   }));
 
   const drift = portfolio.drift;
+  const stability = stabilityBreakdown(drift);
   const latentGap = MODEL_METRICS.latentAuc - MODEL_METRICS.auc;
   const stabilityStatus =
     drift.status === "stable"
@@ -195,7 +196,9 @@ export default function PortfolioPage() {
               <h2 className="mt-1.5 font-display text-[24px] leading-tight text-ink">
                 {stabilityStatus}
               </h2>
-              <p className="mt-0.5 text-[10px] text-muted">Holdout vs train</p>
+              <p className="mt-0.5 text-[10px] text-muted">
+                {stability ? "Holdout vs train" : "Holdout vs train not available"}
+              </p>
             </div>
             <span
               className={cn(
@@ -246,15 +249,23 @@ export default function PortfolioPage() {
               <span>watch 0.25</span>
               <span>alert</span>
             </div>
-            <p className="mt-2 text-[10.5px] leading-relaxed text-muted">
-              PSI {drift.psi.toFixed(3)} sits in the watch band. The holdout
-              genuinely scores higher than train — mean probability{" "}
-              {formatPercent(MODEL_STABILITY.holdoutMeanProbability, 1)} vs{" "}
-              {formatPercent(MODEL_STABILITY.trainMeanProbability, 1)}, win rate{" "}
-              {formatPercent(MODEL_STABILITY.holdoutWinRate, 1)} vs{" "}
-              {formatPercent(MODEL_STABILITY.trainWinRate, 1)}. That is a real
-              base-rate shift in the synthetic world, not a model fault.
-            </p>
+            {stability ? (
+              <p className="mt-2 text-[10.5px] leading-relaxed text-muted">
+                PSI {drift.psi.toFixed(3)} sits in the watch band. The holdout
+                genuinely scores higher than train — mean probability{" "}
+                {formatPercent(stability.holdoutMean, 1)} vs{" "}
+                {formatPercent(stability.trainMean, 1)}, win rate{" "}
+                {formatPercent(stability.holdoutWinRate, 1)} vs{" "}
+                {formatPercent(stability.trainWinRate, 1)}. That is a real
+                base-rate shift in the synthetic world, not a model fault.
+              </p>
+            ) : (
+              <p className="mt-2 text-[10.5px] leading-relaxed text-muted">
+                PSI {drift.psi.toFixed(3)} is available, but the labelled
+                population could not be split into train and holdout. The
+                stability shift is <strong className="font-semibold text-ink">not measurable</strong>; no fallback numbers are shown.
+              </p>
+            )}
           </div>
 
           <dl className="mt-6 space-y-3 border-t border-line pt-4 text-[11.5px]">
@@ -267,24 +278,38 @@ export default function PortfolioPage() {
                 </span>
               </dd>
             </div>
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-muted">Holdout mean p</dt>
-              <dd className="font-medium tabular-nums text-ink">
-                {formatPercent(MODEL_STABILITY.holdoutMeanProbability, 1)}
-                <span className="ml-2 text-[10px] font-normal text-muted">
-                  train {formatPercent(MODEL_STABILITY.trainMeanProbability, 1)}
-                </span>
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-muted">Holdout win rate</dt>
-              <dd className="font-medium tabular-nums text-ink">
-                {formatPercent(MODEL_STABILITY.holdoutWinRate, 1)}
-                <span className="ml-2 text-[10px] font-normal text-muted">
-                  train {formatPercent(MODEL_STABILITY.trainWinRate, 1)}
-                </span>
-              </dd>
-            </div>
+            {stability ? (
+              <>
+                <div className="flex items-baseline justify-between gap-4">
+                  <dt className="text-muted">Holdout mean p</dt>
+                  <dd className="font-medium tabular-nums text-ink">
+                    {formatPercent(stability.holdoutMean, 1)}
+                    <span className="ml-2 text-[10px] font-normal text-muted">
+                      train {formatPercent(stability.trainMean, 1)}
+                    </span>
+                  </dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-4">
+                  <dt className="text-muted">Holdout win rate</dt>
+                  <dd className="font-medium tabular-nums text-ink">
+                    {formatPercent(stability.holdoutWinRate, 1)}
+                    <span className="ml-2 text-[10px] font-normal text-muted">
+                      train {formatPercent(stability.trainWinRate, 1)}
+                    </span>
+                  </dd>
+                </div>
+              </>
+            ) : (
+              <div className="rounded-lg border border-dashed border-line bg-[#FAF8F3] px-3 py-2.5">
+                <p className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted">
+                  Not measurable
+                </p>
+                <p className="mt-1 text-[10px] leading-relaxed text-muted">
+                  The API omitted the train/holdout split for this population.
+                  The panel shows the PSI but no estimated shift.
+                </p>
+              </div>
+            )}
             <div className="flex items-baseline justify-between gap-4">
               <dt className="text-muted">Calibration error</dt>
               <dd className="font-medium tabular-nums text-ink">
@@ -318,9 +343,9 @@ export default function PortfolioPage() {
           <p className="mt-auto border-t border-line pt-4 text-[10px] leading-relaxed text-muted">
             Measured build facts: AUC {MODEL_METRICS.auc}, calibration error{" "}
             {MODEL_METRICS.calibrationError}, latent ceiling{" "}
-            {MODEL_METRICS.latentAuc}. The API contract exposes the calibration
-            bins and the stability PSI, not these; they are held here until the
-            contract carries them.
+            {MODEL_METRICS.latentAuc}. Stability comes from `/api/portfolio`
+            when the labelled population can be split; when the optional fields
+            are absent, this panel says “not measurable” and shows no fallback.
           </p>
         </Card>
       </div>
