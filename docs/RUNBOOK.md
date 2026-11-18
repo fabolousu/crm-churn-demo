@@ -63,7 +63,7 @@ Follow `docs/PITCH.md`. The beats and the numbers on each screen match:
 |---|---|---|
 | 0:30 | Queue | €720.7M open · €282.0M expected · 19,752 leads |
 | 1:30 | Top lead (Moretti Componenti) | 59.9% · €142,297 EV |
-| 2:30 | Leverage sort (Rossi Componenti) | 47.5% → 67.0% · +19.5 pts · €23k moved |
+| 2:30 | Leverage sort (Russo Industrie) | 50.5% → 60.7% · +10.2 pts · rank 170 → 71 |
 | 3:30 | Act | probability updates, lead re-ranks |
 | 4:20 | Portfolio | calibration 0.0104 · stability Watch 0.171 |
 
@@ -87,7 +87,10 @@ find it before the room does.
 - No drift **trend** chart: the demo has one snapshot, so the stability panel shows
   holdout-vs-train, not production drift over time.
 - No `docker compose`: two terminals instead. `compose.yaml` is not written yet.
-- Discount is preview-only: `ActionRequest` carries no discount value, so that lever cannot
-  be committed as an action.
+- Discount is a **what-if, not an action**: `ActionRequest` carries no discount value, so it
+  cannot be committed, and the leverage ranking deliberately excludes it (`max_leverage` counts
+  only committable levers). `discount_upside` is shown separately and labelled as not actionable.
+  If asked: the model says price-sensitive accounts churn more; it does not say un-discounting a
+  signed deal saves it.
 - The lever's median value is **+4.19 points**, not the 17.3 of the hero lead. Say the
   median out loud — it is the credible number.
