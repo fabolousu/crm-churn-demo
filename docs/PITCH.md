@@ -52,10 +52,11 @@ is "we haven't measured that" — never an estimate.
 | Question | Answer |
 |---|---|
 | "Is this real Dynamics?" | "The data model is Dataverse-shaped. The redesign is the point — this is what the next version should be, not a reskin of today's." |
-| "How do we know it works?" | "We generated the world from a known win process, so we can prove the model recovers it: AUC 0.81 — and 0.95 would mean leakage, not brilliance." |
+| "How do we know it works?" | "We generated the world from a known win process, so the ceiling is measurable: AUC **0.773** against a **0.789** ceiling. A model at 0.95 would mean leakage, not brilliance." |
 | "What's fake here?" | "The companies and leads. The model, the explanations, and the re-scoring loop are the real implementation." |
 | "Where's the churn model?" | "You don't have renewals, so churn isn't an event — dormancy is. It's shown on the company page: 214 days without a new initiative." |
 | "Why would reps use it?" | "It removes triage: no list to sort, no guessing why a deal is cold, no separate BI tool." |
+| "The median action is worth 0.4 points — so what?" | "Because most actions genuinely don't matter. The value is finding the rare lead where one does: Russo moves 10 points and 100 places. That's what the leverage sort is for — and it's why nobody should promise a lift on every account." |
 | "Next step?" | "Same model on your real pipeline. The UI is already the argument." |
 
 ## What not to show
