@@ -29,9 +29,9 @@ this analysis credible to a sales director.
 | Time | Screen | Line |
 |---|---|---|
 | 0:00 | Title, one sentence | "We don't have renewals. We have initiatives. This is a CRM that knows which ones we're losing." |
-| 0:30 | **Pipeline queue** | "First screen: open initiatives ranked by expected value. €510M of pipeline, €205M of it expected — ordered by what's worth a meeting." |
-| 1:30 | **Lead 360** | Click the top lead. "54% to win. Three reasons: 11 hours to first response, no executive sponsor meeting yet, and two losses out of four previous initiatives." |
-| 2:30 | **The lever** | Toggle `exec_sponsor_meeting`. "54% to 71%. Across the whole book the median action is worth 4 points — this one is worth 17, and the queue sorts by exactly that." |
+| 0:30 | **Pipeline queue** | "First screen: open initiatives ranked by expected value. €720M of open pipeline, €282M of it expected — ordered by what's worth a meeting." |
+| 1:30 | **Lead 360** | Click the top lead. "Moretti Componenti: 59.9% to win, €142k expected. Three reasons, in business language, and none of them is a dashboard." |
+| 2:30 | **The lever** | Switch the sort to leverage. "Rossi Componenti: 47.5% to 67.0% with an executive sponsor — 19.5 points, €23k of ARR moved. The biggest deal on the page is worth 0.9 points. **That** is the rethink: rank by where effort pays off." |
 | 3:30 | **Act, then re-score** | Click. "Action logged, probability updated, and the lead moves in the queue. The loop closes." |
 | 4:20 | **Portfolio** | "Five Italian regions, one calibrated model — so 34% means 34%, not just 'unlikely'." |
 | 4:50 | Close | "The model is the easy part. The rethink is that this screen replaces the record-first CRM everyone else still ships." |

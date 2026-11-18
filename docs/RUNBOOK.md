@@ -61,10 +61,10 @@ Follow `docs/PITCH.md`. The beats and the numbers on each screen match:
 
 | Time | Screen | Anchor number |
 |---|---|---|
-| 0:30 | Queue | €510M open · €205M expected · 19,752 leads |
-| 1:30 | Farina Vetri | 54.3% |
-| 2:30 | Lever | 54.3% → 71.6% · median +4.19 pts |
-| 3:30 | Act | 43.0% → 50.1%, #2 → #1 |
+| 0:30 | Queue | €720.7M open · €282.0M expected · 19,752 leads |
+| 1:30 | Top lead (Moretti Componenti) | 59.9% · €142,297 EV |
+| 2:30 | Leverage sort (Rossi Componenti) | 47.5% → 67.0% · +19.5 pts · €23k moved |
+| 3:30 | Act | probability updates, lead re-ranks |
 | 4:20 | Portfolio | calibration 0.0104 · stability Watch 0.171 |
 
 ## Offline check
