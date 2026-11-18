@@ -37,11 +37,19 @@ Interpretations where the contract is silent (reported in the PR, contract untou
       the contract lists only ``201`` for the happy path and is silent on the retention guard.
     * An unknown lead or company is a ``404`` with the ``Error`` body, including on
       ``/counterfactual`` and ``/actions`` where the contract does not list ``404``.
-    * ``/api/portfolio``'s calibration curve and drift come from the *labelled* population
-      (closed leads with a ``lead_outcomes`` row), re-scored with the loaded bundle: a
-      calibration curve needs outcomes, and ``lead_scores`` holds only the open pipeline.
-      Drift is the PSI of the open pipeline's score distribution against that reference's
-      deciles -- the standard score-PSI reading, with the usual 0.10/0.25 thresholds.
+    * ``/api/portfolio``'s calibration curve comes from the *labelled* population (closed
+      leads with a ``lead_outcomes`` row), re-scored with the loaded bundle: a calibration
+      curve needs outcomes, and ``lead_scores`` holds only the open pipeline. **Drift is
+      model stability**: the PSI between the temporal *train* and *holdout (validation)*
+      score distributions, both on labelled leads, binned with the same decile edges as the
+      calibration chart. It answers "did the model's output move on unseen data?", not "is
+      the open queue shaped like history?" -- the latter is survivor selection, not drift.
+      Thresholds are the conventional 0.10 / 0.25.
+    * ``max_leverage`` is the largest single-action delta reachable with the three contract
+      levers (exec sponsor meeting, discovery meeting, discount to 0%). It is an **additive
+      extension**: ``api/openapi.yaml`` is deliberately untouched, so the schema still
+      validates these responses (additional properties are allowed) while lane D is told to
+      read the field. See the PR for why the contract owner may want to adopt it formally.
     * ``/api/health`` reports ``degraded`` when the artifact cannot be loaded or
       ``lead_scores`` is empty; it still answers, so the demo's liveness probe is honest
       about a half-built environment instead of returning a 500.
@@ -76,7 +84,13 @@ if str(REPO_ROOT) not in sys.path:  # so ``uvicorn api.app:app`` finds ``ml.*``
     sys.path.insert(0, str(REPO_ROOT))
 
 from ml.explain import Explainer, describe_value, load_bundle  # noqa: E402
-from ml.train import OPEN_STATUSES, band_for, predict  # noqa: E402
+from ml.train import (  # noqa: E402
+    OPEN_STATUSES,
+    band_for,
+    load_labeled_leads,
+    predict,
+    temporal_split,
+)
 
 DEFAULT_DB_PATH = REPO_ROOT / "data" / "demo.db"
 DEFAULT_MODEL_PATH = REPO_ROOT / "ml" / "artifacts" / "model.joblib"
@@ -142,6 +156,9 @@ class PipelineItem(BaseModel):
     expected_value: float
     days_open: int
     top_driver: Driver
+    # Additive extension to the contract: the biggest single-lever gain for this lead. See
+    # the module docstring -- api/openapi.yaml is intentionally untouched.
+    max_leverage: float | None = None
 
 
 class PipelineResponse(BaseModel):
@@ -192,6 +209,9 @@ class LeadDetail(BaseModel):
     drivers: list[Driver]
     prior_initiatives: list[Lead]
     open_actions: list[Action]
+    # Additive extension: the biggest single-lever delta available on this lead. See the
+    # module docstring -- api/openapi.yaml is intentionally untouched.
+    max_leverage: float | None = None
 
 
 class CompanySummary(BaseModel):
@@ -514,8 +534,56 @@ def _lever_from_action(kind: str) -> dict[str, Any]:
     return {}
 
 
+def _leverage_variants(frame: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    """The three contract levers, each at its most favourable value.
+
+    Every lever is one-directional in the hazard (``docs/LABEL.md``): a meeting and an NPS
+    lift can only raise the win probability, and a discount can only lower it -- so the
+    strongest discount lever is 0%. ``max_leverage`` is therefore the ceiling one simulated
+    action can reach, not a tuned number. ``nps_last`` stays ``NaN`` when it was never
+    measured, for the same reason the counterfactual leaves it unset.
+    """
+    variants: dict[str, pd.DataFrame] = {}
+
+    sponsor = frame.copy()
+    sponsor["meetings_before_scoring"] = (
+        pd.to_numeric(sponsor["meetings_before_scoring"], errors="coerce").fillna(0.0)
+        + 1.0
+    )
+    nps = pd.to_numeric(sponsor["nps_last"], errors="coerce")
+    sponsor["nps_last"] = np.minimum(nps + 5.0, 100.0)
+    variants["exec_sponsor_meeting"] = sponsor
+
+    discovery = frame.copy()
+    discovery["meetings_before_scoring"] = (
+        pd.to_numeric(discovery["meetings_before_scoring"], errors="coerce").fillna(0.0)
+        + 1.0
+    )
+    variants["discovery_meeting"] = discovery
+
+    discount = frame.copy()
+    discount["discount_pct"] = 0.0
+    variants["discount_pct"] = discount
+
+    return variants
+
+
+def _max_leverage_deltas(bundle: Mapping[str, Any], frame: pd.DataFrame) -> np.ndarray:
+    """Largest single-lever probability gain per row, in probability (not log-odds) units."""
+    current = predict(bundle, frame)
+    best = np.zeros(len(frame), dtype="float64")
+    for variant in _leverage_variants(frame).values():
+        best = np.maximum(best, predict(bundle, variant) - current)
+    return np.clip(best, 0.0, 1.0)
+
+
+def _max_leverage_delta(bundle: Mapping[str, Any], feature_row: Mapping[str, Any]) -> float:
+    frame = pd.DataFrame([dict(feature_row)])
+    return float(_max_leverage_deltas(bundle, frame)[0])
+
+
 def _pipeline_item(
-    row: Mapping[str, Any], as_of: date
+    row: Mapping[str, Any], as_of: date, max_leverage: float | None = None
 ) -> PipelineItem:
     drivers = _drivers_from_json(row["drivers_json"])
     top = drivers[0] if drivers else _fallback_driver(float(row["amount_arr"]))
@@ -531,6 +599,7 @@ def _pipeline_item(
         expected_value=float(row["expected_value"]),
         days_open=max(0, (as_of - _as_date(row["created_at"])).days),
         top_driver=top,
+        max_leverage=max_leverage,
     )
 
 
@@ -687,6 +756,8 @@ def create_app(
             else "s.expected_value"
         )
 
+        bundle = request.app.state.bundle
+
         with closing(_connect(request.app.state.db_path)) as connection:
             as_of = _as_of(connection)
             total, total_expected = connection.execute(
@@ -699,7 +770,30 @@ def create_app(
                 (*params, int(limit)),
             ).fetchall()
 
-        items = [_pipeline_item(row, as_of) for row in rows]
+            # ``max_leverage`` is an additive extension, computed only for the page (<= 200
+            # leads), never for the whole queue, so opening the pipeline stays cheap.
+            max_leverage_by_lead: dict[str, float] = {}
+            if bundle is not None and rows:
+                lead_ids = [str(row["lead_id"]) for row in rows]
+                feature_placeholders = ", ".join("?" for _ in lead_ids)
+                feature_rows = connection.execute(
+                    "SELECT * FROM lead_features "
+                    f"WHERE lead_id IN ({feature_placeholders})",
+                    lead_ids,
+                ).fetchall()
+                by_lead = {str(row["lead_id"]): dict(row) for row in feature_rows}
+                ordered_ids = [lead_id for lead_id in lead_ids if lead_id in by_lead]
+                if ordered_ids:
+                    frame = pd.DataFrame([by_lead[lead_id] for lead_id in ordered_ids])
+                    for lead_id, delta in zip(
+                        ordered_ids, _max_leverage_deltas(bundle, frame)
+                    ):
+                        max_leverage_by_lead[lead_id] = float(delta)
+
+        items = [
+            _pipeline_item(row, as_of, max_leverage_by_lead.get(str(row["lead_id"])))
+            for row in rows
+        ]
         return PipelineResponse(
             total=int(total),
             total_expected_value=float(total_expected),
@@ -754,6 +848,18 @@ def create_app(
                     f"lead {lead_id} has neither a stored score nor a feature row",
                 )
 
+            # An open lead's ceiling: the biggest delta any single contract lever could reach.
+            # A closed lead is not actionable, so it reports null rather than a hypothetical
+            # gain nobody can book.
+            bundle = request.app.state.bundle
+            max_leverage = (
+                _max_leverage_delta(bundle, feature_row)
+                if bundle is not None
+                and feature_row is not None
+                and str(lead_row["status"]) not in ("won", "lost")
+                else None
+            )
+
             prior_rows = connection.execute(
                 "SELECT * FROM leads WHERE company_id = ? AND created_at < ? AND id != ? "
                 "ORDER BY created_at DESC",
@@ -790,6 +896,7 @@ def create_app(
                 )
                 for row in action_rows
             ],
+            max_leverage=max_leverage,
         )
 
     # ---------------------------------------------------------------- counterfactual
@@ -1022,11 +1129,13 @@ def create_app(
 
     @application.get("/api/portfolio", response_model=Portfolio)
     def get_portfolio(request: Request) -> Portfolio:
-        """Executive view: EV by region, a calibration curve, and population stability.
+        """Executive view: EV by region, a calibration curve, and model stability.
 
         Calibration and drift are computed on the labelled population (closed leads with a
         ``lead_outcomes`` row), because ``lead_scores`` only covers the open pipeline and a
-        calibration curve needs outcomes. Both use the loaded artifact, not a second model.
+        calibration curve needs outcomes. Drift is **model stability**: the score
+        distribution on the temporal holdout versus the temporal train side. Comparing the
+        open queue against history would measure survivor selection, not drift.
         """
         bundle = request.app.state.bundle
         if bundle is None:
@@ -1067,22 +1176,15 @@ def create_app(
                     )
                 )
 
-            labelled = pd.read_sql_query(
-                "SELECT o.won, f.* FROM lead_features AS f "
-                "JOIN lead_outcomes AS o ON o.lead_id = f.lead_id "
-                "ORDER BY f.lead_id",
-                connection,
-            )
-            open_probabilities = [
-                float(row[0])
-                for row in connection.execute(
-                    "SELECT probability FROM lead_scores ORDER BY lead_id"
-                )
-            ]
+            try:
+                labelled = load_labeled_leads(connection)
+            except RuntimeError:  # no labels yet: nothing to calibrate or compare
+                labelled = pd.DataFrame()
 
         predictions = predict(bundle, labelled) if not labelled.empty else np.empty(0)
-        calibration = _calibration_bins(labelled, predictions)
-        drift = _drift(predictions, open_probabilities)
+        edges = _calibration_edges(predictions)
+        calibration = _calibration_bins(labelled, predictions, edges)
+        drift = _stability_drift(bundle, labelled, edges)
 
         return Portfolio(
             total_expected_value=total_expected,
@@ -1094,14 +1196,20 @@ def create_app(
     return application
 
 
+def _calibration_edges(predictions: np.ndarray) -> np.ndarray:
+    """Decile edges over all labelled predictions; the calibration chart and drift share them."""
+    if predictions.size == 0:
+        return np.empty(0)
+    return np.unique(np.quantile(predictions, np.linspace(0.0, 1.0, 11)))
+
+
 def _calibration_bins(
-    labelled: pd.DataFrame, predictions: np.ndarray
+    labelled: pd.DataFrame, predictions: np.ndarray, edges: np.ndarray
 ) -> list[CalibrationBin]:
     """Ten equal-frequency predicted-probability bins: mean prediction vs observed win rate."""
-    if labelled.empty:
+    if labelled.empty or predictions.size == 0:
         return []
     labels = labelled["won"].to_numpy(dtype="float64")
-    edges = np.unique(np.quantile(predictions, np.linspace(0.0, 1.0, 11)))
     if edges.size < 2:
         return [
             CalibrationBin(
@@ -1123,33 +1231,45 @@ def _calibration_bins(
     return bins
 
 
-def _drift(reference: np.ndarray, open_probabilities: list[float]) -> Drift:
-    """Population stability index of the open-pipeline score distribution vs. training.
+def _stability_drift(
+    bundle: Mapping[str, Any], labelled: pd.DataFrame, edges: np.ndarray
+) -> Drift:
+    """PSI between the temporal train and holdout score distributions.
 
-    The reference is how the model scores the labelled population it was validated on; the
-    current population is the open pipeline from ``lead_scores``. Bins are the reference's
-    deciles, so the PSI answers "is the queue shaped like the world the model learned?".
+    Both sides are labelled leads, so the comparison is model stability on unseen data rather
+    than a comparison against the open queue (which is positively selected by censoring).
+    The temporal split is the trainer's own, so the holdout is the population the model was
+    validated on. Degenerate worlds (no labels, one class on a side) report stable at 0.0
+    because stability is undefined without two comparable score samples.
     """
-    if reference.size == 0 or not open_probabilities:
+    if labelled.empty or edges.size < 2:
         return Drift(psi=0.0, status="stable")
-
-    current = np.asarray(open_probabilities, dtype="float64")
-    edges = np.unique(np.quantile(reference, np.linspace(0.0, 1.0, 11)))
-    if edges.size < 2:
+    try:
+        split = temporal_split(labelled)
+    except (RuntimeError, AssertionError):
         return Drift(psi=0.0, status="stable")
+    train_scores = predict(bundle, split.train)
+    holdout_scores = predict(bundle, split.validation)
+    return _psi(train_scores, holdout_scores, edges)
 
-    current = np.clip(current, edges[0], edges[-1])
-    reference_share = np.histogram(reference, bins=edges)[0].astype("float64")
-    current_share = np.histogram(current, bins=edges)[0].astype("float64")
-    reference_share /= reference_share.sum()
-    current_share /= current_share.sum()
+
+def _psi(expected: np.ndarray, actual: np.ndarray, edges: np.ndarray) -> Drift:
+    """Population stability index of ``actual`` against ``expected`` over fixed edges."""
+    expected_share = np.histogram(
+        np.clip(expected, edges[0], edges[-1]), bins=edges
+    )[0].astype("float64")
+    actual_share = np.histogram(
+        np.clip(actual, edges[0], edges[-1]), bins=edges
+    )[0].astype("float64")
+    expected_share /= expected_share.sum()
+    actual_share /= actual_share.sum()
 
     # A zero share makes ln(share) undefined; a small epsilon is the standard PSI convention
     # and leaves the verdict unchanged at these thresholds.
     epsilon = 1e-6
-    reference_share = np.where(reference_share == 0.0, epsilon, reference_share)
-    current_share = np.where(current_share == 0.0, epsilon, current_share)
-    psi = float(np.sum((current_share - reference_share) * np.log(current_share / reference_share)))
+    expected_share = np.where(expected_share == 0.0, epsilon, expected_share)
+    actual_share = np.where(actual_share == 0.0, epsilon, actual_share)
+    psi = float(np.sum((actual_share - expected_share) * np.log(actual_share / expected_share)))
 
     if psi < PSI_STABLE_BELOW:
         status: Literal["stable", "watch", "alert"] = "stable"

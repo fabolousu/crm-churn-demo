@@ -26,6 +26,7 @@ from contextlib import closing
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
@@ -127,6 +128,48 @@ def action_count(db_path: str | Path, lead_id: str, kind: str | None = None) -> 
             (lead_id, kind),
         )
     )
+
+
+def expected_leverage(bundle: dict, row: dict) -> tuple[float, dict[str, float]]:
+    """Independently reproduce the three single-lever deltas for one feature row.
+
+    Deliberately not the service's helper: the test states the lever mapping from
+    ``docs/LABEL.md`` itself (+1 meeting / +5 NPS, and discount to 0 as the best discount).
+    """
+    current = float(train.predict(bundle, row)[0])
+
+    sponsor = dict(row)
+    sponsor["meetings_before_scoring"] = float(row["meetings_before_scoring"] or 0.0) + 1.0
+    if row["nps_last"] is not None:
+        sponsor["nps_last"] = min(float(row["nps_last"]) + 5.0, 100.0)
+
+    discovery = dict(row)
+    discovery["meetings_before_scoring"] = float(row["meetings_before_scoring"] or 0.0) + 1.0
+
+    discount = dict(row)
+    discount["discount_pct"] = 0.0
+
+    return current, {
+        "exec_sponsor_meeting": float(train.predict(bundle, sponsor)[0]) - current,
+        "discovery_meeting": float(train.predict(bundle, discovery)[0]) - current,
+        "discount_pct": float(train.predict(bundle, discount)[0]) - current,
+    }
+
+
+def expected_psi(expected: np.ndarray, actual: np.ndarray, edges: np.ndarray) -> float:
+    """The PSI definition the stability panel is stated in, written out in the test."""
+    expected_hist = np.histogram(
+        np.clip(expected, edges[0], edges[-1]), bins=edges
+    )[0].astype("float64")
+    actual_hist = np.histogram(
+        np.clip(actual, edges[0], edges[-1]), bins=edges
+    )[0].astype("float64")
+    expected_share = expected_hist / expected_hist.sum()
+    actual_share = actual_hist / actual_hist.sum()
+    epsilon = 1e-6
+    expected_share = np.where(expected_share == 0.0, epsilon, expected_share)
+    actual_share = np.where(actual_share == 0.0, epsilon, actual_share)
+    return float(np.sum((actual_share - expected_share) * np.log(actual_share / expected_share)))
 
 
 # --------------------------------------------------------------------------------------
@@ -460,6 +503,46 @@ def test_closed_lead_gets_a_consistent_score_on_its_360(
     assert detail["score"]["model_version"] == bundle["model_version"]
     assert detail["score"]["band"] in ("low", "medium", "high", "critical")
     assert detail["drivers"], "a closed lead still gets its SHAP drivers"
+    assert detail["max_leverage"] is None, (
+        "a closed lead is not actionable; its lead 360 must not promise a lever"
+    )
+
+
+def test_lead_detail_max_leverage_is_the_best_lever(
+    api: TestClient, bundle: dict, demo_db: Path
+) -> None:
+    lead_id = open_lead_ids(demo_db)[0]
+    _, deltas = expected_leverage(bundle, feature_row(demo_db, lead_id))
+    best = max(max(deltas.values()), 0.0)
+
+    detail = api.get(f"/api/leads/{lead_id}").json()
+    assert detail["max_leverage"] is not None
+    assert detail["max_leverage"] == pytest.approx(best, abs=1e-9)
+    assert detail["max_leverage"] >= 0.0
+
+    # The summary field must agree with the counterfactual endpoint it is computed from.
+    endpoint_deltas = []
+    for body in (
+        {"exec_sponsor_meeting": True},
+        {"discovery_meeting": True},
+        {"discount_pct": 0},
+    ):
+        response = api.post(f"/api/leads/{lead_id}/counterfactual", json=body)
+        assert response.status_code == 200
+        endpoint_deltas.append(response.json()["delta"])
+    assert max(endpoint_deltas) == pytest.approx(detail["max_leverage"], abs=1e-9)
+
+
+def test_pipeline_items_carry_the_same_max_leverage_as_the_lead_360(
+    api: TestClient, demo_db: Path
+) -> None:
+    items = api.get("/api/pipeline", params={"limit": 3}).json()["items"]
+    assert items
+    for item in items:
+        assert item["max_leverage"] is not None
+        assert item["max_leverage"] >= 0.0
+        detail = api.get(f"/api/leads/{item['lead_id']}").json()
+        assert item["max_leverage"] == pytest.approx(detail["max_leverage"], abs=1e-12)
 
 
 def test_company_360_lists_initiatives_most_recent_first(api: TestClient, demo_db: Path) -> None:
@@ -832,3 +915,31 @@ def test_portfolio_calibration_and_drift_are_populated(api: TestClient) -> None:
     drift = portfolio["drift"]
     assert math.isfinite(drift["psi"]) and drift["psi"] >= 0.0
     assert drift["status"] in ("stable", "watch", "alert")
+
+
+def test_portfolio_drift_is_train_vs_holdout_stability(
+    api: TestClient, bundle: dict, demo_db: Path
+) -> None:
+    """Drift is model stability on unseen labelled leads, not the open queue.
+
+    Computing it against the open pipeline would conflate survivor selection (leads still
+    open are the ones not yet lost) with drift and always read "alert"; this pins the
+    intended definition: PSI between the temporal train and holdout score distributions,
+    binned with the calibration deciles.
+    """
+    with closing(_connect(demo_db)) as connection:
+        labelled = train.load_labeled_leads(connection)
+    split = train.temporal_split(labelled)
+
+    all_scores = train.predict(bundle, labelled)
+    edges = np.unique(np.quantile(all_scores, np.linspace(0.0, 1.0, 11)))
+    train_scores = train.predict(bundle, split.train)
+    holdout_scores = train.predict(bundle, split.validation)
+
+    expected = expected_psi(train_scores, holdout_scores, edges)
+    drift = api.get("/api/portfolio").json()["drift"]
+    assert drift["psi"] == pytest.approx(expected, abs=1e-6)
+    expected_status = (
+        "stable" if expected < 0.1 else ("watch" if expected < 0.25 else "alert")
+    )
+    assert drift["status"] == expected_status
