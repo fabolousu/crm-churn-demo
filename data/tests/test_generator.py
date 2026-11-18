@@ -95,11 +95,17 @@ def demo_db(tmp_path_factory: pytest.TempPathFactory) -> Path:
     run_generator(db_path)
     # Test-only indexes for the reachability queries; the demo schema indexes
     # the columns the product needs, not necessarily the ones tests probe.
-    with sqlite3.connect(db_path) as connection:
+    # sqlite3's context manager commits but does NOT close, which leaves the file handle
+    # open and makes a later unlink fail on Windows with WinError 32.
+    connection = sqlite3.connect(db_path)
+    try:
         connection.execute(
             "CREATE INDEX IF NOT EXISTS idx_test_rep "
             "ON leads(owner_rep, closed_at)"
         )
+        connection.commit()
+    finally:
+        connection.close()
     return db_path
 
 
@@ -925,8 +931,11 @@ def test_nullable_resolution_and_failed_publication(tmp_path, small_world, monke
 
     def fail_replace(source, target):
         # The replacement is a committed database before publication.
-        with sqlite3.connect(source) as connection:
+        connection = sqlite3.connect(source)
+        try:
             assert connection.execute("SELECT COUNT(*) FROM tickets").fetchone()[0] == 1
+        finally:
+            connection.close()
         raise OSError("publication failed")
 
     monkeypatch.setattr(generator.os, "replace", fail_replace)

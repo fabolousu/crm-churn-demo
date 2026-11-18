@@ -275,11 +275,15 @@ components:
       description: |
         Forward-looking levers only; nothing rewrites a response that already happened.
         Each is re-scored by the same model.
+
+        There is deliberately no `accelerate_to_proposal` lever: the model trains on leads
+        labelled at qualification, so `stage_at_scoring` is constant in training and the
+        proposal-stage effect is unlearnable. A lever the model cannot see would be a
+        fabricated number on screen. See `docs/DECISIONS.md` for the fix path.
       properties:
         exec_sponsor_meeting: { type: boolean }
         discovery_meeting: { type: boolean }
         discount_pct: { type: number, minimum: 0, maximum: 60 }
-        accelerate_to_proposal: { type: boolean }
       additionalProperties: false
 
     CounterfactualResponse:
