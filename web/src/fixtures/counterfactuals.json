@@ -1,0 +1,674 @@
+{
+  "L057056": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.7158,
+      "delta": 0.1727,
+      "explanation": "An executive sponsor meeting moves this initiative from 54.3% to 71.6% — the largest lever on the lead."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.6039,
+      "delta": 0.0608,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.6016,
+      "delta": 0.0585,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 5.9 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.5653,
+      "delta": 0.0222,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 2.2 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.5282,
+      "delta": -0.0149,
+      "explanation": "Raising the proposed discount to 10% lowers the score by 1.5 points — a discount does not buy the win."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.4909,
+      "delta": -0.0522,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 5.2 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.4536,
+      "delta": -0.0895,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 8.9 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.4169,
+      "delta": -0.1262,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 12.6 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.5431,
+      "hypothetical_probability": 0.381,
+      "delta": -0.1621,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 16.2 points — a discount does not buy the win."
+    }
+  },
+  "L052117": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.43,
+      "hypothetical_probability": 0.5007,
+      "delta": 0.0707,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.43,
+      "hypothetical_probability": 0.4918,
+      "delta": 0.0618,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.43,
+      "hypothetical_probability": 0.4744,
+      "delta": 0.0444,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 4.4 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.43,
+      "hypothetical_probability": 0.4373,
+      "delta": 0.0073,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 0.7 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.43,
+      "hypothetical_probability": 0.401,
+      "delta": -0.029,
+      "explanation": "Raising the proposed discount to 10% lowers the score by 2.9 points — a discount does not buy the win."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.43,
+      "hypothetical_probability": 0.3656,
+      "delta": -0.0644,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 6.4 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.43,
+      "hypothetical_probability": 0.3317,
+      "delta": -0.0983,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 9.8 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.43,
+      "hypothetical_probability": 0.2994,
+      "delta": -0.1306,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 13.1 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.43,
+      "hypothetical_probability": 0.269,
+      "delta": -0.161,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 16.1 points — a discount does not buy the win."
+    }
+  },
+  "L048322": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.56,
+      "hypothetical_probability": 0.6285,
+      "delta": 0.0685,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.56,
+      "hypothetical_probability": 0.6201,
+      "delta": 0.0601,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.56,
+      "hypothetical_probability": 0.6457,
+      "delta": 0.0857,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 8.6 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.56,
+      "hypothetical_probability": 0.6108,
+      "delta": 0.0508,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 5.1 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.56,
+      "hypothetical_probability": 0.5747,
+      "delta": 0.0147,
+      "explanation": "Lowering the proposed discount to 10% raises the score by 1.5 points."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.56,
+      "hypothetical_probability": 0.5378,
+      "delta": -0.0222,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 2.2 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.56,
+      "hypothetical_probability": 0.5005,
+      "delta": -0.0595,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 5.9 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.56,
+      "hypothetical_probability": 0.4631,
+      "delta": -0.0969,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 9.7 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.56,
+      "hypothetical_probability": 0.4262,
+      "delta": -0.1338,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 13.4 points — a discount does not buy the win."
+    }
+  },
+  "L061904": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.31,
+      "hypothetical_probability": 0.3739,
+      "delta": 0.0639,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.31,
+      "hypothetical_probability": 0.3656,
+      "delta": 0.0556,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.31,
+      "hypothetical_probability": 0.3773,
+      "delta": 0.0673,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 6.7 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.31,
+      "hypothetical_probability": 0.3429,
+      "delta": 0.0329,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 3.3 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.31,
+      "hypothetical_probability": 0.31,
+      "delta": 0,
+      "explanation": "The proposed discount is unchanged."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.31,
+      "hypothetical_probability": 0.2789,
+      "delta": -0.0311,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 3.1 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.31,
+      "hypothetical_probability": 0.2499,
+      "delta": -0.0601,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 6.0 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.31,
+      "hypothetical_probability": 0.2229,
+      "delta": -0.0871,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 8.7 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.31,
+      "hypothetical_probability": 0.1981,
+      "delta": -0.1119,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 11.2 points — a discount does not buy the win."
+    }
+  },
+  "L043781": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.62,
+      "hypothetical_probability": 0.6844,
+      "delta": 0.0644,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.62,
+      "hypothetical_probability": 0.6767,
+      "delta": 0.0567,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.62,
+      "hypothetical_probability": 0.6546,
+      "delta": 0.0346,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 3.5 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.62,
+      "hypothetical_probability": 0.62,
+      "delta": 0,
+      "explanation": "The proposed discount is unchanged."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.62,
+      "hypothetical_probability": 0.5842,
+      "delta": -0.0358,
+      "explanation": "Raising the proposed discount to 10% lowers the score by 3.6 points — a discount does not buy the win."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.62,
+      "hypothetical_probability": 0.5475,
+      "delta": -0.0725,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 7.2 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.62,
+      "hypothetical_probability": 0.5102,
+      "delta": -0.1098,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 11.0 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.62,
+      "hypothetical_probability": 0.4728,
+      "delta": -0.1472,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 14.7 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.62,
+      "hypothetical_probability": 0.4358,
+      "delta": -0.1842,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 18.4 points — a discount does not buy the win."
+    }
+  },
+  "L059233": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.27,
+      "hypothetical_probability": 0.3296,
+      "delta": 0.0596,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.27,
+      "hypothetical_probability": 0.3218,
+      "delta": 0.0518,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.27,
+      "hypothetical_probability": 0.3262,
+      "delta": 0.0562,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 5.6 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.27,
+      "hypothetical_probability": 0.2942,
+      "delta": 0.0242,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 2.4 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.27,
+      "hypothetical_probability": 0.2641,
+      "delta": -0.0059,
+      "explanation": "Raising the proposed discount to 10% lowers the score by 0.6 points — a discount does not buy the win."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.27,
+      "hypothetical_probability": 0.2361,
+      "delta": -0.0339,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 3.4 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.27,
+      "hypothetical_probability": 0.2102,
+      "delta": -0.0598,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 6.0 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.27,
+      "hypothetical_probability": 0.1864,
+      "delta": -0.0836,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 8.4 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.27,
+      "hypothetical_probability": 0.1648,
+      "delta": -0.1052,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 10.5 points — a discount does not buy the win."
+    }
+  },
+  "L050418": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.48,
+      "hypothetical_probability": 0.551,
+      "delta": 0.071,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.48,
+      "hypothetical_probability": 0.5421,
+      "delta": 0.0621,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.48,
+      "hypothetical_probability": 0.6406,
+      "delta": 0.1606,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 16.1 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.48,
+      "hypothetical_probability": 0.6055,
+      "delta": 0.1255,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 12.6 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.48,
+      "hypothetical_probability": 0.5693,
+      "delta": 0.0893,
+      "explanation": "Lowering the proposed discount to 10% raises the score by 8.9 points."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.48,
+      "hypothetical_probability": 0.5323,
+      "delta": 0.0523,
+      "explanation": "Lowering the proposed discount to 15% raises the score by 5.2 points."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.48,
+      "hypothetical_probability": 0.4949,
+      "delta": 0.0149,
+      "explanation": "Lowering the proposed discount to 20% raises the score by 1.5 points."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.48,
+      "hypothetical_probability": 0.4577,
+      "delta": -0.0223,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 2.2 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.48,
+      "hypothetical_probability": 0.4208,
+      "delta": -0.0592,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 5.9 points — a discount does not buy the win."
+    }
+  },
+  "L046677": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.38,
+      "hypothetical_probability": 0.449,
+      "delta": 0.069,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.38,
+      "hypothetical_probability": 0.4401,
+      "delta": 0.0601,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.38,
+      "hypothetical_probability": 0.4304,
+      "delta": 0.0504,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 5.0 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.38,
+      "hypothetical_probability": 0.3942,
+      "delta": 0.0142,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 1.4 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.38,
+      "hypothetical_probability": 0.3591,
+      "delta": -0.0209,
+      "explanation": "Raising the proposed discount to 10% lowers the score by 2.1 points — a discount does not buy the win."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.38,
+      "hypothetical_probability": 0.3254,
+      "delta": -0.0546,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 5.5 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.38,
+      "hypothetical_probability": 0.2935,
+      "delta": -0.0865,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 8.6 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.38,
+      "hypothetical_probability": 0.2635,
+      "delta": -0.1165,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 11.7 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.38,
+      "hypothetical_probability": 0.2355,
+      "delta": -0.1445,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 14.4 points — a discount does not buy the win."
+    }
+  },
+  "L057912": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.24,
+      "hypothetical_probability": 0.2957,
+      "delta": 0.0557,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.24,
+      "hypothetical_probability": 0.2883,
+      "delta": 0.0483,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.24,
+      "hypothetical_probability": 0.305,
+      "delta": 0.065,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 6.5 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.24,
+      "hypothetical_probability": 0.2742,
+      "delta": 0.0342,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 3.4 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.24,
+      "hypothetical_probability": 0.2455,
+      "delta": 0.0055,
+      "explanation": "Lowering the proposed discount to 10% raises the score by 0.5 points."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.24,
+      "hypothetical_probability": 0.2189,
+      "delta": -0.0211,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 2.1 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.24,
+      "hypothetical_probability": 0.1944,
+      "delta": -0.0456,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 4.6 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.24,
+      "hypothetical_probability": 0.172,
+      "delta": -0.068,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 6.8 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.24,
+      "hypothetical_probability": 0.1517,
+      "delta": -0.0883,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 8.8 points — a discount does not buy the win."
+    }
+  },
+  "L044105": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.52,
+      "hypothetical_probability": 0.5902,
+      "delta": 0.0702,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.52,
+      "hypothetical_probability": 0.5815,
+      "delta": 0.0615,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.52,
+      "hypothetical_probability": 0.5498,
+      "delta": 0.0298,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 3.0 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.52,
+      "hypothetical_probability": 0.5125,
+      "delta": -0.0075,
+      "explanation": "Raising the proposed discount to 5% lowers the score by 0.8 points — a discount does not buy the win."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.52,
+      "hypothetical_probability": 0.4752,
+      "delta": -0.0448,
+      "explanation": "Raising the proposed discount to 10% lowers the score by 4.5 points — a discount does not buy the win."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.52,
+      "hypothetical_probability": 0.4381,
+      "delta": -0.0819,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 8.2 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.52,
+      "hypothetical_probability": 0.4017,
+      "delta": -0.1183,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 11.8 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.52,
+      "hypothetical_probability": 0.3663,
+      "delta": -0.1537,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 15.4 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.52,
+      "hypothetical_probability": 0.3323,
+      "delta": -0.1877,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 18.8 points — a discount does not buy the win."
+    }
+  },
+  "L060284": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.19,
+      "hypothetical_probability": 0.2377,
+      "delta": 0.0477,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.19,
+      "hypothetical_probability": 0.2313,
+      "delta": 0.0413,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.19,
+      "hypothetical_probability": 0.3313,
+      "delta": 0.1413,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 14.1 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.19,
+      "hypothetical_probability": 0.2991,
+      "delta": 0.1091,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 10.9 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.19,
+      "hypothetical_probability": 0.2687,
+      "delta": 0.0787,
+      "explanation": "Lowering the proposed discount to 10% raises the score by 7.9 points."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.19,
+      "hypothetical_probability": 0.2403,
+      "delta": 0.0503,
+      "explanation": "Lowering the proposed discount to 15% raises the score by 5.0 points."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.19,
+      "hypothetical_probability": 0.2141,
+      "delta": 0.0241,
+      "explanation": "Lowering the proposed discount to 20% raises the score by 2.4 points."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.19,
+      "hypothetical_probability": 0.19,
+      "delta": 0,
+      "explanation": "The proposed discount is unchanged."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.19,
+      "hypothetical_probability": 0.168,
+      "delta": -0.022,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 2.2 points — a discount does not buy the win."
+    }
+  },
+  "L051639": {
+    "exec_sponsor_meeting=true": {
+      "current_probability": 0.35,
+      "hypothetical_probability": 0.4172,
+      "delta": 0.0672,
+      "explanation": "An executive sponsor meeting adds a meeting and lifts relationship health. The same model re-scores this initiative."
+    },
+    "discovery_meeting=true": {
+      "current_probability": 0.35,
+      "hypothetical_probability": 0.4085,
+      "delta": 0.0585,
+      "explanation": "A discovery meeting adds one structured session with the buyer. The same model re-scores this initiative."
+    },
+    "discount_pct=0": {
+      "current_probability": 0.35,
+      "hypothetical_probability": 0.399,
+      "delta": 0.049,
+      "explanation": "Lowering the proposed discount to 0% raises the score by 4.9 points."
+    },
+    "discount_pct=5": {
+      "current_probability": 0.35,
+      "hypothetical_probability": 0.3637,
+      "delta": 0.0137,
+      "explanation": "Lowering the proposed discount to 5% raises the score by 1.4 points."
+    },
+    "discount_pct=10": {
+      "current_probability": 0.35,
+      "hypothetical_probability": 0.3299,
+      "delta": -0.0201,
+      "explanation": "Raising the proposed discount to 10% lowers the score by 2.0 points — a discount does not buy the win."
+    },
+    "discount_pct=15": {
+      "current_probability": 0.35,
+      "hypothetical_probability": 0.2977,
+      "delta": -0.0523,
+      "explanation": "Raising the proposed discount to 15% lowers the score by 5.2 points — a discount does not buy the win."
+    },
+    "discount_pct=20": {
+      "current_probability": 0.35,
+      "hypothetical_probability": 0.2674,
+      "delta": -0.0826,
+      "explanation": "Raising the proposed discount to 20% lowers the score by 8.3 points — a discount does not buy the win."
+    },
+    "discount_pct=25": {
+      "current_probability": 0.35,
+      "hypothetical_probability": 0.2391,
+      "delta": -0.1109,
+      "explanation": "Raising the proposed discount to 25% lowers the score by 11.1 points — a discount does not buy the win."
+    },
+    "discount_pct=30": {
+      "current_probability": 0.35,
+      "hypothetical_probability": 0.213,
+      "delta": -0.137,
+      "explanation": "Raising the proposed discount to 30% lowers the score by 13.7 points — a discount does not buy the win."
+    }
+  }
+}
