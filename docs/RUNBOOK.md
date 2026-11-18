@@ -1,0 +1,93 @@
+# Demo runbook
+
+For the person driving the laptop. Five minutes of demo, about two minutes of setup.
+
+## Pre-flight (do this before the room, once)
+
+```powershell
+# 1. Dependencies (first time only)
+python -m pip install -r requirements.txt
+pnpm --dir web install
+
+# 2. Data, features, model, scores — deterministic from seed 42
+python tools/run_pipeline.py
+
+# 3. Confirm the model gate before you trust any number on screen
+python tools/check_metrics.py
+```
+
+Expected gate output: `ok metrics: auc=0.773 calibration=0.010 lift@10=2.26 (ceiling 0.789)`.
+If it fails, **do not demo**. The numbers on screen come from that artifact.
+
+## Start it (two terminals)
+
+**Terminal 1 — API**
+
+```powershell
+python -m uvicorn api.app:app --host 127.0.0.1 --port 8000
+```
+
+**Terminal 2 — UI**
+
+`VITE_API_BASE` is a **build-time** variable. Set it, then build, then serve:
+
+```powershell
+$env:VITE_API_BASE = "http://127.0.0.1:8000"
+pnpm --dir web build
+pnpm --dir web preview --port 5173
+```
+
+Open `http://127.0.0.1:5173`.
+
+> Fixture mode: if you skip `VITE_API_BASE`, the UI renders committed fixtures with the
+> same numbers. That is the fallback if the API misbehaves on stage — the screens still
+> work, and you say so if asked.
+
+## Pre-warm (30 seconds before you start)
+
+Click through everything once, in this order — the first hit loads the model bundle:
+
+1. `/api/health` in a browser tab → `{"status":"ok","model_version":"lead-win-lgbm-v1"}`
+2. The queue screen
+3. Farina Vetri's lead page
+4. Toggle the exec-sponsor lever
+5. The portfolio screen
+
+Then reload the queue so the demo starts on a warm page.
+
+## The five minutes
+
+Follow `docs/PITCH.md`. The beats and the numbers on each screen match:
+
+| Time | Screen | Anchor number |
+|---|---|---|
+| 0:30 | Queue | €510M open · €205M expected · 19,752 leads |
+| 1:30 | Farina Vetri | 54.3% |
+| 2:30 | Lever | 54.3% → 71.6% · median +4.19 pts |
+| 3:30 | Act | 43.0% → 50.1%, #2 → #1 |
+| 4:20 | Portfolio | calibration 0.0104 · stability Watch 0.171 |
+
+## Offline check
+
+Disconnect Wi-Fi (or turn off the adapter), reload the queue, click into a lead, toggle the
+lever. Everything above must still work. If anything breaks, it was reaching the network —
+find it before the room does.
+
+## If something fails on stage
+
+| Symptom | Move |
+|---|---|
+| UI shows stale/blank data | The API is down → restart Terminal 1, reload. Fixtures still work. |
+| `data/demo.db` missing | `python tools/run_pipeline.py` (~2 min) — do not run this in the room if you can avoid it |
+| A number is questioned that isn't on screen | Open `ml/artifacts/metrics.json`. Never estimate. |
+| Queue looks different from rehearsal | Scores are deterministic from seed 42; a difference means the DB was regenerated with another seed |
+
+## Known gaps (state them if asked; don't paper over them)
+
+- No drift **trend** chart: the demo has one snapshot, so the stability panel shows
+  holdout-vs-train, not production drift over time.
+- No `docker compose`: two terminals instead. `compose.yaml` is not written yet.
+- Discount is preview-only: `ActionRequest` carries no discount value, so that lever cannot
+  be committed as an action.
+- The lever's median value is **+4.19 points**, not the 17.3 of the hero lead. Say the
+  median out loud — it is the credible number.

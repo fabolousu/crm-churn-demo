@@ -1,0 +1,55 @@
+{
+  "auc": 0.772915,
+  "calibration_error": 0.010442,
+  "lift_at_10": 2.262173,
+  "latent_auc": 0.788589,
+  "model_version": "lead-win-lgbm-v1",
+  "split": {
+    "strategy": "temporal by closed_at",
+    "quantile": 0.8,
+    "cutoff": "2025-08-24T00:40:36.800000",
+    "train_rows": 32126,
+    "validation_rows": 8032,
+    "train_max_closed_at": "2025-08-24T00:13:38",
+    "validation_min_closed_at": "2025-08-24T00:58:36",
+    "train_win_rate": 0.270497,
+    "validation_win_rate": 0.35122
+  },
+  "bands": {
+    "medium": 0.2,
+    "high": 0.4,
+    "critical": 0.6
+  },
+  "scored_leads": 19752,
+  "scored_leads_by_stage": {
+    "contacted": 10638,
+    "new": 6134,
+    "proposal": 1660,
+    "qualified": 1320
+  },
+  "shap_sample_rows": 42000,
+  "features": [
+    "source",
+    "stage_at_scoring",
+    "region",
+    "industry",
+    "age_days_at_scoring",
+    "amount_arr",
+    "discount_pct",
+    "first_response_hours",
+    "employees",
+    "company_age_days",
+    "prior_won_initiatives",
+    "prior_lost_initiatives",
+    "days_since_last_initiative",
+    "lifetime_won_arr",
+    "open_initiatives_count",
+    "usage_trend_slope",
+    "tickets_90d",
+    "nps_last",
+    "payment_delay_days_avg_180d",
+    "meetings_before_scoring",
+    "owner_win_rate_180d"
+  ],
+  "num_boost_round": 500
+}
