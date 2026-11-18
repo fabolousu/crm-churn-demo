@@ -44,7 +44,9 @@ Interpretations where the contract is silent (reported in the PR, contract untou
       score distributions, both on labelled leads, binned with the same decile edges as the
       calibration chart. It answers "did the model's output move on unseen data?", not "is
       the open queue shaped like history?" -- the latter is survivor selection, not drift.
-      Thresholds are the conventional 0.10 / 0.25.
+      Thresholds are the conventional 0.10 / 0.25. The response also carries the split's
+      summary -- ``train_mean``, ``holdout_mean``, ``train_win_rate``, ``holdout_win_rate``
+      -- so the executive screen never hardcodes a number the pipeline can compute.
     * ``max_leverage`` is the largest single-action delta reachable with the three contract
       levers (exec sponsor meeting, discovery meeting, discount to 0%). It is an **additive
       extension**: ``api/openapi.yaml`` is deliberately untouched, so the schema still
@@ -280,6 +282,20 @@ class CalibrationBin(BaseModel):
 class Drift(BaseModel):
     psi: float
     status: Literal["stable", "watch", "alert"]
+    # Optional stability context: the four numbers behind the PSI. Omitted when the world is
+    # too small to split, because the contract's type is ``number``, not nullable.
+    train_mean: float | None = None
+    holdout_mean: float | None = None
+    train_win_rate: float | None = None
+    holdout_win_rate: float | None = None
+
+    @model_serializer(mode="wrap")
+    def _omit_missing_stability_fields(self, handler: Any) -> dict[str, Any]:
+        data = handler(self)
+        for field in ("train_mean", "holdout_mean", "train_win_rate", "holdout_win_rate"):
+            if data.get(field) is None:
+                data.pop(field, None)
+        return data
 
 
 class Portfolio(BaseModel):
@@ -1239,8 +1255,11 @@ def _stability_drift(
     Both sides are labelled leads, so the comparison is model stability on unseen data rather
     than a comparison against the open queue (which is positively selected by censoring).
     The temporal split is the trainer's own, so the holdout is the population the model was
-    validated on. Degenerate worlds (no labels, one class on a side) report stable at 0.0
-    because stability is undefined without two comparable score samples.
+    validated on. The four context numbers (mean score and observed win rate per side) are
+    the same split's summary, served so the UI never hardcodes them.
+
+    Degenerate worlds (no labels, one class on a side) report stable at 0.0 and omit the
+    context numbers, because stability is undefined without two comparable score samples.
     """
     if labelled.empty or edges.size < 2:
         return Drift(psi=0.0, status="stable")
@@ -1250,7 +1269,15 @@ def _stability_drift(
         return Drift(psi=0.0, status="stable")
     train_scores = predict(bundle, split.train)
     holdout_scores = predict(bundle, split.validation)
-    return _psi(train_scores, holdout_scores, edges)
+    psi = _psi(train_scores, holdout_scores, edges)
+    return Drift(
+        psi=psi.psi,
+        status=psi.status,
+        train_mean=round(float(train_scores.mean()), 6),
+        holdout_mean=round(float(holdout_scores.mean()), 6),
+        train_win_rate=round(float(split.train["won"].mean()), 6),
+        holdout_win_rate=round(float(split.validation["won"].mean()), 6),
+    )
 
 
 def _psi(expected: np.ndarray, actual: np.ndarray, edges: np.ndarray) -> Drift:

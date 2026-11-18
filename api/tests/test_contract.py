@@ -188,14 +188,29 @@ def test_open_lead_detail_matches_contract(api: TestClient, demo_db: Path) -> No
     lead_id = open_lead_ids(demo_db)[0]
     response = api.get(f"/api/leads/{lead_id}")
     assert response.status_code == 200
-    _validate(response.json(), _response_schema("/api/leads/{lead_id}"))
+    body = response.json()
+    _validate(body, _response_schema("/api/leads/{lead_id}"))
+    # max_leverage is declared by the contract as nullable; an open lead must serve a number.
+    assert isinstance(body["max_leverage"], (int, float))
+    assert 0.0 <= body["max_leverage"] <= 1.0
 
 
 def test_closed_lead_detail_matches_contract(api: TestClient, demo_db: Path) -> None:
     lead_id = closed_lead_ids(demo_db)[0]
     response = api.get(f"/api/leads/{lead_id}")
     assert response.status_code == 200
-    _validate(response.json(), _response_schema("/api/leads/{lead_id}"))
+    body = response.json()
+    _validate(body, _response_schema("/api/leads/{lead_id}"))
+    assert body["max_leverage"] is None, "the contract declares max_leverage null for closed leads"
+
+
+def test_pipeline_items_declare_their_max_leverage(api: TestClient) -> None:
+    body = api.get("/api/pipeline", params={"limit": 5}).json()
+    assert body["items"]
+    for item in body["items"]:
+        # PipelineItem.max_leverage is declared nullable, but an open lead is actionable.
+        assert isinstance(item["max_leverage"], (int, float))
+        assert 0.0 <= item["max_leverage"] <= 1.0
 
 
 def test_stored_drivers_parse_to_the_driver_shape(api: TestClient, demo_db: Path) -> None:
@@ -356,3 +371,10 @@ def test_portfolio_matches_contract(api: TestClient) -> None:
     region_enum = set(CONTRACT["components"]["schemas"]["Region"]["enum"])
     assert {entry["region"] for entry in body["by_region"]} == region_enum
     assert body["calibration"], "the fixture has labelled leads; the chart cannot be empty"
+
+    # The contract's stability block is optional but, when the split exists, all four
+    # context numbers must be served -- lane D may not hardcode them.
+    drift = body["drift"]
+    for field in ("train_mean", "holdout_mean", "train_win_rate", "holdout_win_rate"):
+        assert field in drift, f"portfolio drift is missing the contract's {field}"
+        assert 0.0 <= drift[field] <= 1.0

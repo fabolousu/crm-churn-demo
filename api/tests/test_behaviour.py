@@ -943,3 +943,28 @@ def test_portfolio_drift_is_train_vs_holdout_stability(
         "stable" if expected < 0.1 else ("watch" if expected < 0.25 else "alert")
     )
     assert drift["status"] == expected_status
+
+
+def test_portfolio_drift_statistics_match_the_split(
+    api: TestClient, bundle: dict, demo_db: Path
+) -> None:
+    """The four stability numbers are the temporal split's own summary, not hardcoded."""
+    with closing(_connect(demo_db)) as connection:
+        labelled = train.load_labeled_leads(connection)
+    split = train.temporal_split(labelled)
+
+    train_scores = train.predict(bundle, split.train)
+    holdout_scores = train.predict(bundle, split.validation)
+    observed_holdout_win_rate = float(split.validation["won"].sum()) / len(split.validation)
+
+    drift = api.get("/api/portfolio").json()["drift"]
+    assert drift["train_mean"] == pytest.approx(float(train_scores.mean()), abs=1e-6)
+    assert drift["holdout_mean"] == pytest.approx(float(holdout_scores.mean()), abs=1e-6)
+    assert drift["train_win_rate"] == pytest.approx(
+        float(split.train["won"].mean()), abs=1e-6
+    )
+    assert drift["holdout_win_rate"] == pytest.approx(observed_holdout_win_rate, abs=1e-6)
+    # A higher-scoring holdout should show a higher win rate here; if it did not, the four
+    # numbers would be internally inconsistent even if each matched its own column.
+    assert drift["holdout_mean"] > drift["train_mean"]
+    assert drift["holdout_win_rate"] > drift["train_win_rate"]
