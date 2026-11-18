@@ -29,7 +29,7 @@ this analysis credible to a sales director.
 | Time | Screen | Line |
 |---|---|---|
 | 0:00 | Title, one sentence | "We don't have renewals. We have initiatives. This is a CRM that knows which ones we're losing." |
-| 0:30 | **Pipeline queue** | "First screen: open initiatives ranked by expected value. €4.2M of pipeline, ordered by what's worth a meeting." |
+| 0:30 | **Pipeline queue** | "First screen: open initiatives ranked by expected value. €510M of pipeline, €205M of it expected — ordered by what's worth a meeting." |
 | 1:30 | **Lead 360** | Click the top lead. "54% to win. Three reasons: 11 hours to first response, no executive sponsor meeting yet, and two losses out of four previous initiatives." |
 | 2:30 | **The lever** | Toggle `exec_sponsor_meeting`. "54% to 71%. Across the whole book the median action is worth 4 points — this one is worth 17, and the queue sorts by exactly that." |
 | 3:30 | **Act, then re-score** | Click. "Action logged, probability updated, and the lead moves in the queue. The loop closes." |

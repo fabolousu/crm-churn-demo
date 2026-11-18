@@ -248,6 +248,12 @@ components:
         open_actions:
           type: array
           items: { $ref: '#/components/schemas/Action' }
+        max_leverage:
+          type: [number, 'null']
+          description: |
+            Largest achievable probability delta across the supported counterfactual levers.
+            Null for closed leads. Present so the detail payload is self-contained rather
+            than forcing the client to remember the queue row it came from.
 
     CompanyDetail:
       type: object
@@ -356,10 +362,18 @@ components:
               actual: { type: number }
         drift:
           type: object
+          description: |
+            Model stability, not production drift: the PSI between the temporal holdout and
+            train score distributions, both on labelled leads. A single-snapshot demo has no
+            production window, so this is the only stability claim it can honestly make.
           required: [psi, status]
           properties:
             psi: { type: number }
             status: { type: string, enum: [stable, watch, alert] }
+            train_mean: { type: number }
+            holdout_mean: { type: number }
+            train_win_rate: { type: number }
+            holdout_win_rate: { type: number }
 
     Error:
       type: object
