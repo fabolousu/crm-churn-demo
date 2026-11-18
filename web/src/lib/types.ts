@@ -1,0 +1,150 @@
+// Mirrors api/openapi.yaml (contract v0.3). Field names are the contract's;
+// do not add a field here that the API does not return.
+
+export type Region = "nord-ovest" | "nord-est" | "centro" | "sud" | "isole";
+export type Band = "low" | "medium" | "high" | "critical";
+export type Source = "inbound" | "outbound" | "referral" | "partner" | "event";
+export type LeadStatus =
+  | "new"
+  | "contacted"
+  | "qualified"
+  | "proposal"
+  | "won"
+  | "lost";
+export type ActionKind =
+  | "call"
+  | "exec_sponsor_meeting"
+  | "discovery_meeting"
+  | "discount_review";
+
+export interface Driver {
+  feature: string;
+  label: string;
+  contribution: number;
+  value: string;
+  direction: "increases" | "decreases";
+}
+
+export interface Lead {
+  id: string;
+  status: LeadStatus;
+  source: Source;
+  created_at: string;
+  closed_at: string | null;
+  amount_arr: number | null;
+  discount_pct: number;
+  lost_reason: string | null;
+}
+
+export interface PipelineItem {
+  lead_id: string;
+  company_name: string;
+  region: Region;
+  source: Source;
+  status: string;
+  amount_arr: number;
+  probability: number;
+  band: Band;
+  expected_value: number;
+  days_open: number;
+  top_driver: Driver;
+}
+
+export interface PipelineResponse {
+  total: number;
+  total_expected_value: number;
+  items: PipelineItem[];
+}
+
+export interface CompanySummary {
+  id: string;
+  name: string;
+  region: Region;
+  industry: string;
+  employees: number;
+  lifetime_won_arr: number;
+  dormant: boolean;
+}
+
+export interface Score {
+  probability: number;
+  band: Band;
+  model_version: string;
+  scored_at: string;
+  expected_value: number;
+}
+
+export interface Action {
+  id: string;
+  kind: string;
+  status: "open" | "done" | "cancelled";
+  created_at: string;
+  created_by: string;
+  note?: string;
+}
+
+export interface LeadDetail {
+  lead: Lead;
+  company: CompanySummary;
+  score: Score;
+  drivers: Driver[];
+  prior_initiatives: Lead[];
+  open_actions: Action[];
+}
+
+export interface CounterfactualRequest {
+  exec_sponsor_meeting?: boolean;
+  discovery_meeting?: boolean;
+  discount_pct?: number;
+}
+
+export interface CounterfactualResponse {
+  current_probability: number;
+  hypothetical_probability: number;
+  delta: number;
+  explanation: string;
+}
+
+export interface ActionRequest {
+  kind: ActionKind;
+  note?: string;
+}
+
+export interface ActionResponse {
+  action: Action;
+  probability_after: number;
+  delta: number;
+}
+
+export interface RegionPortfolio {
+  region: Region;
+  open_leads: number;
+  win_rate: number;
+  expected_value: number;
+}
+
+export interface CalibrationPoint {
+  predicted: number;
+  actual: number;
+}
+
+export interface Portfolio {
+  total_expected_value: number;
+  by_region: RegionPortfolio[];
+  calibration: CalibrationPoint[];
+  drift: {
+    psi: number;
+    status: "stable" | "watch" | "alert";
+  };
+}
+
+export interface Health {
+  status: "ok" | "degraded";
+  model_version: string;
+  scored_at: string;
+}
+
+export interface ApiError {
+  error: string;
+  detail: string;
+}

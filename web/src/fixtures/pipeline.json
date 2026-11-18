@@ -1,0 +1,234 @@
+{
+  "total": 19752,
+  "total_expected_value": 205190000,
+  "items": [
+    {
+      "lead_id": "L-10482",
+      "company_name": "Fonderia Valsesia S.p.A.",
+      "region": "nord-ovest",
+      "source": "referral",
+      "status": "proposal",
+      "amount_arr": 360000,
+      "probability": 0.34,
+      "band": "medium",
+      "expected_value": 122400,
+      "days_open": 17,
+      "top_driver": {
+        "feature": "prior_lost_initiatives",
+        "label": "Lost initiatives",
+        "contribution": -0.34,
+        "value": "2 of the last 4 initiatives lost",
+        "direction": "decreases"
+      }
+    },
+    {
+      "lead_id": "L-10517",
+      "company_name": "Cantieri Marini S.p.A.",
+      "region": "nord-est",
+      "source": "partner",
+      "status": "proposal",
+      "amount_arr": 284000,
+      "probability": 0.43,
+      "band": "medium",
+      "expected_value": 122120,
+      "days_open": 29,
+      "top_driver": {
+        "feature": "meetings_before_scoring",
+        "label": "Meetings held",
+        "contribution": 0.33,
+        "value": "Six meetings already held",
+        "direction": "increases"
+      }
+    },
+    {
+      "lead_id": "L-10396",
+      "company_name": "Tecnoimpianti Sabina S.r.l.",
+      "region": "centro",
+      "source": "referral",
+      "status": "qualified",
+      "amount_arr": 215000,
+      "probability": 0.56,
+      "band": "low",
+      "expected_value": 120400,
+      "days_open": 51,
+      "top_driver": {
+        "feature": "prior_won_initiatives",
+        "label": "Won initiatives",
+        "contribution": 0.3,
+        "value": "Three initiatives won together",
+        "direction": "increases"
+      }
+    },
+    {
+      "lead_id": "L-10533",
+      "company_name": "Officine Bertolini S.p.A.",
+      "region": "nord-ovest",
+      "source": "outbound",
+      "status": "proposal",
+      "amount_arr": 380000,
+      "probability": 0.31,
+      "band": "medium",
+      "expected_value": 117800,
+      "days_open": 86,
+      "top_driver": {
+        "feature": "amount_arr",
+        "label": "Deal size",
+        "contribution": -0.38,
+        "value": "€380,000 proposed — larger initiatives close less often",
+        "direction": "decreases"
+      }
+    },
+    {
+      "lead_id": "L-10455",
+      "company_name": "Logistica Mediterranea S.r.l.",
+      "region": "sud",
+      "source": "inbound",
+      "status": "qualified",
+      "amount_arr": 175000,
+      "probability": 0.62,
+      "band": "low",
+      "expected_value": 108500,
+      "days_open": 34,
+      "top_driver": {
+        "feature": "source",
+        "label": "Lead source",
+        "contribution": 0.24,
+        "value": "Inbound interest from the website",
+        "direction": "increases"
+      }
+    },
+    {
+      "lead_id": "L-10561",
+      "company_name": "Agrumi di Sicilia S.r.l.",
+      "region": "isole",
+      "source": "outbound",
+      "status": "contacted",
+      "amount_arr": 395000,
+      "probability": 0.27,
+      "band": "high",
+      "expected_value": 106650,
+      "days_open": 77,
+      "top_driver": {
+        "feature": "days_since_last_initiative",
+        "label": "Relationship gap",
+        "contribution": -0.33,
+        "value": "212 days without a new initiative",
+        "direction": "decreases"
+      }
+    },
+    {
+      "lead_id": "L-10408",
+      "company_name": "Serigrafia Veneta S.r.l.",
+      "region": "nord-est",
+      "source": "event",
+      "status": "proposal",
+      "amount_arr": 210000,
+      "probability": 0.48,
+      "band": "medium",
+      "expected_value": 100800,
+      "days_open": 44,
+      "top_driver": {
+        "feature": "discount_pct",
+        "label": "Discount",
+        "contribution": -0.31,
+        "value": "22% discount requested",
+        "direction": "decreases"
+      }
+    },
+    {
+      "lead_id": "L-10502",
+      "company_name": "Studio Medico Appia S.r.l.",
+      "region": "centro",
+      "source": "outbound",
+      "status": "qualified",
+      "amount_arr": 260000,
+      "probability": 0.38,
+      "band": "medium",
+      "expected_value": 98800,
+      "days_open": 60,
+      "top_driver": {
+        "feature": "tickets_90d",
+        "label": "Support friction",
+        "contribution": -0.3,
+        "value": "5 support tickets in 90 days",
+        "direction": "decreases"
+      }
+    },
+    {
+      "lead_id": "L-10574",
+      "company_name": "Salumi Irpini S.p.A.",
+      "region": "sud",
+      "source": "outbound",
+      "status": "contacted",
+      "amount_arr": 390000,
+      "probability": 0.24,
+      "band": "high",
+      "expected_value": 93600,
+      "days_open": 41,
+      "top_driver": {
+        "feature": "first_response_hours",
+        "label": "First response",
+        "contribution": -0.36,
+        "value": "38 hours to first response",
+        "direction": "decreases"
+      }
+    },
+    {
+      "lead_id": "L-10441",
+      "company_name": "Hotel Riviera del Sud S.r.l.",
+      "region": "isole",
+      "source": "referral",
+      "status": "qualified",
+      "amount_arr": 178000,
+      "probability": 0.52,
+      "band": "low",
+      "expected_value": 92560,
+      "days_open": 23,
+      "top_driver": {
+        "feature": "nps_last",
+        "label": "Relationship health",
+        "contribution": 0.27,
+        "value": "NPS 62 — a strong relationship",
+        "direction": "increases"
+      }
+    },
+    {
+      "lead_id": "L-10588",
+      "company_name": "Cooperativa Edilizia Tevere S.r.l.",
+      "region": "centro",
+      "source": "outbound",
+      "status": "contacted",
+      "amount_arr": 400000,
+      "probability": 0.19,
+      "band": "high",
+      "expected_value": 76000,
+      "days_open": 11,
+      "top_driver": {
+        "feature": "first_response_hours",
+        "label": "First response",
+        "contribution": -0.34,
+        "value": "No first response yet",
+        "direction": "decreases"
+      }
+    },
+    {
+      "lead_id": "L-10529",
+      "company_name": "Mobilificio Salentino S.r.l.",
+      "region": "sud",
+      "source": "outbound",
+      "status": "proposal",
+      "amount_arr": 205000,
+      "probability": 0.35,
+      "band": "medium",
+      "expected_value": 71750,
+      "days_open": 67,
+      "top_driver": {
+        "feature": "owner_win_rate_180d",
+        "label": "Rep track record",
+        "contribution": 0.26,
+        "value": "Rep wins 44% of initiatives",
+        "direction": "increases"
+      }
+    }
+  ]
+}

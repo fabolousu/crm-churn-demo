@@ -1,0 +1,998 @@
+{
+  "L-10482": {
+    "lead": {
+      "id": "L-10482",
+      "status": "proposal",
+      "source": "referral",
+      "created_at": "2026-11-01",
+      "closed_at": null,
+      "amount_arr": 360000,
+      "discount_pct": 8.5,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00318",
+      "name": "Fonderia Valsesia S.p.A.",
+      "region": "nord-ovest",
+      "industry": "Manifattura",
+      "employees": 420,
+      "lifetime_won_arr": 965000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.34,
+      "band": "medium",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 122400
+    },
+    "drivers": [
+      {
+        "feature": "prior_lost_initiatives",
+        "label": "Lost initiatives",
+        "contribution": -0.34,
+        "value": "2 of the last 4 initiatives lost",
+        "direction": "decreases"
+      },
+      {
+        "feature": "first_response_hours",
+        "label": "First response",
+        "contribution": -0.27,
+        "value": "11 hours to first response",
+        "direction": "decreases"
+      },
+      {
+        "feature": "owner_win_rate_180d",
+        "label": "Rep track record",
+        "contribution": 0.22,
+        "value": "Rep wins 41% of initiatives",
+        "direction": "increases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09881",
+        "status": "won",
+        "source": "referral",
+        "created_at": "2026-08-16",
+        "closed_at": "2026-09-30",
+        "amount_arr": 610000,
+        "discount_pct": 5,
+        "lost_reason": null
+      },
+      {
+        "id": "L-08914",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2026-04-02",
+        "closed_at": "2026-05-20",
+        "amount_arr": 240000,
+        "discount_pct": 12,
+        "lost_reason": "price"
+      },
+      {
+        "id": "L-07742",
+        "status": "won",
+        "source": "partner",
+        "created_at": "2025-11-14",
+        "closed_at": "2025-12-19",
+        "amount_arr": 355000,
+        "discount_pct": 4,
+        "lost_reason": null
+      },
+      {
+        "id": "L-06603",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2025-06-27",
+        "closed_at": "2025-08-01",
+        "amount_arr": 310000,
+        "discount_pct": 9,
+        "lost_reason": "competitor"
+      }
+    ],
+    "open_actions": [
+      {
+        "id": "ACT-0412",
+        "kind": "call",
+        "status": "open",
+        "created_at": "2026-11-17T09:15:00+01:00",
+        "created_by": "Marco Rossi",
+        "note": "Confirm the technical sponsor for the proposal review."
+      }
+    ]
+  },
+  "L-10517": {
+    "lead": {
+      "id": "L-10517",
+      "status": "proposal",
+      "source": "partner",
+      "created_at": "2026-10-20",
+      "closed_at": null,
+      "amount_arr": 284000,
+      "discount_pct": 6,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00542",
+      "name": "Cantieri Marini S.p.A.",
+      "region": "nord-est",
+      "industry": "Costruzioni",
+      "employees": 280,
+      "lifetime_won_arr": 740000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.43,
+      "band": "medium",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 122120
+    },
+    "drivers": [
+      {
+        "feature": "meetings_before_scoring",
+        "label": "Meetings held",
+        "contribution": 0.33,
+        "value": "Six meetings already held",
+        "direction": "increases"
+      },
+      {
+        "feature": "prior_won_initiatives",
+        "label": "Won initiatives",
+        "contribution": 0.24,
+        "value": "Two initiatives won together",
+        "direction": "increases"
+      },
+      {
+        "feature": "amount_arr",
+        "label": "Deal size",
+        "contribution": -0.18,
+        "value": "€284,000 proposed — larger initiatives close less often",
+        "direction": "decreases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09602",
+        "status": "won",
+        "source": "partner",
+        "created_at": "2026-07-21",
+        "closed_at": "2026-09-02",
+        "amount_arr": 420000,
+        "discount_pct": 4,
+        "lost_reason": null
+      },
+      {
+        "id": "L-08277",
+        "status": "won",
+        "source": "referral",
+        "created_at": "2026-02-10",
+        "closed_at": "2026-03-30",
+        "amount_arr": 320000,
+        "discount_pct": 5,
+        "lost_reason": null
+      },
+      {
+        "id": "L-07119",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2025-05-12",
+        "closed_at": "2025-06-25",
+        "amount_arr": 180000,
+        "discount_pct": 8,
+        "lost_reason": "competitor"
+      }
+    ],
+    "open_actions": []
+  },
+  "L-10396": {
+    "lead": {
+      "id": "L-10396",
+      "status": "qualified",
+      "source": "referral",
+      "created_at": "2026-09-28",
+      "closed_at": null,
+      "amount_arr": 215000,
+      "discount_pct": 12,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00271",
+      "name": "Tecnoimpianti Sabina S.r.l.",
+      "region": "centro",
+      "industry": "Elettronica",
+      "employees": 150,
+      "lifetime_won_arr": 410000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.56,
+      "band": "low",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 120400
+    },
+    "drivers": [
+      {
+        "feature": "prior_won_initiatives",
+        "label": "Won initiatives",
+        "contribution": 0.3,
+        "value": "Three initiatives won together",
+        "direction": "increases"
+      },
+      {
+        "feature": "source",
+        "label": "Lead source",
+        "contribution": 0.27,
+        "value": "Referral from an existing customer",
+        "direction": "increases"
+      },
+      {
+        "feature": "discount_pct",
+        "label": "Discount",
+        "contribution": -0.14,
+        "value": "12% discount requested",
+        "direction": "decreases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09003",
+        "status": "won",
+        "source": "referral",
+        "created_at": "2026-06-03",
+        "closed_at": "2026-07-15",
+        "amount_arr": 210000,
+        "discount_pct": 6,
+        "lost_reason": null
+      },
+      {
+        "id": "L-07841",
+        "status": "won",
+        "source": "inbound",
+        "created_at": "2025-10-20",
+        "closed_at": "2025-12-01",
+        "amount_arr": 200000,
+        "discount_pct": 3,
+        "lost_reason": null
+      },
+      {
+        "id": "L-06214",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2025-03-05",
+        "closed_at": "2025-04-10",
+        "amount_arr": 90000,
+        "discount_pct": 10,
+        "lost_reason": "no_budget"
+      }
+    ],
+    "open_actions": []
+  },
+  "L-10533": {
+    "lead": {
+      "id": "L-10533",
+      "status": "proposal",
+      "source": "outbound",
+      "created_at": "2026-08-24",
+      "closed_at": null,
+      "amount_arr": 380000,
+      "discount_pct": 10,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00786",
+      "name": "Officine Bertolini S.p.A.",
+      "region": "nord-ovest",
+      "industry": "Meccanica",
+      "employees": 510,
+      "lifetime_won_arr": 1320000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.31,
+      "band": "medium",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 117800
+    },
+    "drivers": [
+      {
+        "feature": "amount_arr",
+        "label": "Deal size",
+        "contribution": -0.38,
+        "value": "€380,000 proposed — larger initiatives close less often",
+        "direction": "decreases"
+      },
+      {
+        "feature": "days_since_last_initiative",
+        "label": "Relationship gap",
+        "contribution": -0.26,
+        "value": "172 days without a new initiative",
+        "direction": "decreases"
+      },
+      {
+        "feature": "tickets_90d",
+        "label": "Support friction",
+        "contribution": -0.19,
+        "value": "4 support tickets in 90 days",
+        "direction": "decreases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09418",
+        "status": "won",
+        "source": "outbound",
+        "created_at": "2026-05-30",
+        "closed_at": "2026-07-10",
+        "amount_arr": 720000,
+        "discount_pct": 7,
+        "lost_reason": null
+      },
+      {
+        "id": "L-07455",
+        "status": "won",
+        "source": "partner",
+        "created_at": "2025-09-01",
+        "closed_at": "2025-10-20",
+        "amount_arr": 600000,
+        "discount_pct": 4,
+        "lost_reason": null
+      },
+      {
+        "id": "L-05602",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2024-12-10",
+        "closed_at": "2025-01-30",
+        "amount_arr": 250000,
+        "discount_pct": 11,
+        "lost_reason": "timing"
+      }
+    ],
+    "open_actions": []
+  },
+  "L-10455": {
+    "lead": {
+      "id": "L-10455",
+      "status": "qualified",
+      "source": "inbound",
+      "created_at": "2026-10-15",
+      "closed_at": null,
+      "amount_arr": 175000,
+      "discount_pct": 5,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00409",
+      "name": "Logistica Mediterranea S.r.l.",
+      "region": "sud",
+      "industry": "Logistica",
+      "employees": 190,
+      "lifetime_won_arr": 330000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.62,
+      "band": "low",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 108500
+    },
+    "drivers": [
+      {
+        "feature": "source",
+        "label": "Lead source",
+        "contribution": 0.24,
+        "value": "Inbound interest from the website",
+        "direction": "increases"
+      },
+      {
+        "feature": "meetings_before_scoring",
+        "label": "Meetings held",
+        "contribution": 0.23,
+        "value": "Four meetings already held",
+        "direction": "increases"
+      },
+      {
+        "feature": "first_response_hours",
+        "label": "First response",
+        "contribution": 0.19,
+        "value": "2 hours to first response",
+        "direction": "increases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09740",
+        "status": "won",
+        "source": "inbound",
+        "created_at": "2026-08-01",
+        "closed_at": "2026-09-15",
+        "amount_arr": 180000,
+        "discount_pct": 2,
+        "lost_reason": null
+      },
+      {
+        "id": "L-08105",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2026-01-20",
+        "closed_at": "2026-03-01",
+        "amount_arr": 120000,
+        "discount_pct": 9,
+        "lost_reason": "price"
+      },
+      {
+        "id": "L-07022",
+        "status": "won",
+        "source": "partner",
+        "created_at": "2025-04-15",
+        "closed_at": "2025-05-30",
+        "amount_arr": 150000,
+        "discount_pct": 3,
+        "lost_reason": null
+      }
+    ],
+    "open_actions": []
+  },
+  "L-10561": {
+    "lead": {
+      "id": "L-10561",
+      "status": "contacted",
+      "source": "outbound",
+      "created_at": "2026-09-02",
+      "closed_at": null,
+      "amount_arr": 395000,
+      "discount_pct": 9,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00812",
+      "name": "Agrumi di Sicilia S.r.l.",
+      "region": "isole",
+      "industry": "Alimentare",
+      "employees": 120,
+      "lifetime_won_arr": 180000,
+      "dormant": true
+    },
+    "score": {
+      "probability": 0.27,
+      "band": "high",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 106650
+    },
+    "drivers": [
+      {
+        "feature": "days_since_last_initiative",
+        "label": "Relationship gap",
+        "contribution": -0.33,
+        "value": "212 days without a new initiative",
+        "direction": "decreases"
+      },
+      {
+        "feature": "amount_arr",
+        "label": "Deal size",
+        "contribution": -0.29,
+        "value": "€395,000 proposed — larger initiatives close less often",
+        "direction": "decreases"
+      },
+      {
+        "feature": "prior_lost_initiatives",
+        "label": "Lost initiatives",
+        "contribution": -0.12,
+        "value": "1 of the last 3 initiatives lost",
+        "direction": "decreases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-08612",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2026-04-20",
+        "closed_at": "2026-06-01",
+        "amount_arr": 140000,
+        "discount_pct": 13,
+        "lost_reason": "no_budget"
+      },
+      {
+        "id": "L-07230",
+        "status": "won",
+        "source": "outbound",
+        "created_at": "2025-08-10",
+        "closed_at": "2025-09-20",
+        "amount_arr": 180000,
+        "discount_pct": 6,
+        "lost_reason": null
+      }
+    ],
+    "open_actions": [
+      {
+        "id": "ACT-0388",
+        "kind": "call",
+        "status": "open",
+        "created_at": "2026-11-12T11:40:00+01:00",
+        "created_by": "Giulia Bianchi",
+        "note": "Re-open the conversation after the harvest season."
+      }
+    ]
+  },
+  "L-10408": {
+    "lead": {
+      "id": "L-10408",
+      "status": "proposal",
+      "source": "event",
+      "created_at": "2026-10-05",
+      "closed_at": null,
+      "amount_arr": 210000,
+      "discount_pct": 22,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00596",
+      "name": "Serigrafia Veneta S.r.l.",
+      "region": "nord-est",
+      "industry": "Grafica",
+      "employees": 85,
+      "lifetime_won_arr": 210000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.48,
+      "band": "medium",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 100800
+    },
+    "drivers": [
+      {
+        "feature": "discount_pct",
+        "label": "Discount",
+        "contribution": -0.31,
+        "value": "22% discount requested",
+        "direction": "decreases"
+      },
+      {
+        "feature": "meetings_before_scoring",
+        "label": "Meetings held",
+        "contribution": 0.21,
+        "value": "Five meetings already held",
+        "direction": "increases"
+      },
+      {
+        "feature": "owner_win_rate_180d",
+        "label": "Rep track record",
+        "contribution": 0.18,
+        "value": "Rep wins 39% of initiatives",
+        "direction": "increases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09755",
+        "status": "won",
+        "source": "event",
+        "created_at": "2026-08-25",
+        "closed_at": "2026-10-01",
+        "amount_arr": 90000,
+        "discount_pct": 5,
+        "lost_reason": null
+      },
+      {
+        "id": "L-08008",
+        "status": "won",
+        "source": "inbound",
+        "created_at": "2026-01-12",
+        "closed_at": "2026-02-20",
+        "amount_arr": 120000,
+        "discount_pct": 4,
+        "lost_reason": null
+      },
+      {
+        "id": "L-06518",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2025-03-18",
+        "closed_at": "2025-04-22",
+        "amount_arr": 60000,
+        "discount_pct": 7,
+        "lost_reason": "no_fit"
+      }
+    ],
+    "open_actions": []
+  },
+  "L-10502": {
+    "lead": {
+      "id": "L-10502",
+      "status": "qualified",
+      "source": "outbound",
+      "created_at": "2026-09-19",
+      "closed_at": null,
+      "amount_arr": 260000,
+      "discount_pct": 7,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00633",
+      "name": "Studio Medico Appia S.r.l.",
+      "region": "centro",
+      "industry": "Sanità",
+      "employees": 60,
+      "lifetime_won_arr": 80000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.38,
+      "band": "medium",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 98800
+    },
+    "drivers": [
+      {
+        "feature": "tickets_90d",
+        "label": "Support friction",
+        "contribution": -0.3,
+        "value": "5 support tickets in 90 days",
+        "direction": "decreases"
+      },
+      {
+        "feature": "first_response_hours",
+        "label": "First response",
+        "contribution": -0.22,
+        "value": "24 hours to first response",
+        "direction": "decreases"
+      },
+      {
+        "feature": "owner_win_rate_180d",
+        "label": "Rep track record",
+        "contribution": 0.17,
+        "value": "Rep wins 39% of initiatives",
+        "direction": "increases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09510",
+        "status": "won",
+        "source": "outbound",
+        "created_at": "2026-07-02",
+        "closed_at": "2026-08-10",
+        "amount_arr": 80000,
+        "discount_pct": 5,
+        "lost_reason": null
+      },
+      {
+        "id": "L-07644",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2025-11-05",
+        "closed_at": "2025-12-15",
+        "amount_arr": 60000,
+        "discount_pct": 10,
+        "lost_reason": "competitor"
+      }
+    ],
+    "open_actions": []
+  },
+  "L-10574": {
+    "lead": {
+      "id": "L-10574",
+      "status": "contacted",
+      "source": "outbound",
+      "created_at": "2026-10-08",
+      "closed_at": null,
+      "amount_arr": 390000,
+      "discount_pct": 11,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00847",
+      "name": "Salumi Irpini S.p.A.",
+      "region": "sud",
+      "industry": "Alimentare",
+      "employees": 210,
+      "lifetime_won_arr": 260000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.24,
+      "band": "high",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 93600
+    },
+    "drivers": [
+      {
+        "feature": "first_response_hours",
+        "label": "First response",
+        "contribution": -0.36,
+        "value": "38 hours to first response",
+        "direction": "decreases"
+      },
+      {
+        "feature": "amount_arr",
+        "label": "Deal size",
+        "contribution": -0.28,
+        "value": "€390,000 proposed — larger initiatives close less often",
+        "direction": "decreases"
+      },
+      {
+        "feature": "days_since_last_initiative",
+        "label": "Relationship gap",
+        "contribution": -0.18,
+        "value": "141 days without a new initiative",
+        "direction": "decreases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09320",
+        "status": "won",
+        "source": "outbound",
+        "created_at": "2026-06-30",
+        "closed_at": "2026-08-08",
+        "amount_arr": 160000,
+        "discount_pct": 6,
+        "lost_reason": null
+      },
+      {
+        "id": "L-07798",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2025-12-02",
+        "closed_at": "2026-01-15",
+        "amount_arr": 100000,
+        "discount_pct": 9,
+        "lost_reason": "timing"
+      },
+      {
+        "id": "L-05884",
+        "status": "won",
+        "source": "partner",
+        "created_at": "2025-02-14",
+        "closed_at": "2025-03-28",
+        "amount_arr": 100000,
+        "discount_pct": 4,
+        "lost_reason": null
+      }
+    ],
+    "open_actions": []
+  },
+  "L-10441": {
+    "lead": {
+      "id": "L-10441",
+      "status": "qualified",
+      "source": "referral",
+      "created_at": "2026-10-26",
+      "closed_at": null,
+      "amount_arr": 178000,
+      "discount_pct": 4,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00471",
+      "name": "Hotel Riviera del Sud S.r.l.",
+      "region": "isole",
+      "industry": "Turismo",
+      "employees": 140,
+      "lifetime_won_arr": 195000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.52,
+      "band": "low",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 92560
+    },
+    "drivers": [
+      {
+        "feature": "nps_last",
+        "label": "Relationship health",
+        "contribution": 0.27,
+        "value": "NPS 62 — a strong relationship",
+        "direction": "increases"
+      },
+      {
+        "feature": "source",
+        "label": "Lead source",
+        "contribution": 0.25,
+        "value": "Referral from an existing customer",
+        "direction": "increases"
+      },
+      {
+        "feature": "prior_won_initiatives",
+        "label": "Won initiatives",
+        "contribution": 0.14,
+        "value": "One initiative won together",
+        "direction": "increases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09964",
+        "status": "won",
+        "source": "referral",
+        "created_at": "2026-09-10",
+        "closed_at": "2026-10-22",
+        "amount_arr": 105000,
+        "discount_pct": 3,
+        "lost_reason": null
+      },
+      {
+        "id": "L-08331",
+        "status": "won",
+        "source": "inbound",
+        "created_at": "2026-02-18",
+        "closed_at": "2026-03-30",
+        "amount_arr": 90000,
+        "discount_pct": 2,
+        "lost_reason": null
+      }
+    ],
+    "open_actions": []
+  },
+  "L-10588": {
+    "lead": {
+      "id": "L-10588",
+      "status": "contacted",
+      "source": "outbound",
+      "created_at": "2026-11-07",
+      "closed_at": null,
+      "amount_arr": 400000,
+      "discount_pct": 25,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00903",
+      "name": "Cooperativa Edilizia Tevere S.r.l.",
+      "region": "centro",
+      "industry": "Costruzioni",
+      "employees": 95,
+      "lifetime_won_arr": 88000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.19,
+      "band": "high",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 76000
+    },
+    "drivers": [
+      {
+        "feature": "first_response_hours",
+        "label": "First response",
+        "contribution": -0.34,
+        "value": "No first response yet",
+        "direction": "decreases"
+      },
+      {
+        "feature": "discount_pct",
+        "label": "Discount",
+        "contribution": -0.22,
+        "value": "25% discount already offered",
+        "direction": "decreases"
+      },
+      {
+        "feature": "amount_arr",
+        "label": "Deal size",
+        "contribution": -0.2,
+        "value": "€400,000 proposed — larger initiatives close less often",
+        "direction": "decreases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09845",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2026-08-20",
+        "closed_at": "2026-09-28",
+        "amount_arr": 55000,
+        "discount_pct": 8,
+        "lost_reason": "price"
+      },
+      {
+        "id": "L-08011",
+        "status": "won",
+        "source": "outbound",
+        "created_at": "2026-01-12",
+        "closed_at": "2026-02-20",
+        "amount_arr": 88000,
+        "discount_pct": 5,
+        "lost_reason": null
+      }
+    ],
+    "open_actions": []
+  },
+  "L-10529": {
+    "lead": {
+      "id": "L-10529",
+      "status": "proposal",
+      "source": "outbound",
+      "created_at": "2026-09-12",
+      "closed_at": null,
+      "amount_arr": 205000,
+      "discount_pct": 7,
+      "lost_reason": null
+    },
+    "company": {
+      "id": "C-00724",
+      "name": "Mobilificio Salentino S.r.l.",
+      "region": "sud",
+      "industry": "Manifattura",
+      "employees": 130,
+      "lifetime_won_arr": 205000,
+      "dormant": false
+    },
+    "score": {
+      "probability": 0.35,
+      "band": "medium",
+      "model_version": "lead-win-gbm-0.3.0",
+      "scored_at": "2026-11-18T06:00:00+01:00",
+      "expected_value": 71750
+    },
+    "drivers": [
+      {
+        "feature": "owner_win_rate_180d",
+        "label": "Rep track record",
+        "contribution": 0.26,
+        "value": "Rep wins 44% of initiatives",
+        "direction": "increases"
+      },
+      {
+        "feature": "days_since_last_initiative",
+        "label": "Relationship gap",
+        "contribution": -0.21,
+        "value": "133 days without a new initiative",
+        "direction": "decreases"
+      },
+      {
+        "feature": "tickets_90d",
+        "label": "Support friction",
+        "contribution": -0.09,
+        "value": "2 support tickets in 90 days",
+        "direction": "decreases"
+      }
+    ],
+    "prior_initiatives": [
+      {
+        "id": "L-09528",
+        "status": "won",
+        "source": "outbound",
+        "created_at": "2026-07-08",
+        "closed_at": "2026-08-20",
+        "amount_arr": 125000,
+        "discount_pct": 5,
+        "lost_reason": null
+      },
+      {
+        "id": "L-07512",
+        "status": "lost",
+        "source": "outbound",
+        "created_at": "2025-10-01",
+        "closed_at": "2025-11-10",
+        "amount_arr": 80000,
+        "discount_pct": 9,
+        "lost_reason": "no_fit"
+      },
+      {
+        "id": "L-06109",
+        "status": "won",
+        "source": "inbound",
+        "created_at": "2025-01-20",
+        "closed_at": "2025-03-01",
+        "amount_arr": 80000,
+        "discount_pct": 2,
+        "lost_reason": null
+      }
+    ],
+    "open_actions": []
+  }
+}

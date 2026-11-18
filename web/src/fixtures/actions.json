@@ -1,0 +1,218 @@
+{
+  "L-10482": {
+    "call": {
+      "probability_after": 0.34,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.4065,
+      "delta": 0.0665
+    },
+    "discovery_meeting": {
+      "probability_after": 0.3979,
+      "delta": 0.0579
+    },
+    "discount_review": {
+      "probability_after": 0.34,
+      "delta": 0
+    }
+  },
+  "L-10517": {
+    "call": {
+      "probability_after": 0.43,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.5007,
+      "delta": 0.0707
+    },
+    "discovery_meeting": {
+      "probability_after": 0.4918,
+      "delta": 0.0618
+    },
+    "discount_review": {
+      "probability_after": 0.43,
+      "delta": 0
+    }
+  },
+  "L-10396": {
+    "call": {
+      "probability_after": 0.56,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.6285,
+      "delta": 0.0685
+    },
+    "discovery_meeting": {
+      "probability_after": 0.6201,
+      "delta": 0.0601
+    },
+    "discount_review": {
+      "probability_after": 0.56,
+      "delta": 0
+    }
+  },
+  "L-10533": {
+    "call": {
+      "probability_after": 0.31,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.3739,
+      "delta": 0.0639
+    },
+    "discovery_meeting": {
+      "probability_after": 0.3656,
+      "delta": 0.0556
+    },
+    "discount_review": {
+      "probability_after": 0.31,
+      "delta": 0
+    }
+  },
+  "L-10455": {
+    "call": {
+      "probability_after": 0.62,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.6844,
+      "delta": 0.0644
+    },
+    "discovery_meeting": {
+      "probability_after": 0.6767,
+      "delta": 0.0567
+    },
+    "discount_review": {
+      "probability_after": 0.62,
+      "delta": 0
+    }
+  },
+  "L-10561": {
+    "call": {
+      "probability_after": 0.27,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.3296,
+      "delta": 0.0596
+    },
+    "discovery_meeting": {
+      "probability_after": 0.3218,
+      "delta": 0.0518
+    },
+    "discount_review": {
+      "probability_after": 0.27,
+      "delta": 0
+    }
+  },
+  "L-10408": {
+    "call": {
+      "probability_after": 0.48,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.551,
+      "delta": 0.071
+    },
+    "discovery_meeting": {
+      "probability_after": 0.5421,
+      "delta": 0.0621
+    },
+    "discount_review": {
+      "probability_after": 0.48,
+      "delta": 0
+    }
+  },
+  "L-10502": {
+    "call": {
+      "probability_after": 0.38,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.449,
+      "delta": 0.069
+    },
+    "discovery_meeting": {
+      "probability_after": 0.4401,
+      "delta": 0.0601
+    },
+    "discount_review": {
+      "probability_after": 0.38,
+      "delta": 0
+    }
+  },
+  "L-10574": {
+    "call": {
+      "probability_after": 0.24,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.2957,
+      "delta": 0.0557
+    },
+    "discovery_meeting": {
+      "probability_after": 0.2883,
+      "delta": 0.0483
+    },
+    "discount_review": {
+      "probability_after": 0.24,
+      "delta": 0
+    }
+  },
+  "L-10441": {
+    "call": {
+      "probability_after": 0.52,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.5902,
+      "delta": 0.0702
+    },
+    "discovery_meeting": {
+      "probability_after": 0.5815,
+      "delta": 0.0615
+    },
+    "discount_review": {
+      "probability_after": 0.52,
+      "delta": 0
+    }
+  },
+  "L-10588": {
+    "call": {
+      "probability_after": 0.19,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.2377,
+      "delta": 0.0477
+    },
+    "discovery_meeting": {
+      "probability_after": 0.2313,
+      "delta": 0.0413
+    },
+    "discount_review": {
+      "probability_after": 0.19,
+      "delta": 0
+    }
+  },
+  "L-10529": {
+    "call": {
+      "probability_after": 0.35,
+      "delta": 0
+    },
+    "exec_sponsor_meeting": {
+      "probability_after": 0.4172,
+      "delta": 0.0672
+    },
+    "discovery_meeting": {
+      "probability_after": 0.4085,
+      "delta": 0.0585
+    },
+    "discount_review": {
+      "probability_after": 0.35,
+      "delta": 0
+    }
+  }
+}

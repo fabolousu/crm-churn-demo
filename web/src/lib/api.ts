@@ -1,0 +1,214 @@
+import pipelineFixture from "../fixtures/pipeline.json";
+import leadsFixture from "../fixtures/leads.json";
+import counterfactualsFixture from "../fixtures/counterfactuals.json";
+import actionsFixture from "../fixtures/actions.json";
+import portfolioFixture from "../fixtures/portfolio.json";
+import healthFixture from "../fixtures/health.json";
+import { bandForProbability } from "./bands";
+import type {
+  Action,
+  ActionRequest,
+  ActionResponse,
+  ApiError,
+  CounterfactualRequest,
+  CounterfactualResponse,
+  Health,
+  LeadDetail,
+  PipelineResponse,
+  Portfolio,
+} from "./types";
+
+const RAW_BASE = (import.meta.env.VITE_API_BASE ?? "").trim();
+export const API_BASE = RAW_BASE.replace(/\/+$/, "");
+export const isLiveApi = API_BASE.length > 0;
+
+const pipelineData = pipelineFixture as unknown as PipelineResponse;
+const leadsData = leadsFixture as unknown as Record<string, LeadDetail>;
+const counterfactualData = counterfactualsFixture as unknown as Record<
+  string,
+  Record<string, CounterfactualResponse>
+>;
+const actionData = actionsFixture as unknown as Record<
+  string,
+  Record<string, { probability_after: number; delta: number }>
+>;
+const portfolioData = portfolioFixture as unknown as Portfolio;
+const healthData = healthFixture as unknown as Health;
+
+// In fixture mode the UI starts with data already in hand — no spinner, no
+// empty state, exactly as the demo script requires. In live mode these return
+// null and the provider fetches from VITE_API_BASE.
+export const initialPipeline = (): PipelineResponse | null =>
+  isLiveApi ? null : pipelineData;
+export const initialPortfolio = (): Portfolio | null =>
+  isLiveApi ? null : portfolioData;
+export const initialHealth = (): Health | null => (isLiveApi ? null : healthData);
+
+export function initialLeadDetail(id: string): LeadDetail | null {
+  if (isLiveApi) return null;
+  return leadsData[id] ?? null;
+}
+
+export function fixtureLeadExists(id: string): boolean {
+  return Boolean(leadsData[id]);
+}
+
+export const DEFAULT_ACT_LEAD_ID = "L-10517";
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      Accept: "application/json",
+      ...(init?.body ? { "Content-Type": "application/json" } : {}),
+      ...(init?.headers ?? {}),
+    },
+  });
+
+  const body = (await response.json().catch(() => null)) as
+    | T
+    | ApiError
+    | null;
+
+  if (!response.ok) {
+    const detail =
+      body && typeof body === "object" && "detail" in body
+        ? String((body as ApiError).detail)
+        : `The scoring service answered ${response.status}.`;
+    throw new Error(detail);
+  }
+
+  return body as T;
+}
+
+export async function fetchPipeline(): Promise<PipelineResponse> {
+  return request<PipelineResponse>("/api/pipeline?limit=50");
+}
+
+export async function fetchPortfolio(): Promise<Portfolio> {
+  return request<Portfolio>("/api/portfolio");
+}
+
+export async function fetchHealth(): Promise<Health> {
+  return request<Health>("/api/health");
+}
+
+export async function fetchLead(id: string): Promise<LeadDetail> {
+  if (!isLiveApi) {
+    const detail = leadsData[id];
+    if (!detail) throw new Error("That initiative is not in the fixture set.");
+    return detail;
+  }
+  return request<LeadDetail>(`/api/leads/${encodeURIComponent(id)}`);
+}
+
+function counterfactualKey(request: CounterfactualRequest): string {
+  if (request.exec_sponsor_meeting) return "exec_sponsor_meeting=true";
+  if (request.discovery_meeting) return "discovery_meeting=true";
+  if (typeof request.discount_pct === "number") {
+    return `discount_pct=${request.discount_pct}`;
+  }
+  throw new Error("No lever selected.");
+}
+
+export async function postCounterfactual(
+  id: string,
+  requestBody: CounterfactualRequest,
+): Promise<CounterfactualResponse> {
+  if (!isLiveApi) {
+    const response = counterfactualData[id]?.[counterfactualKey(requestBody)];
+    if (!response) {
+      throw new Error("No fixture for that lever. Set VITE_API_BASE to re-score live.");
+    }
+    return response;
+  }
+
+  return request<CounterfactualResponse>(
+    `/api/leads/${encodeURIComponent(id)}/counterfactual`,
+    { method: "POST", body: JSON.stringify(requestBody) },
+  );
+}
+
+export async function postAction(
+  id: string,
+  requestBody: ActionRequest,
+): Promise<ActionResponse> {
+  if (!isLiveApi) {
+    const base = actionData[id]?.[requestBody.kind];
+    if (!base) {
+      throw new Error("No fixture for that action. Set VITE_API_BASE to use the service.");
+    }
+
+    // The API response includes the created action; fixtures precompute only
+    // the re-score, so the UI assembles the action row it just recorded.
+    const action: Action = {
+      id: `ACT-${Date.now().toString().slice(-6)}`,
+      kind: requestBody.kind,
+      status: "open",
+      created_at: new Date().toISOString(),
+      created_by: "Marco Rossi",
+      ...(requestBody.note ? { note: requestBody.note } : {}),
+    };
+
+    return {
+      action,
+      probability_after: base.probability_after,
+      delta: base.delta,
+    };
+  }
+
+  return request<ActionResponse>(`/api/leads/${encodeURIComponent(id)}/actions`, {
+    method: "POST",
+    body: JSON.stringify(requestBody),
+  });
+}
+
+const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
+const logit = (p: number) => Math.log(p / (1 - p));
+
+// If the queue has been re-scored since the fixture was written (an action on
+// this lead), keep the lever's *logit* effect and rebase it on the current
+// probability. In live mode the API has already done this.
+export function rebaseCounterfactual(
+  response: CounterfactualResponse,
+  currentProbability: number,
+): CounterfactualResponse {
+  if (Math.abs(currentProbability - response.current_probability) < 1e-9) {
+    return response;
+  }
+  const hypothetical = sigmoid(
+    logit(currentProbability) +
+      logit(response.hypothetical_probability) -
+      logit(response.current_probability),
+  );
+  return {
+    ...response,
+    current_probability: currentProbability,
+    hypothetical_probability: Number(hypothetical.toFixed(4)),
+    delta: Number((hypothetical - currentProbability).toFixed(4)),
+  };
+}
+
+export function rebaseAction(
+  response: ActionResponse,
+  currentProbability: number,
+  originalProbability: number,
+): ActionResponse {
+  if (Math.abs(currentProbability - originalProbability) < 1e-9) {
+    return response;
+  }
+  const score = sigmoid(
+    logit(currentProbability) +
+      logit(response.probability_after) -
+      logit(originalProbability),
+  );
+  return {
+    ...response,
+    probability_after: Number(score.toFixed(4)),
+    delta: Number((score - currentProbability).toFixed(4)),
+  };
+}
+
+export function applyBand(probability: number) {
+  return bandForProbability(probability);
+}
