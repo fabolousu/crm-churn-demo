@@ -40,7 +40,13 @@ What makes this generator trustworthy
 Run::
 
     python data/generator.py
+    python data/generator.py --overwrite  # replace an existing demo.db
     python data/generator.py --db data/demo.db --seed 42 --companies 20000
+
+Known limitation (deferred, recorded on purpose): the database is written in
+place, so replacement is not atomic.  A crash leaves a partial ``demo.db`` and
+costs one rerun of a deterministic generator; ``temp file + os.replace`` is the
+eventual fix.
 """
 
 from __future__ import annotations
@@ -50,7 +56,6 @@ import math
 import random
 import sqlite3
 import sys
-from array import array
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
@@ -235,13 +240,15 @@ BETA_TICKETS = -0.25
 BETA_NPS = 0.20
 NOISE_SD = 0.40
 
-# z() standardises against the reference lead population, not against the
-# labelled subset.  Qualification is a selection event, so the scored subset is
-# narrower than the reference population; using the reference SD is what gives
-# the generating process the signal-to-noise level in LABEL.md (true AUC in the
-# 0.78-0.86 band).  A value of 1.0 here would standardise on the scored subset
-# itself and leave too little variance for the documented model performance.
-Z_SD_INFLATION = 1.25
+# z() uses a fixed global reference scale, never a per-region or per-snapshot
+# refit.  CALIBRATED_Z stores the scored-population mean and SD from the
+# deterministic seed-42 calibration.  Z_REFERENCE_SCALE converts those SDs to
+# the reference scale used by the hazard: reference SD = scored SD / 1.25, so
+# z = (x - mean) * 1.25 / scored_sd.  This is a scale conversion, not a second
+# standardisation, and it is applied identically everywhere.  The constant is
+# fixed so the world's true latent AUC is ~0.79, the documented signal ceiling
+# (a model should land around 0.77-0.79; materially above means leakage).
+Z_REFERENCE_SCALE = 1.25
 
 # Population parameters for z().  They were measured from a deterministic
 # seed-42 calibration of this same generating process, with a damped fixed-point
@@ -278,6 +285,11 @@ def random_dt(rng: random.Random, start: datetime, end: datetime) -> datetime:
         return start
     span = int((end - start).total_seconds())
     return start + timedelta(seconds=rng.randrange(span + 1))
+
+
+def whole_second(value: datetime) -> datetime:
+    """Drop sub-second precision at assignment, not only at persistence."""
+    return value.replace(microsecond=0)
 
 
 def poisson_draw(rng: random.Random, lam: float) -> int:
@@ -388,7 +400,7 @@ class RawWorld:
     companies: list[Company]
     company_by_id: dict[str, Company]
     company_leads: dict[str, list[Lead]]
-    usage_by_company: dict[str, array]
+    usage_by_company: dict[str, dict[date, int]]
     week_starts: list[date]
     tickets_by_company: dict[str, list[datetime]]
     invoices_by_company: dict[str, list[tuple[datetime, datetime | None]]]
@@ -493,7 +505,7 @@ def simulate_lead_stage(
     response_at: datetime | None = None
     if answered:
         hours = clamp(rng.lognormvariate(math.log(8.0), 0.90), 0.10, 240.0)
-        candidate = created_at + timedelta(hours=hours)
+        candidate = whole_second(created_at + timedelta(hours=hours))
         if candidate <= T0:
             response_at = candidate
             first_response_at = candidate
@@ -515,7 +527,9 @@ def simulate_lead_stage(
             qualification_days = clamp(
                 rng.lognormvariate(math.log(12.0), 0.70), 1.0, 90.0
             )
-            candidate_qualified = response_at + timedelta(days=qualification_days)
+            candidate_qualified = whole_second(
+                response_at + timedelta(days=qualification_days)
+            )
             if candidate_qualified <= T0:
                 qualified_at = candidate_qualified
                 open_status = "qualified"
@@ -528,7 +542,9 @@ def simulate_lead_stage(
                     proposal_days = clamp(
                         rng.lognormvariate(math.log(14.0), 0.70), 1.0, 120.0
                     )
-                    candidate_proposal = qualified_at + timedelta(days=proposal_days)
+                    candidate_proposal = whole_second(
+                        qualified_at + timedelta(days=proposal_days)
+                    )
                     if candidate_proposal <= T0:
                         proposal_at = candidate_proposal
                     else:
@@ -539,7 +555,9 @@ def simulate_lead_stage(
                     close_days = clamp(
                         rng.lognormvariate(math.log(30.0), 0.80), 2.0, 180.0
                     )
-                    candidate_close = proposal_at + timedelta(days=close_days)
+                    candidate_close = whole_second(
+                        proposal_at + timedelta(days=close_days)
+                    )
                 elif proposal_after_t0:
                     # The proposal has not happened by t0, so the lead cannot
                     # close by t0 either; it stays at qualified.
@@ -548,7 +566,9 @@ def simulate_lead_stage(
                     close_days = clamp(
                         rng.lognormvariate(math.log(22.0), 0.80), 2.0, 150.0
                     )
-                    candidate_close = qualified_at + timedelta(days=close_days)
+                    candidate_close = whole_second(
+                        qualified_at + timedelta(days=close_days)
+                    )
 
                 if candidate_close is not None and candidate_close <= T0:
                     closed_at = candidate_close
@@ -740,7 +760,7 @@ def build_week_starts() -> list[date]:
 
 def generate_usage(
     rng: random.Random, company: Company, week_starts: list[date]
-) -> array:
+) -> dict[date, int]:
     company_number = int(company.id[1:])
     flat = company_number % 20 == 0
     base = max(
@@ -750,18 +770,19 @@ def generate_usage(
     trend = 0.0 if flat else rng.gauss(0.0, 0.12)
     phase = rng.uniform(0.0, 2.0 * math.pi)
     company_day = company.created_at.date()
-    events = array("i")
+    events: dict[date, int] = {}
     for index, week_start in enumerate(week_starts):
+        # Do not materialise a row for a week that ended before the company
+        # existed: pre-creation zeros are not observed usage.
         if week_start + timedelta(days=7) <= company_day:
-            events.append(0)
             continue
         if flat:
-            events.append(max(0, int(round(base))))
+            events[week_start] = max(0, int(round(base)))
             continue
         seasonal = 0.10 * base * math.sin(2.0 * math.pi * index / 52.0 + phase)
         noise = rng.gauss(0.0, 0.12 * base)
         value = base + trend * index + seasonal + noise
-        events.append(max(0, int(round(value))))
+        events[week_start] = max(0, int(round(value)))
     return events
 
 
@@ -885,7 +906,11 @@ def generate_nps(
         rows.append((surveyed_at, score))
 
     # Guarantee a measured zero as well as a measured positive/negative score.
-    add_survey(start, force_zero=company_number % 37 == 0)
+    force_zero = company_number % 37 == 0
+    add_survey(start, force_zero=force_zero)
+    if force_zero:
+        # No later survey can turn the latest score into a non-zero value.
+        return rows
     count = poisson_draw(rng, 1.8)
     follow_up_start = start + timedelta(days=1)
     if follow_up_start < end:
@@ -967,12 +992,11 @@ def generate_interactions(
             answered = 1 if rng.random() < 0.60 else 0
             add(lead, "email", direction, occurred_at, answered)
 
-        if lead.first_response_hours is not None:
-            response_at = lead.created_at + timedelta(
-                hours=lead.first_response_hours
-            )
-            if lead.created_at <= response_at <= life_end:
-                add(lead, "email", "inbound", response_at, 1)
+        if (
+            lead.first_response_at is not None
+            and lead.created_at <= lead.first_response_at <= life_end
+        ):
+            add(lead, "email", "inbound", lead.first_response_at, 1)
 
     return rows, meetings_by_lead
 
@@ -985,13 +1009,17 @@ def generate_interactions(
 def window_usage(
     world: RawWorld, company_id: str, snapshot: datetime
 ) -> list[int]:
-    """Weekly events in the 90 days before snapshot, only completed weeks."""
+    """Observed weekly events in the 90 days before snapshot.
+
+    Only completed weeks are included; weeks before the company existed were
+    never materialised, so they cannot pad the two-week minimum.
+    """
     low = snapshot.date() - timedelta(days=90)
     high = snapshot.date() - timedelta(days=7)
     return [
         events
-        for week_start, events in zip(
-            world.week_starts, world.usage_by_company[company_id]
+        for week_start, events in sorted(
+            world.usage_by_company[company_id].items()
         )
         if low <= week_start <= high
     ]
@@ -1139,7 +1167,7 @@ def z_value(
     mean, sd = stats.get(key, (0.0, 1.0))
     if sd <= 0:
         return 0.0
-    return (value - mean) * Z_SD_INFLATION / sd
+    return (value - mean) * Z_REFERENCE_SCALE / sd
 
 
 def hazard_logit(
@@ -1265,7 +1293,7 @@ def simulate_outcomes(
                 "snapshot_date": row["snapshot_date"],
                 "won": won,
                 "closed_at": iso(lead.closed_at),
-                "latent_p": round(probability, 10),
+                "latent_p": probability,
             }
         )
 
@@ -1293,9 +1321,16 @@ def write_database(
     ticket_rows: list[tuple[Any, ...]],
     invoice_rows: list[tuple[Any, ...]],
     nps_rows: list[tuple[Any, ...]],
+    overwrite: bool = False,
 ) -> None:
     schema_path = Path(__file__).with_name("schema.sql")
     schema_sql = schema_path.read_text(encoding="utf-8")
+
+    if db_path.exists() and not overwrite:
+        raise FileExistsError(
+            f"refusing to overwrite existing database {db_path}; "
+            "pass --overwrite to replace it"
+        )
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
     for suffix in ("", "-journal", "-wal", "-shm"):
@@ -1356,9 +1391,12 @@ def write_database(
 
         usage_batch: list[tuple[Any, ...]] = []
         for company in companies:
-            events = world.usage_by_company[company.id]
-            for week_start, value in zip(world.week_starts, events):
-                usage_batch.append((company.id, week_start.isoformat(), int(value)))
+            for week_start, value in sorted(
+                world.usage_by_company[company.id].items()
+            ):
+                usage_batch.append(
+                    (company.id, week_start.isoformat(), int(value))
+                )
             if len(usage_batch) >= 20_000:
                 insert_rows(
                     connection,
@@ -1494,6 +1532,7 @@ def generate(
     companies_count: int = DEFAULT_COMPANIES,
     leads_count: int | None = None,
     quiet: bool = False,
+    overwrite: bool = False,
 ) -> tuple[list[Company], list[Lead], list[dict[str, Any]]]:
     if leads_count is None:
         leads_count = companies_count * LEADS_PER_COMPANY
@@ -1501,6 +1540,11 @@ def generate(
         raise ValueError("companies must be positive")
     if leads_count < 0:
         raise ValueError("leads must be non-negative")
+    if db_path.exists() and not overwrite:
+        raise FileExistsError(
+            f"refusing to overwrite existing database {db_path}; "
+            "pass --overwrite to replace it"
+        )
 
     rng = random.Random(seed)
 
@@ -1590,6 +1634,7 @@ def generate(
         ticket_rows,
         invoice_rows,
         nps_rows,
+        overwrite=overwrite,
     )
 
     if not quiet:
@@ -1628,6 +1673,11 @@ def main(argv: list[str] | None = None) -> int:
         help="lead count (default: companies * 3)",
     )
     parser.add_argument("--quiet", action="store_true", help="suppress the summary")
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="replace an existing --db file (refused by default)",
+    )
     args = parser.parse_args(argv)
 
     generate(
@@ -1636,6 +1686,7 @@ def main(argv: list[str] | None = None) -> int:
         companies_count=args.companies,
         leads_count=args.leads,
         quiet=args.quiet,
+        overwrite=args.overwrite,
     )
     return 0
 

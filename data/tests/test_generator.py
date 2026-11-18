@@ -235,6 +235,44 @@ def test_degenerate_cli_targets_terminate_and_fail_fast(tmp_path: Path) -> None:
     assert "limit is 110" in combined, combined
 
 
+def test_refuses_to_overwrite_without_flag(tmp_path: Path) -> None:
+    db_path = tmp_path / "guarded.db"
+    first = subprocess.run(
+        _generator_command(
+            db_path, ["--companies", "1", "--leads", "10", "--quiet"]
+        ),
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert first.returncode == 0, first.stderr
+
+    guarded = subprocess.run(
+        _generator_command(
+            db_path, ["--companies", "1", "--leads", "10", "--quiet"]
+        ),
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert guarded.returncode != 0, "existing --db must not be overwritten silently"
+    assert "refusing to overwrite" in guarded.stdout + guarded.stderr
+
+    allowed = subprocess.run(
+        _generator_command(
+            db_path,
+            ["--companies", "1", "--leads", "10", "--quiet", "--overwrite"],
+        ),
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert allowed.returncode == 0, allowed.stderr
+
+
 def test_domain_invariants(demo_db: Path) -> None:
     with connect(demo_db) as connection:
         vat_pattern = re.compile(r"^\d{11}$")
@@ -465,6 +503,16 @@ def test_raw_point_in_time_temporal_coherence(demo_db: Path) -> None:
             """,
         ) == 0
 
+        # A usage week can never have ended before its company existed.
+        assert scalar(
+            connection,
+            """
+            SELECT COUNT(*) FROM company_usage_weekly u
+            JOIN companies c ON c.id = u.company_id
+            WHERE date(u.week_start, '+7 days') <= date(c.created_at)
+            """,
+        ) == 0
+
         # created <= qualified <= proposal <= closed, wherever present.
         coherence_checks = (
             "qualified_at IS NOT NULL AND qualified_at < created_at",
@@ -581,31 +629,75 @@ def test_reachability_of_null_and_zero_states(demo_db: Path) -> None:
             """,
         ) == 1
 
-        # -- MEASURED ZERO: flat usage -> OLS slope exactly zero -------------
+        # -- MEASURED ZERO: a *scored* lead with flat, observed usage --------
         assert scalar(
             connection,
-            """
+            f"""
             SELECT EXISTS (
-              SELECT 1 FROM company_usage_weekly
-              GROUP BY company_id
-              HAVING COUNT(*) >= 2 AND MIN(events) = MAX(events)
+              SELECT 1 FROM leads l
+              WHERE l.qualified_at IS NOT NULL
+                AND (
+                  SELECT COUNT(*) FROM company_usage_weekly u
+                  WHERE u.company_id = l.company_id
+                    AND u.week_start <= date({snapshot}, '-7 days')
+                    AND u.week_start >= date({snapshot}, '-90 days')
+                ) >= 2
+                AND (
+                  SELECT COUNT(DISTINCT u.events) FROM company_usage_weekly u
+                  WHERE u.company_id = l.company_id
+                    AND u.week_start <= date({snapshot}, '-7 days')
+                    AND u.week_start >= date({snapshot}, '-90 days')
+                ) = 1
+              LIMIT 1
             )
             """,
         ) == 1
 
-        # -- MEASURED ZERO: an NPS score of exactly zero ---------------------
+        # -- MEASURED ZERO: latest survey at/before snapshot is exactly zero --
         assert scalar(
             connection,
-            "SELECT EXISTS (SELECT 1 FROM nps_surveys WHERE score = 0)",
+            f"""
+            SELECT EXISTS (
+              SELECT 1 FROM leads l
+              WHERE l.qualified_at IS NOT NULL
+                AND (
+                  SELECT n.score FROM nps_surveys n
+                  WHERE n.company_id = l.company_id
+                    AND n.surveyed_at <= {snapshot}
+                  ORDER BY n.surveyed_at DESC LIMIT 1
+                ) = 0
+              LIMIT 1
+            )
+            """,
         ) == 1
 
-        # -- MEASURED ZERO: an invoice paid on its due date ------------------
+        # -- MEASURED ZERO: average invoice delay is 0 with >=1 eligible invoice
         assert scalar(
             connection,
-            """
+            f"""
             SELECT EXISTS (
-              SELECT 1 FROM invoices
-              WHERE paid_at IS NOT NULL AND date(paid_at) = date(due_at)
+              SELECT 1 FROM leads l
+              WHERE l.qualified_at IS NOT NULL
+                AND (
+                  SELECT COUNT(*) FROM invoices i
+                  WHERE i.company_id = l.company_id
+                    AND i.due_at <= {snapshot}
+                    AND julianday(i.due_at) >= julianday({snapshot}) - 180
+                ) > 0
+                AND (
+                  SELECT AVG(
+                    CASE
+                      WHEN i.paid_at IS NOT NULL AND i.paid_at <= {snapshot}
+                      THEN julianday(date(i.paid_at)) - julianday(date(i.due_at))
+                      ELSE julianday(date({snapshot})) - julianday(date(i.due_at))
+                    END
+                  )
+                  FROM invoices i
+                  WHERE i.company_id = l.company_id
+                    AND i.due_at <= {snapshot}
+                    AND julianday(i.due_at) >= julianday({snapshot}) - 180
+                ) = 0.0
+              LIMIT 1
             )
             """,
         ) == 1
