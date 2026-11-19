@@ -6,7 +6,7 @@
   "outputDirectory": "web/dist",
   "functions": {
     "api/index.py": {
-      "includeFiles": ["data/demo.slim.db", "serverless/**"],
+      "includeFiles": "{data/demo.slim.db,serverless/**}",
       "maxDuration": 30
     }
   },
