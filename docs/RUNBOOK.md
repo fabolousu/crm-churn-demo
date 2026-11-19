@@ -6,7 +6,7 @@ For the person driving the laptop. Five minutes of demo, about two minutes of se
 
 ```powershell
 # 1. Dependencies (first time only)
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt
 pnpm --dir web install
 
 # 2. Data, features, model, scores — deterministic from seed 42

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npx --yes pnpm@12.21.0 --dir web install --frozen-lockfile",
+  "buildCommand": "npx --yes pnpm@12.21.0 --dir web build",
+  "outputDirectory": "web/dist",
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "data/demo.slim.db",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/health",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/pipeline",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
