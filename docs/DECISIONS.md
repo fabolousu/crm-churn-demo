@@ -137,3 +137,9 @@ Decision: the demo API stays **public and read-only**; token auth is not added. 
 - **PII** — the dataset is synthetic (generator seed 42); no real personal data is served.
 - **Prompt injection** — N/A: no LLM runs at request time; the model is used only in the offline build.
 - Generated docs/schema are disabled in the function (`docs_url=None`, `openapi_url=None`); CORS is an explicit allowlist, and responses carry `nosniff`/`no-referrer`.
+
+## D8/D9 operations (recorded 2026-11-19)
+
+- **D8 alerting**: GitHub Actions `uptime.yml` checks `/api/health` (`status=ok`) and `/api/pipeline?limit=1` every 10 minutes; failures create or comment on an issue labelled `uptime`, and recovery closes it. Hobby logs are not an alert channel. Token cost is N/A (no LLM runs at request time). GitHub disables scheduled workflows after 60 days of repository inactivity — re-enable if the demo goes quiet.
+- **D9 rollout**: `deployment-smoke.yml` runs `scripts/smoke_deployment.sh` on successful Vercel deployments. Preview smoke requires `VERCEL_AUTOMATION_BYPASS_SECRET` and `VERCEL_TOKEN` (which must have access to this Vercel project, and is used to prove the deployment's project ownership before the bypass header is sent). Without the bypass secret the preview is skipped with a notice; if ownership cannot be verified the job fails rather than claiming success. Production is public and needs neither secret. Rollback is manual via the Vercel dashboard or `vercel rollback`; `docs/RUNBOOK.md` records the procedure and the last-known-good deployment.
+

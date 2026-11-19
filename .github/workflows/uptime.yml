@@ -1,0 +1,91 @@
+name: Uptime Monitor
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+# Serialize runs so an older success cannot close an issue a newer failure created.
+concurrency:
+  group: uptime-monitor
+  cancel-in-progress: false
+
+jobs:
+  uptime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Health
+        id: health
+        run: |
+          for i in 1 2 3; do
+            if ! body=$(curl -sS --max-time 20 https://crm-churn-demo.vercel.app/api/health); then
+              echo "Attempt $i failed (curl error)"
+              sleep 5
+              continue
+            fi
+            status=$(printf '%s' "$body" | python3 -c "import json,sys; print(json.load(sys.stdin).get('status',''))" 2>/dev/null || true)
+            if [ "$status" = "ok" ]; then
+              echo "Health check passed"
+              exit 0
+            fi
+            echo "Attempt $i failed (status=${status:-none})"
+            sleep 5
+          done
+          exit 1
+
+      - name: Check Pipeline
+        id: pipeline
+        run: |
+          for i in 1 2 3; do
+            if ! code=$(curl -sS --max-time 20 -o pipeline.json -w "%{http_code}" "https://crm-churn-demo.vercel.app/api/pipeline?limit=1"); then
+              echo "Attempt $i failed (curl error)"
+              sleep 5
+              continue
+            fi
+            if [ "$code" = "200" ]; then
+              total=$(python3 -c "import json,sys; print(json.load(sys.stdin).get('total', 0))" < pipeline.json 2>/dev/null || echo 0)
+              if [ "$total" -gt 0 ]; then
+                echo "Pipeline check passed"
+                exit 0
+              fi
+            fi
+            echo "Attempt $i failed (http=${code:-none})"
+            sleep 5
+          done
+          exit 1
+
+      - name: Handle Failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The label must exist before an issue can use it.
+          gh label create uptime --color B60205 --description "Automated uptime alert" >/dev/null 2>&1 || true
+          issue_number=$(gh issue list --label uptime --state open --json number -q '.[0].number')
+          
+          if [ -z "$issue_number" ]; then
+            echo "Creating new issue"
+            gh issue create --title "Uptime alert: production API" --body "Production API health/pipeline check failed. Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --label uptime
+          else
+            echo "Commenting on existing issue #$issue_number"
+            gh issue comment "$issue_number" --body "Another failure detected. Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          fi
+
+      - name: Handle Recovery
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          issue_number=$(gh issue list --label uptime --state open --json number -q '.[0].number')
+          if [ -n "$issue_number" ]; then
+            echo "Closing issue #$issue_number"
+            gh issue comment "$issue_number" --body "Service recovered."
+            gh issue close "$issue_number"
+          fi
