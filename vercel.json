@@ -12,6 +12,14 @@
   },
   "rewrites": [
     {
+      "source": "/api/health",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/pipeline",
+      "destination": "/api/index"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
