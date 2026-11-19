@@ -55,7 +55,7 @@ function Wordmark() {
         <span className="block text-[15px] font-semibold tracking-[0.14em] text-paper">
           INIZIATIVA
         </span>
-        <span className="block text-[10px] uppercase tracking-[0.16em] text-paper/45">
+        <span className="block text-[10px] uppercase tracking-[0.16em] text-paper/60">
           Pipeline intelligence
         </span>
       </span>
@@ -75,7 +75,7 @@ function ModelCard() {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] uppercase tracking-[0.16em] text-paper/45">
+        <span className="text-[10px] uppercase tracking-[0.16em] text-paper/60">
           Model stability
         </span>
         <span className="inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-paper/60">
@@ -92,10 +92,10 @@ function ModelCard() {
       <p className="mt-2 text-[13px] font-medium text-paper">
         {health.model_version}
       </p>
-      <p className="mt-1 text-[11px] leading-relaxed text-paper/45">
+      <p className="mt-1 text-[11px] leading-relaxed text-paper/60">
         Scored {formatDateTime(health.scored_at)}
       </p>
-      <p className="mt-3 border-t border-white/10 pt-2 text-[10px] uppercase tracking-[0.14em] text-paper/35">
+      <p className="mt-3 border-t border-white/10 pt-2 text-[10px] uppercase tracking-[0.14em] text-paper/60">
         {live ? "Live service" : "Fixture build · offline"}
       </p>
     </div>
@@ -127,7 +127,7 @@ function NavLinks({
             : "text-[#8FCFBE]"
           : onPaper
             ? "text-ink/35 group-hover:text-ink/60"
-            : "text-paper/35 group-hover:text-paper/60";
+            : "text-paper/50 group-hover:text-paper/85";
 
         return (
           <Link
@@ -160,7 +160,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <div>
           <Wordmark />
           <div className="mt-10">
-            <p className="px-3 text-[10px] font-medium uppercase tracking-[0.18em] text-paper/35">
+            <p className="px-3 text-[10px] font-medium uppercase tracking-[0.18em] text-paper/60">
               Workspace
             </p>
             <div className="mt-3">
@@ -168,7 +168,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </div>
           </div>
           <div className="mt-10 rounded-xl border border-white/10 p-4">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-paper/35">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-paper/60">
               The argument
             </p>
             <p className="mt-2 font-display text-[15px] leading-snug text-paper/85">

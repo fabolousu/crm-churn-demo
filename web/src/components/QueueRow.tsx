@@ -36,7 +36,7 @@ export default function QueueRow({
       <div
         className={cn(
           "pt-0.5 font-display text-[20px] leading-none tabular-nums",
-          rank === 1 ? "text-accent" : "text-muted/70",
+          rank === 1 ? "text-accent" : "text-muted",
         )}
       >
         {formatOrdinal(rank)}
