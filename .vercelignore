@@ -1,0 +1,10 @@
+# Upload only what the Vercel build needs. The full 251 MB demo database and the
+# local node_modules are regenerable and must never be uploaded.
+.git
+data
+web/node_modules
+web/dist
+.tmp
+reports
+crm design
+*.db
