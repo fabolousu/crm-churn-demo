@@ -13,6 +13,9 @@ fi
 # Remove trailing slash
 BASE_URL=${BASE_URL%/}
 
+# Always clean up the response files, including on a failed attempt.
+trap 'rm -f response.json pipeline.json' EXIT
+
 echo "Testing $BASE_URL..."
 
 # Helper to run curl with retries
@@ -26,9 +29,9 @@ run_curl() {
     
     # Check if bypass secret is set
     if [ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
-      response=$(curl -s -w "%{http_code}" -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" -o response.json "$url")
+      response=$(curl -sS --max-time 20 -w "%{http_code}" -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" -o response.json "$url") || response="000"
     else
-      response=$(curl -s -w "%{http_code}" -o response.json "$url")
+      response=$(curl -sS --max-time 20 -w "%{http_code}" -o response.json "$url") || response="000"
     fi
     
     if [ "$response" -eq 200 ]; then
@@ -87,4 +90,3 @@ else
 fi
 
 echo "All smoke tests passed."
-rm response.json

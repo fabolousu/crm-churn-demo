@@ -122,5 +122,6 @@ T16 (Vercel serverless API lane) was initially assigned to the Gemini 3.8 Flash 
 
 ## D8/D9 operations (recorded 2026-11-19)
 
-Hobby logs are not alerting; GitHub issue is the alert channel; 10-minute cron; token cost N/A; preview smoke is conditional on a bypass secret; rollback is manual.
+- **D8 alerting**: GitHub Actions `uptime.yml` checks `/api/health` (`status=ok`) and `/api/pipeline?limit=1` every 10 minutes; failures create or comment on an issue labelled `uptime`, and recovery closes it. Hobby logs are not an alert channel. Token cost is N/A (no LLM runs at request time). GitHub disables scheduled workflows after 60 days of repository inactivity — re-enable if the demo goes quiet.
+- **D9 rollout**: `deployment-smoke.yml` runs `scripts/smoke_deployment.sh` on successful Vercel deployments. Preview smoke requires `VERCEL_AUTOMATION_BYPASS_SECRET`; without it the preview is skipped with a notice rather than failed. Production is public and needs no bypass. Rollback is manual via the Vercel dashboard or `vercel rollback`; `docs/RUNBOOK.md` records the procedure and the last-known-good deployment.
 
