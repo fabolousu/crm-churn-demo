@@ -200,14 +200,42 @@ app = FastAPI(
         "Slim serverless API reading from data/demo.slim.db. "
         "No ML stack at runtime — scores and leverage are precomputed."
     ),
+    # The generated docs and schema are not part of the public demo surface.
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
+
+# Read-only demo: only the origins that actually host the UI may call it. The UI is
+# same-origin in production, so this mainly protects local development and the Pages
+# showcase. ``CRM_ALLOWED_ORIGINS`` (comma-separated) overrides the list.
+_DEFAULT_ALLOWED_ORIGINS = [
+    "https://crm-churn-demo.vercel.app",
+    "https://fabolousu.github.io",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+]
+_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CRM_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+] or _DEFAULT_ALLOWED_ORIGINS
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_ALLOWED_ORIGINS,
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def security_headers(request, call_next):
+    """Baseline response hardening for a public, read-only demo endpoint."""
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    return response
 
 
 # ---------------------------------------------------------------------------

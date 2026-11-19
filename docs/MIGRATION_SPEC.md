@@ -170,7 +170,7 @@ named in the report.
 |---|---|
 | Node/pnpm | Installed; `web/node_modules` present. `pnpm install` took **45 min** once — avoid reinstalling |
 | Vite build quirk | Fails with `Access is denied` removing an `esbuild-*` file in `%TEMP%`. Set `TEMP`/`TMP` to a repo `.tmp/` first |
-| Python | 3.12; `pip install -r requirements.txt` already satisfied |
+| Python | 3.12; `pip install -r requirements-dev.txt` already satisfied |
 | GitHub | `gh` authenticated with `repo` + `workflow`; Pages enabled (`build_type=workflow`) |
 | CodeRabbit | CLI v0.9.5 at `%LOCALAPPDATA%\Programs\coderabbit`, signed in as `fabolousu` |
 | Data | `data/demo.db` is **240 MB** and gitignored; regenerate with `python tools/run_pipeline.py` (~90 s) |

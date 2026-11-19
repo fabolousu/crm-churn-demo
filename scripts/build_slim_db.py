@@ -25,6 +25,9 @@ sys.path.insert(0, str(REPO_ROOT))
 
 SRC_DB = REPO_ROOT / "data" / "demo.db"
 DST_DB = REPO_ROOT / "data" / "demo.slim.db"
+# Build into a sibling first: a failed rebuild must never destroy the committed
+# serving artifact that the deployed function is reading.
+TMP_DB = DST_DB.with_name(DST_DB.name + ".tmp")
 SCHEMA_SQL = REPO_ROOT / "data" / "schema.sql"
 TOP_N = 2_000
 OPEN_STATUSES = ("new", "contacted", "qualified", "proposal")
@@ -43,9 +46,9 @@ def build_slim_db() -> None:
             f"{SRC_DB} not found. Run 'python tools/run_pipeline.py' first."
         )
 
-    # Remove old slim DB so we start fresh
-    if DST_DB.exists():
-        DST_DB.unlink()
+    # Remove a stale temp DB; the published artifact is left untouched until the end.
+    if TMP_DB.exists():
+        TMP_DB.unlink()
 
     print(f"Source DB: {SRC_DB} ({SRC_DB.stat().st_size / 1_048_576:.1f} MB)")
 
@@ -53,7 +56,7 @@ def build_slim_db() -> None:
     # executescript() commits any pending transaction and runs DDL.
     # We use isolation_level=None (autocommit) so there is no implicit transaction to worry about.
     schema_sql = SCHEMA_SQL.read_text(encoding="utf-8")
-    with closing(_open(DST_DB)) as dst:
+    with closing(_open(TMP_DB)) as dst:
         dst.execute("PRAGMA foreign_keys = OFF")
         dst.executescript(schema_sql)
 
@@ -141,7 +144,7 @@ def build_slim_db() -> None:
     assert len(model_runs) >= 1, "No model_runs found"
 
     # --- Step 3: insert into slim DB (all in one transaction for speed) ---
-    with closing(_open(DST_DB)) as dst:
+    with closing(_open(TMP_DB)) as dst:
         dst.execute("PRAGMA foreign_keys = OFF")
         dst.execute("PRAGMA synchronous = OFF")
         dst.execute("BEGIN")
@@ -207,16 +210,21 @@ def build_slim_db() -> None:
 
     # --- Step 4: compute lead_leverage ---
     print("Computing lead_leverage (this uses the full ML stack)...")
-    _build_lead_leverage(lead_ids)
+    _build_lead_leverage(lead_ids, TMP_DB)
 
-    # --- Step 5: VACUUM and report ---
-    with closing(_open(DST_DB)) as dst:
+    # --- Step 5: VACUUM, validate, then publish atomically ---
+    with closing(_open(TMP_DB)) as dst:
         dst.execute("VACUUM")
 
-    size_mb = DST_DB.stat().st_size / 1_048_576
-    print(f"\nSlim DB written: {DST_DB}")
-    print(f"Size: {size_mb:.2f} MB")
+    size_mb = TMP_DB.stat().st_size / 1_048_576
     assert size_mb < 25, f"Slim DB too large: {size_mb:.2f} MB (limit 25 MB)"
+
+    # Publish only after the build has validated: the previous artifact stays intact
+    # until this replace, which is atomic on the same filesystem.
+    os.replace(TMP_DB, DST_DB)
+
+    print(f"\nSlim DB published: {DST_DB}")
+    print(f"Size: {size_mb:.2f} MB")
     print("OK — size within 25 MB limit.")
 
     # Final count verification
@@ -226,7 +234,7 @@ def build_slim_db() -> None:
             print(f"  {table}: {count} rows")
 
 
-def _build_lead_leverage(lead_ids: list[str]) -> None:
+def _build_lead_leverage(lead_ids: list[str], db_path: pathlib.Path) -> None:
     """Score committable levers and discount what-if for every lead using the full ML stack.
 
     ``max_leverage`` = max delta over committable levers (exec_sponsor_meeting,
@@ -242,7 +250,7 @@ def _build_lead_leverage(lead_ids: list[str]) -> None:
     MODEL_PATH = REPO_ROOT / "ml" / "artifacts" / "model.joblib"
     bundle = load_bundle(str(MODEL_PATH))
 
-    with closing(_open(DST_DB)) as conn:
+    with closing(_open(db_path)) as conn:
         lead_placeholders = ", ".join("?" * len(lead_ids))
         feature_rows = conn.execute(
             f"SELECT * FROM lead_features WHERE lead_id IN ({lead_placeholders})",
@@ -288,7 +296,7 @@ def _build_lead_leverage(lead_ids: list[str]) -> None:
     discount_upside = np.clip(discount_delta, 0.0, 1.0)
 
     # Insert into slim DB
-    with closing(_open(DST_DB)) as conn:
+    with closing(_open(db_path)) as conn:
         conn.execute("BEGIN")
         conn.executemany(
             "INSERT INTO lead_leverage (lead_id, max_leverage, discount_upside) VALUES (?, ?, ?)",

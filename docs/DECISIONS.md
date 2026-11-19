@@ -126,3 +126,14 @@ Q1 CRM becomes the shell; ML screens move under `/previsioni`. Q2 slim committed
 ## T16 vendor fallback (recorded 2026-11-19)
 
 T16 (Vercel serverless API lane) was initially assigned to the Gemini 3.8 Flash model. That run died with no files and no message; a probe of the session returned only session-init output with zero authored content. Per the documented "Gemini lanes re-runnable on Anthropic" limitation in `docs/ORCHESTRATION.md`, the lane was re-run on Anthropic Claude Sonnet (claude-sonnet-4-6). This is recorded here rather than silently accepted: the authoring model changed mid-lane, and CodeRabbit remains the independent primary reviewer for all code introduced in this lane (it did not participate in authorship). The deliverables — `api/serverless.py`, `api/index.py`, `scripts/build_slim_db.py`, `api/tests/test_serverless.py`, and the dependency split — were written entirely in the Anthropic fallback run.
+
+## D7 guardrails — demo scope (recorded 2026-11-19)
+
+Decision: the demo API stays **public and read-only**; token auth is not added. `DECISIONS.md` already lists Auth as a non-goal, and a link that requires a key defeats the pitch. D7 is recorded as **passed with documented exceptions**, not as a full auth implementation:
+
+- **Auth** — not implemented; justified exception (demo non-goal). The API is read-only and serves synthetic data.
+- **Rate limiting** — not implemented in-function: Vercel functions are stateless and this Hobby project has no durable counter. Mitigation is the read-only surface plus bounded responses; revisit before any traffic beyond the demo.
+- **Input/output validation** — FastAPI bounds every query (`limit` 1–200, `min_probability` 0–1, region/sort enums) and Pydantic models enforce the contract; tests cover the 422 and 200 cases.
+- **PII** — the dataset is synthetic (generator seed 42); no real personal data is served.
+- **Prompt injection** — N/A: no LLM runs at request time; the model is used only in the offline build.
+- Generated docs/schema are disabled in the function (`docs_url=None`, `openapi_url=None`); CORS is an explicit allowlist, and responses carry `nosniff`/`no-referrer`.
