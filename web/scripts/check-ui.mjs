@@ -15,9 +15,15 @@
  *   pnpm --dir web check:ui
  *
  * Environment
- *   CHECK_UI_CHROME     explicit browser executable (default: autodetect Chrome/Edge)
- *   CHECK_UI_MAX_PAGES  crawl cap (default 40)
- *   CHECK_UI_STRICT=1   fail on every axe impact, not only serious/critical
+ *   CHECK_UI_CHROME         explicit browser executable (default: autodetect Chrome/Edge)
+ *   CHECK_UI_MAX_PAGES      total crawl safety cap (default 40)
+ *   CHECK_UI_PER_TEMPLATE   samples per route template, e.g. /leads/:id (default 5)
+ *   CHECK_UI_STRICT=1       fail on every axe impact, not only serious/critical
+ *
+ * The crawl samples each route template rather than every record: the app has hundreds
+ * of lead ids that all render the same screen, so axe findings and link failures are
+ * template-level. The report names every template covered; a global-cap truncation is
+ * reported as incomplete and fails instead of passing silently.
  *
  * This is intentionally dependent on a real browser: the app is client-rendered, so a
  * static HTML crawler would see no links and report a false pass.
@@ -34,8 +40,31 @@ import { chromium } from "playwright-core";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(HERE, "..", "dist");
 const INDEX = path.join(DIST, "index.html");
-const MAX_PAGES = Number(process.env.CHECK_UI_MAX_PAGES ?? 40);
 const STRICT = process.env.CHECK_UI_STRICT === "1";
+
+function pageLimit() {
+  const raw = process.env.CHECK_UI_MAX_PAGES ?? "40";
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 1) {
+    throw new Error(`CHECK_UI_MAX_PAGES must be a positive number, got "${raw}"`);
+  }
+  return Math.floor(value);
+}
+
+function perTemplateLimit() {
+  const raw = process.env.CHECK_UI_PER_TEMPLATE ?? "5";
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 1) {
+    throw new Error(`CHECK_UI_PER_TEMPLATE must be a positive number, got "${raw}"`);
+  }
+  return Math.floor(value);
+}
+
+/** Collapse record ids so the crawl samples each screen template, not every record. */
+function routeTemplate(route) {
+  return route.replace(/^\/leads\/[^/]+/, "/leads/:id").replace(/^\/act\/[^/]+/, "/act/:id");
+}
+
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 const BLOCKING_IMPACTS = STRICT
   ? new Set(["minor", "moderate", "serious", "critical"])
@@ -151,7 +180,7 @@ async function launchBrowser() {
   }
   throw new Error(
     `No Chrome/Edge found. Set CHECK_UI_CHROME to a browser executable, or run ` +
-      `"pnpm --dir web exec playwright install chromium". Last error: ${lastError?.message}`
+      `"pnpm --dir web exec playwright-core install chromium". Last error: ${lastError?.message}`
   );
 }
 
@@ -168,18 +197,22 @@ function sameOriginTarget(href, pageUrl, origin) {
 }
 
 async function main() {
+  const maxPages = pageLimit();
+  const perTemplate = perTemplateLimit();
   const { server, base } = await serveDist();
   const origin = new URL(base).origin;
-  const browser = await launchBrowser();
   const results = {
     visited: [],
     axe: [],
     broken: [],
     failedResources: [],
     consoleErrors: [],
+    unvisited: [],
   };
 
+  let browser;
   try {
+    browser = await launchBrowser();
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
     let currentRoute = "/";
@@ -206,8 +239,10 @@ async function main() {
     const axePath = axeScriptPath();
     const queue = ["/", "/act", "/portfolio"];
     const seen = new Set();
+    const samples = new Map();
+    for (const route of queue) samples.set(routeTemplate(route), 1);
 
-    while (queue.length > 0 && seen.size < MAX_PAGES) {
+    while (queue.length > 0 && seen.size < maxPages) {
       const route = queue.shift();
       if (seen.has(route)) continue;
       seen.add(route);
@@ -264,20 +299,41 @@ async function main() {
       );
       for (const href of hrefs) {
         const target = sameOriginTarget(href, pageUrl, origin);
-        if (target && !seen.has(target)) queue.push(target);
+        if (!target || seen.has(target)) continue;
+        const template = routeTemplate(target);
+        const sampled = samples.get(template) ?? 0;
+        if (sampled >= perTemplate) continue;
+        samples.set(template, sampled + 1);
+        queue.push(target);
       }
     }
+
+    results.unvisited = [...new Set(queue)].filter((route) => !seen.has(route));
   } finally {
-    await browser.close();
+    if (browser) await browser.close().catch(() => {});
+    server.closeIdleConnections?.();
+    server.closeAllConnections?.();
     await new Promise((resolve) => server.close(resolve));
   }
 
   const blocking = results.axe.filter((finding) => BLOCKING_IMPACTS.has(finding.impact));
   const passed =
-    blocking.length === 0 && results.broken.length === 0 && results.failedResources.length === 0;
+    blocking.length === 0 &&
+    results.broken.length === 0 &&
+    results.failedResources.length === 0 &&
+    results.unvisited.length === 0;
 
   console.log(`\nD1 UI check — ${base}`);
   console.log(`Visited ${results.visited.length} route(s): ${results.visited.join(", ")}`);
+  const templates = [...new Set(results.visited.map(routeTemplate))];
+  console.log(`Templates covered (${templates.length}): ${templates.join(", ")}`);
+  if (results.unvisited.length > 0) {
+    console.log(
+      `crawl incomplete: ${results.unvisited.length} discovered route(s) not visited at ` +
+        `CHECK_UI_MAX_PAGES=${maxPages}`
+    );
+    for (const route of results.unvisited.slice(0, 10)) console.log(`  unvisited: ${route}`);
+  }
 
   if (results.axe.length === 0) {
     console.log("axe: no violations");
