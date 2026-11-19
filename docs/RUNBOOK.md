@@ -118,3 +118,11 @@ find it before the room does.
   leverage sort is the product.
 - `discount_upside` (the old Rossi +19.5) is a what-if the model can score but no rep can
   commit. Show it only in the what-if lane, never as a recommendation.
+
+## Deploy, smoke, roll back
+
+- **Pre-merge**: Open the PR preview, run the smoke script against it (`./scripts/smoke_deployment.sh <preview-url>`). If the preview is protected (Vercel Authentication), provide the `VERCEL_AUTOMATION_BYPASS_SECRET` environment variable as the argument.
+- **After merge**: The automated job `deployment-smoke.yml` will smoke test production. If the uptime monitor fails, a GitHub issue titled `Uptime alert: production API` will be created with the failing URL/status. Check the issue status to see if it has been resolved automatically.
+- **Rollback**: Vercel Dashboard → Deployments → Select previous production deployment → Promote/Rollback, or run `vercel rollback <url>`.
+- **Last-known-good deployment**: At time of writing (2026-11-19), the last-known-good deployment ID is not tracked here; consult the Vercel dashboard history.
+

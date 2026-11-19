@@ -1,0 +1,29 @@
+name: Deployment Smoke Test
+
+on:
+  deployment_status:
+
+jobs:
+  smoke-test:
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Smoke Test
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          url="${{ github.event.deployment_status.environment_url }}"
+          
+          # Check if preview
+          if [[ "$url" == *"preview"* ]] || [[ "$url" != *"crm-churn-demo.vercel.app"* ]]; then
+            if [ -z "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
+              echo "::notice::Preview deployment detected but VERCEL_AUTOMATION_BYPASS_SECRET is not set. Skipping smoke test."
+              exit 0
+            fi
+          fi
+          
+          chmod +x ./scripts/smoke_deployment.sh
+          ./scripts/smoke_deployment.sh "$url"
