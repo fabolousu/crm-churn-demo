@@ -111,3 +111,7 @@ where multi-agent builds fail.
 tables plus `lead_outcomes` and leaves `lead_features` empty — asserted by a generator
 test. Two producers of one table diverge silently, and a generator that pre-computes
 features would let the demo show a table that nothing in the pipeline computed.
+
+## Plan v2 decisions (recorded 2026-11-19)
+
+Q1 CRM becomes the shell; ML screens move under `/previsioni`. Q2 slim committed DB for serving, full DB local for training. Q3 GitHub Pages for the free showcase (done); Vercel Hobby still preferred for previews + serverless once a token exists. Q4 both stories in the pitch. Handover: `docs/NEXT_SESSION.md`.
