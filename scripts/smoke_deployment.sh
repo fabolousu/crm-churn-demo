@@ -42,9 +42,9 @@ run_curl() {
     
     # Check if bypass secret is set
     if [ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
-      response=$(curl -sS --max-time 20 -w "%{http_code}" -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" -o "$TMP_DIR/response.json" "$url") || response="000"
+      response=$(curl -sS --globoff --max-time 20 -w "%{http_code}" -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" -o "$TMP_DIR/response.json" "$url") || response="000"
     else
-      response=$(curl -sS --max-time 20 -w "%{http_code}" -o "$TMP_DIR/response.json" "$url") || response="000"
+      response=$(curl -sS --globoff --max-time 20 -w "%{http_code}" -o "$TMP_DIR/response.json" "$url") || response="000"
     fi
     
     if [ "$response" -eq 200 ]; then

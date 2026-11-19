@@ -23,6 +23,7 @@ jobs:
         env:
           DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           if [ -z "$DEPLOYMENT_URL" ]; then
             echo "::notice::No environment_url on this deployment; skipping."

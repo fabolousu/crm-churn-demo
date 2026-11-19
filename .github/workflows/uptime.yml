@@ -25,7 +25,11 @@ jobs:
         id: health
         run: |
           for i in 1 2 3; do
-            body=$(curl -sS --max-time 20 https://crm-churn-demo.vercel.app/api/health || true)
+            if ! body=$(curl -sS --max-time 20 https://crm-churn-demo.vercel.app/api/health); then
+              echo "Attempt $i failed (curl error)"
+              sleep 5
+              continue
+            fi
             status=$(printf '%s' "$body" | python3 -c "import json,sys; print(json.load(sys.stdin).get('status',''))" 2>/dev/null || true)
             if [ "$status" = "ok" ]; then
               echo "Health check passed"
@@ -40,7 +44,11 @@ jobs:
         id: pipeline
         run: |
           for i in 1 2 3; do
-            code=$(curl -sS --max-time 20 -o pipeline.json -w "%{http_code}" "https://crm-churn-demo.vercel.app/api/pipeline?limit=1" || true)
+            if ! code=$(curl -sS --max-time 20 -o pipeline.json -w "%{http_code}" "https://crm-churn-demo.vercel.app/api/pipeline?limit=1"); then
+              echo "Attempt $i failed (curl error)"
+              sleep 5
+              continue
+            fi
             if [ "$code" = "200" ]; then
               total=$(python3 -c "import json,sys; print(json.load(sys.stdin).get('total', 0))" < pipeline.json 2>/dev/null || echo 0)
               if [ "$total" -gt 0 ]; then
