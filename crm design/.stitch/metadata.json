@@ -1,0 +1,38 @@
+{
+  "projectId": "3133723532266431010",
+  "title": "CRM Promos - Modulo Sales",
+  "designSystem": {
+    "id": "assets/11537345874869338597",
+    "displayName": "Promos Sales Fresh",
+    "theme": {
+      "bodyFont": "INTER",
+      "headlineFont": "INTER",
+      "colorMode": "LIGHT",
+      "customColor": "#1F8A4C",
+      "roundness": "ROUND_EIGHT"
+    }
+  },
+  "screens": [
+    {
+      "id": "e9712148ff0949c7a1f1a9a1fab1b888",
+      "title": "Lead personali aperti",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti.html",
+      "screenshot": "designs/lead-personali-aperti.png"
+    },
+    {
+      "id": "11200872029948a688fe3b9e4235b4a9",
+      "title": "Scheda Lead",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead.html",
+      "screenshot": "designs/scheda-lead.png"
+    },
+    {
+      "id": "9ef1e08c1f4b495f909e69142b9d2a3c",
+      "title": "Lead personali aperti v2",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti-v2.html",
+      "screenshot": "designs/lead-personali-aperti-v2.png"
+    }
+  ]
+}

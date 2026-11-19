@@ -9,6 +9,11 @@
 #   - verifiable work goes to the cheapest agent that passes the gate
 #   - irreversible work goes to the strongest reasoner and is serialized
 #   - taste work goes to a human gate, because no test can adjudicate it
+#
+# `model` is the family actually used in this build; `tier` is the capability the task
+# requires (see docs/AGENT_MODEL_POLICY.md). Where a task is `tier: reasoning` but
+# `model: deepseek`, the manifest is recording the gap, not the decision: no Anthropic
+# route was configured when these lanes ran, so every lane used deepseek-flash.
 
 version: 1
 reviewer_default: pr-reviewer
@@ -19,6 +24,7 @@ tasks:
     scope: "docs/LABEL.md, data/schema.sql, api/openapi.yaml, docs/DECISIONS.md"
     agent: lead
     model: anthropic
+    tier: reasoning
     reviewer: human
     gate: "human reads the contract"
     parallel_group: 0
@@ -28,6 +34,7 @@ tasks:
     scope: "data/generator.py, data/seed.py, data/tests/"
     agent: data-engineer
     model: deepseek
+    tier: workhorse
     reviewer: pr-reviewer
     gate: "win prevalence 25-30%, regional base rates plausibly ordered, no NaN"
     parallel_group: 1
@@ -37,6 +44,7 @@ tasks:
     scope: "ml/features.py, ml/tests/test_leakage.py"
     agent: ml-engineer
     model: deepseek
+    tier: reasoning
     reviewer: pr-reviewer
     gate: "leakage test green; snapshot discipline proven by test"
     parallel_group: 1
@@ -46,6 +54,7 @@ tasks:
     scope: "ml/train.py, ml/explain.py, ml/artifacts/"
     agent: ml-engineer
     model: deepseek
+    tier: workhorse
     reviewer: pr-reviewer
     gate: "AUC in [0.75, 0.90] (above = leakage), calibration < 0.05"
     parallel_group: 2
@@ -55,6 +64,7 @@ tasks:
     scope: "api/app.py, api/tests/"
     agent: service-engineer
     model: deepseek
+    tier: bulk
     reviewer: pr-reviewer
     gate: "contract tests against openapi.yaml green"
     parallel_group: 1
@@ -64,6 +74,7 @@ tasks:
     scope: "web/"
     agent: ui-engineer
     model: anthropic
+    tier: workhorse
     reviewer: human
     gate: "one screen reviewed by a human for legibility"
     parallel_group: 1
@@ -73,6 +84,7 @@ tasks:
     scope: "api/retention.py, api/tests/test_retention.py"
     agent: service-engineer
     model: deepseek
+    tier: bulk
     reviewer: pr-reviewer
     gate: "unit tests; no duplicate task for an open action"
     parallel_group: 1
@@ -82,6 +94,7 @@ tasks:
     scope: "compose.yaml, scripts/, web/ data wiring"
     agent: lead
     model: anthropic
+    tier: reasoning
     reviewer: pr-reviewer
     gate: "docker compose up + click-through of all five screens"
     parallel_group: 3
@@ -91,6 +104,7 @@ tasks:
     scope: "reports/"
     agent: triage
     model: anthropic
+    tier: workhorse
     reviewer: human
     gate: "coderabbit exit 0 + deterministic checks + PR approvals"
     parallel_group: 4
@@ -100,6 +114,7 @@ tasks:
     scope: "docs/PITCH.md, docs/DEMO_SCRIPT.md, README.md"
     agent: lead
     model: anthropic
+    tier: workhorse
     reviewer: human
     gate: "the demo runs unattended, twice"
     parallel_group: 5

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+
+<html lang="it"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={theme:{extend:{colors:{primary:"#1F8A4C","on-primary":"#FFFFFF","primary-container":"#DCF8E6","on-primary-container":"#0E502B",secondary:"#2E4A3E","on-secondary":"#FFFFFF",surface:"#F8FAF9","on-surface":"#1A1C1B","surface-container-lowest":"#FFFFFF","surface-container-low":"#F1F5F3","surface-container":"#EAEFEA","surface-container-high":"#E3E9E4","surface-container-highest":"#DCE3DD","on-surface-variant":"#4E5851",outline:"#79847C","outline-variant":"#C7D0C9"},fontFamily:{sans:["Inter","sans-serif"],body:["Inter","sans-serif"],headline:["Inter","sans-serif"]}}}}</script></head><body class="bg-surface font-body text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 h-14 bg-surface-container-lowest/90 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.03)] z-50 flex items-center justify-between px-4"><div class="flex items-center gap-3 min-w-[280px]"><button class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="App Launcher"><span class="material-symbols-outlined text-[20px]">apps</span></button><div class="flex items-center gap-2"><span class="font-headline font-semibold text-sm tracking-tight text-on-surface">CRM CCIAA - PROMOS</span><span class="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-primary-container text-on-primary-container tracking-wider">Trade Agency</span></div></div><div class="flex-1 max-w-xl px-4"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[18px]">search</span><input class="w-full h-8 pl-9 pr-4 text-xs bg-surface-container-low rounded-lg text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-container transition-all" placeholder="Cerca" type="text"/></div></div><div class="flex items-center justify-end gap-1 min-w-[280px]"><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Suggerimenti / AI"><span class="material-symbols-outlined text-[19px]">lightbulb</span></button><button class="h-8 px-2.5 rounded-lg flex items-center gap-1 bg-primary text-on-primary hover:opacity-90 transition-opacity text-xs font-medium"><span class="material-symbols-outlined text-[16px]">add</span><span>Crea</span></button><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Ricerca avanzata"><span class="material-symbols-outlined text-[19px]">filter_list</span></button><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Impostazioni"><span class="material-symbols-outlined text-[19px]">settings</span></button><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Aiuto"><span class="material-symbols-outlined text-[19px]">help</span></button><div class="h-4 w-px bg-surface-container-high mx-1.5"></div><div class="flex items-center gap-2 pl-1 cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-semibold text-xs text-on-primary select-none" title="Marta Rossi">MR</div></div></div></header><aside class="fixed left-0 top-14 bottom-0 w-64 bg-surface-container-lowest z-40 flex flex-col justify-between shadow-[1px_0_6px_rgba(0,0,0,0.02)]"><div class="flex flex-col flex-1 overflow-y-auto pt-3 px-3"><div class="flex items-center justify-between px-2 mb-2"><button class="w-8 h-8 rounded flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Comprimi barra laterale"><span class="material-symbols-outlined text-[20px]">menu</span></button></div><nav class="flex flex-col gap-0.5" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="home" href="#"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px]">home</span><span>Home</span></div></a><div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface cursor-pointer transition-colors"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px]">schedule</span><span>Recenti</span></div><span class="material-symbols-outlined text-[16px]">expand_more</span></div><div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface cursor-pointer transition-colors"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px]">bookmark</span><span>Aggiunti</span></div><span class="material-symbols-outlined text-[16px]">expand_more</span></div><div class="pt-4 pb-1 px-2.5 text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider">Attività personali</div><a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[18px]">space_dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="impegni" href="#"><span class="material-symbols-outlined text-[18px]">task</span><span>Impegni</span></a><div class="pt-4 pb-1 px-2.5 text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider">Clienti</div><a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="aziende" href="#"><span class="material-symbols-outlined text-[18px]">domain</span><span>Aziende</span></a><a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="contatti" href="#"><span class="material-symbols-outlined text-[18px]">contacts</span><span>Contatti</span></a><a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="rel-aziende-contatti" href="#"><span class="material-symbols-outlined text-[18px]">hub</span><span>Rel. Aziende-Contatti</span></a><div class="pt-4 pb-1 px-2.5 text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider">Interazioni</div><a class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="lead" href="#"><span class="material-symbols-outlined text-[18px]">person_search</span><span>Lead</span></a><a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="manif-interesse" href="#"><span class="material-symbols-outlined text-[18px]">campaign</span><span>Manif. Interesse</span></a><a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="servizi" href="#"><span class="material-symbols-outlined text-[18px]">design_services</span><span>Servizi</span></a><div class="pt-4 pb-1 px-2.5 text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider">Entità di configurazione</div><a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="anagr-iniziative" href="#"><span class="material-symbols-outlined text-[18px]">assignment</span><span>Anagr. Iniziative</span></a></nav></div><div class="p-3 bg-surface-container-low"><div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-lowest shadow-[0_1px_4px_rgba(0,0,0,0.03)] cursor-pointer"><div class="flex flex-col"><span class="text-[10px] text-on-surface-variant uppercase tracking-wide">Area di lavoro</span><span class="text-xs font-semibold text-on-surface">Sales</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px]">unfold_more</span></div></div></aside><div class="pl-64"><main class="relative pt-14 min-h-screen bg-surface"><div class="flex flex-col w-full text-on-surface bg-surface min-h-full">
+<!-- Command Bar Superiore -->
+<div class="w-full bg-surface-container-lowest px-4 py-1.5 flex items-center justify-between shadow-[0_1px_3px_rgba(0,0,0,0.04)] select-none">
+<div class="flex items-center gap-1.5 flex-wrap">
+<!-- Pulsante primario '+ Nuovo' -->
+<button class="h-8 px-3 rounded bg-primary text-on-primary hover:opacity-95 active:scale-[0.99] transition-all flex items-center gap-1 text-xs font-semibold shadow-sm">
+<span class="material-symbols-outlined text-[17px] leading-none">add</span>
+<span>Nuovo</span>
+</button>
+<div class="h-4 w-px bg-surface-container-highest mx-1"></div>
+<!-- Ghost buttons orizzontali ben spaziati -->
+<div class="flex items-center gap-0.5">
+<button class="h-8 px-2.5 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[17px] text-on-surface-variant">bar_chart</span>
+<span>Mostra grafico</span>
+</button>
+<button class="h-8 px-2.5 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[17px] text-on-surface-variant">refresh</span>
+<span>Aggiorna</span>
+</button>
+<button class="h-8 px-2.5 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[17px] text-on-surface-variant">edit</span>
+<span>Modifica</span>
+</button>
+<button class="h-8 px-2.5 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[17px] text-on-surface-variant">person_add</span>
+<span>Assegna</span>
+</button>
+<button class="h-8 px-2.5 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[17px] text-on-surface-variant">delete</span>
+<span>Elimina</span>
+</button>
+<button class="h-8 px-2.5 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[17px] text-on-surface-variant">share</span>
+<span>Condividi</span>
+</button>
+<button class="h-8 px-2.5 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[17px] text-primary">table_view</span>
+<span>Esporta in Excel</span>
+</button>
+<button class="w-8 h-8 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center justify-center" title="Altre azioni">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Riga di Intestazione Vista (View Header) -->
+<div class="w-full px-5 pt-3.5 pb-2.5 flex items-center justify-between gap-4">
+<!-- Selettore vista e badge predefinito -->
+<div class="flex items-center gap-2.5">
+<div class="flex items-center gap-1 cursor-pointer group">
+<h1 class="text-lg font-bold text-on-surface tracking-tight group-hover:text-primary transition-colors">
+          Lead personali aperti
+        </h1>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
+</div>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-surface-container-high text-on-surface-variant">
+        Predefinito
+      </span>
+</div>
+<!-- Strumenti di visualizzazione a destra -->
+<div class="flex items-center gap-2">
+<!-- Ricerca compattata con shortcut -->
+<div class="relative flex items-center w-64">
+<span class="material-symbols-outlined absolute left-2.5 text-on-surface-variant text-[16px]">search</span>
+<input class="w-full h-8 pl-8 pr-12 text-xs bg-surface-container-lowest rounded text-on-surface placeholder:text-on-surface-variant shadow-sm focus:outline-none focus:bg-surface-container-low transition-all" placeholder="Cerca in questa vista" type="text"/>
+<kbd class="absolute right-2 px-1.5 py-0.5 text-[9px] font-mono text-on-surface-variant bg-surface-container rounded select-none shadow-[0_1px_1px_rgba(0,0,0,0.06)]">Ctrl+K</kbd>
+</div>
+<!-- Modifica colonne -->
+<button class="h-8 px-2.5 rounded bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1 text-xs font-medium shadow-sm">
+<span class="material-symbols-outlined text-[16px]">view_column</span>
+<span>Modifica colonne</span>
+</button>
+<!-- Modifica filtri -->
+<button class="h-8 px-2.5 rounded bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1 text-xs font-medium shadow-sm">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span>Modifica filtri</span>
+</button>
+</div>
+</div>
+<!-- Chip Filtri Rapidi -->
+<div class="w-full px-5 pb-3 flex items-center gap-1.5 overflow-x-auto">
+<button class="h-7 px-3 rounded-full bg-primary-container text-on-primary-container text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+<span>Aperti</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="font-bold text-[11px]">42</span>
+</button>
+<button class="h-7 px-3 rounded-full bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant text-xs font-medium flex items-center gap-1.5 shadow-sm transition-colors">
+<span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+<span>Interessato</span>
+<span class="text-[11px] text-on-surface-variant/80 font-semibold">18</span>
+</button>
+<button class="h-7 px-3 rounded-full bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant text-xs font-medium flex items-center gap-1.5 shadow-sm transition-colors">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+<span>Da contattare</span>
+<span class="text-[11px] text-on-surface-variant/80 font-semibold">11</span>
+</button>
+<button class="h-7 px-3 rounded-full bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant text-xs font-medium flex items-center gap-1.5 shadow-sm transition-colors">
+<span class="w-2 h-2 rounded-full bg-sky-600"></span>
+<span>In attesa di riscontro</span>
+<span class="text-[11px] text-on-surface-variant/80 font-semibold">13</span>
+</button>
+</div>
+<!-- Data Grid Container (100% width, no horizontal scroll, fixed proportions) -->
+<div class="w-full px-5 flex-1 pb-4">
+<div class="w-full bg-surface-container-lowest rounded-lg shadow-sm overflow-hidden flex flex-col">
+<table class="w-full table-fixed select-none text-left">
+<!-- Definizione larghezze colonne rigide per layout senza overflow -->
+<colgroup>
+<col class="w-[3%]"/>
+<col class="w-[25%]"/>
+<col class="w-[10%]"/>
+<col class="w-[12%]"/>
+<col class="w-[9%]"/>
+<col class="w-[13%]"/>
+<col class="w-[8%]"/>
+<col class="w-[9%]"/>
+<col class="w-[5.5%]"/>
+<col class="w-[5.5%]"/>
+</colgroup>
+<thead class="bg-surface-container-low text-on-surface-variant text-[11px] uppercase tracking-wider font-semibold">
+<tr class="h-9">
+<th class="px-2.5 text-center">
+<input class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</th>
+<th class="px-2 group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between min-w-0">
+<span class="truncate">Argomento</span>
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant/50 group-hover:text-on-surface">arrow_drop_down</span>
+</div>
+</th>
+<th class="px-2 group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between min-w-0">
+<span class="truncate">Contatto</span>
+<span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 text-on-surface-variant">arrow_drop_down</span>
+</div>
+</th>
+<th class="px-2 group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between min-w-0">
+<span class="truncate">Azienda</span>
+<span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 text-on-surface-variant">arrow_drop_down</span>
+</div>
+</th>
+<th class="px-2 group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between min-w-0">
+<span class="truncate">1° Macro Settore</span>
+<span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 text-on-surface-variant">arrow_drop_down</span>
+</div>
+</th>
+<th class="px-2 group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between min-w-0">
+<span class="truncate">Anagr. interesse</span>
+<span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 text-on-surface-variant">arrow_drop_down</span>
+</div>
+</th>
+<th class="px-2 group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between min-w-0">
+<span class="truncate">Proprietario</span>
+<span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 text-on-surface-variant">arrow_drop_down</span>
+</div>
+</th>
+<th class="px-2 group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between min-w-0">
+<span class="truncate">Stato lavorazione</span>
+<span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 text-on-surface-variant">arrow_drop_down</span>
+</div>
+</th>
+<th class="px-2 group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between min-w-0">
+<span class="truncate">Creazione</span>
+<span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 text-on-surface-variant">arrow_drop_down</span>
+</div>
+</th>
+<th class="px-2 group cursor-pointer hover:bg-surface-container bg-surface-container/60 transition-colors">
+<div class="flex items-center justify-between min-w-0 text-primary font-bold">
+<span class="truncate">Modifica</span>
+<span class="material-symbols-outlined text-[15px] leading-none">arrow_downward</span>
+</div>
+</th>
+</tr>
+</thead>
+<tbody class="text-xs divide-y divide-transparent">
+<!-- Riga 1 (SELEZIONATA) -->
+<tr class="h-11 bg-primary/5 hover:bg-primary/10 transition-colors">
+<td class="px-2.5 text-center">
+<input checked="" class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Interesse partecipazione B2B agroalimentare Stoccolma e apertura canale GDO nordica
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Giuseppe Molinari</td>
+<td class="px-2 truncate text-on-surface">Moltren Soc. Agr. Semplice</td>
+<td class="px-2 truncate text-on-surface-variant">Agroalimentare</td>
+<td class="px-2 truncate text-on-surface-variant">Missione Svezia - Wine 2025</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
+<span class="truncate">Interessato</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">14/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">10:15</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">24/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">16:40</div>
+</td>
+</tr>
+<!-- Riga 2 -->
+<tr class="h-11 hover:bg-surface-container-low transition-colors">
+<td class="px-2.5 text-center">
+<input class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Richiesta stand collettiva e supporto logistico fiera Hannover Messe padiglione Italia
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Ing. Laura Riva</td>
+<td class="px-2 truncate text-on-surface">Officine Meccaniche Riva S.r.l.</td>
+<td class="px-2 truncate text-on-surface-variant">Meccanica &amp; Meccatronica</td>
+<td class="px-2 truncate text-on-surface-variant">Missione Industriale Hannover 2025</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+<span class="truncate">Da contattare</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">15/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">09:40</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">24/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">15:20</div>
+</td>
+</tr>
+<!-- Riga 3 (SELEZIONATA) -->
+<tr class="h-11 bg-primary/5 hover:bg-primary/10 transition-colors">
+<td class="px-2.5 text-center">
+<input checked="" class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Consulenza doganale e certificazioni filati sostenibili esportazione verso New York
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Marco Brambilla</td>
+<td class="px-2 truncate text-on-surface">Lanificio Fratelli Biella SpA</td>
+<td class="px-2 truncate text-on-surface-variant">Moda &amp; Tessile</td>
+<td class="px-2 truncate text-on-surface-variant">Progetto Export Moda USA 2025</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-sky-50 text-sky-900 text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-sky-600 shrink-0"></span>
+<span class="truncate">In attesa di riscontro</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">16/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">14:10</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">23/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">18:05</div>
+</td>
+</tr>
+<!-- Riga 4 -->
+<tr class="h-11 hover:bg-surface-container-low transition-colors">
+<td class="px-2.5 text-center">
+<input class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Adesione workshop contrattualistica internazionale e matchmaking buyers GCC Dubai
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Elena Moretti</td>
+<td class="px-2 truncate text-on-surface">Studio Luce &amp; Arredo Milano</td>
+<td class="px-2 truncate text-on-surface-variant">Arredo &amp; Design</td>
+<td class="px-2 truncate text-on-surface-variant">Incoming Designers EAU 2025</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
+<span class="truncate">Interessato</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">17/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">11:30</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">23/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">11:15</div>
+</td>
+</tr>
+<!-- Riga 5 -->
+<tr class="h-11 hover:bg-surface-container-low transition-colors">
+<td class="px-2.5 text-center">
+<input class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Voucher digital export bando regionale Lombardia e check-up cybersecurity cloud
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Davide Ferri</td>
+<td class="px-2 truncate text-on-surface">TechSolutions Consulting Srl</td>
+<td class="px-2 truncate text-on-surface-variant">ICT &amp; Digitale</td>
+<td class="px-2 truncate text-on-surface-variant">Bando Digital Export 2025</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-outline shrink-0"></span>
+<span class="truncate">Nuovo</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">18/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">16:45</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">22/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">14:00</div>
+</td>
+</tr>
+<!-- Riga 6 -->
+<tr class="h-11 hover:bg-surface-container-low transition-colors">
+<td class="px-2.5 text-center">
+<input class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Supporto etichettatura FDA e partecipazione Foodex Tokyo con consorzio di tutela
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Chiara Esposito</td>
+<td class="px-2 truncate text-on-surface">Pastificio Artigianale Campano Srl</td>
+<td class="px-2 truncate text-on-surface-variant">Food &amp; Beverage</td>
+<td class="px-2 truncate text-on-surface-variant">Foodex Japan Edizione 2025</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+<span class="truncate">Da contattare</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">19/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">08:50</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">22/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">09:30</div>
+</td>
+</tr>
+<!-- Riga 7 -->
+<tr class="h-11 hover:bg-surface-container-low transition-colors">
+<td class="px-2.5 text-center">
+<input class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Accreditamento clinico dispositivi medici e partnership con cluster bavarese
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Dott. Roberto Bianchi</td>
+<td class="px-2 truncate text-on-surface">NovaBio Pharma Italia SpA</td>
+<td class="px-2 truncate text-on-surface-variant">Biotech &amp; Pharma</td>
+<td class="px-2 truncate text-on-surface-variant">Cluster Life Sciences Germania</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-sky-50 text-sky-900 text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-sky-600 shrink-0"></span>
+<span class="truncate">In attesa di riscontro</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">20/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">12:00</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">21/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">17:50</div>
+</td>
+</tr>
+<!-- Riga 8 -->
+<tr class="h-11 hover:bg-surface-container-low transition-colors">
+<td class="px-2.5 text-center">
+<input class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Consulenza per protocollo LEED e fornitura gres porcellanato per cantieri svizzeri
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Silvia Marchesi</td>
+<td class="px-2 truncate text-on-surface">Ceramiche Emiliane Group</td>
+<td class="px-2 truncate text-on-surface-variant">Edilizia &amp; Materiali</td>
+<td class="px-2 truncate text-on-surface-variant">Tavolo Edilizia Svizzera 2025</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
+<span class="truncate">Interessato</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">21/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">15:10</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">21/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">16:15</div>
+</td>
+</tr>
+<!-- Riga 9 -->
+<tr class="h-11 hover:bg-surface-container-low transition-colors">
+<td class="px-2.5 text-center">
+<input class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Progetto automazione industriale e integrazione linee robotizzate fiera SPS Norimberga
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Andrea Colombo</td>
+<td class="px-2 truncate text-on-surface">Robotics Dynamics Srl</td>
+<td class="px-2 truncate text-on-surface-variant">Meccanica &amp; Meccatronica</td>
+<td class="px-2 truncate text-on-surface-variant">SPS IPC Drives Norimberga</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+<span class="truncate">Da contattare</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">21/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">17:05</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">21/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">17:30</div>
+</td>
+</tr>
+<!-- Riga 10 -->
+<tr class="h-11 hover:bg-surface-container-low transition-colors">
+<td class="px-2.5 text-center">
+<input class="rounded accent-primary w-3.5 h-3.5 cursor-pointer align-middle" type="checkbox"/>
+</td>
+<td class="px-2 min-w-0">
+<a class="font-medium text-primary hover:underline line-clamp-2 leading-tight" href="#">
+                Richiesta inserimento catalogo vini biologici per buyer delegazione Regno Unito
+              </a>
+</td>
+<td class="px-2 truncate font-medium text-on-surface">Giulia Fontana</td>
+<td class="px-2 truncate text-on-surface">Vigneti &amp; Cantine Salentine</td>
+<td class="px-2 truncate text-on-surface-variant">Agroalimentare</td>
+<td class="px-2 truncate text-on-surface-variant">Incoming Wine Buyers UK 2025</td>
+<td class="px-2">
+<div class="flex items-center gap-1.5 truncate">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center shrink-0">MR</div>
+<span class="truncate text-on-surface">M. Rossi</span>
+</div>
+</td>
+<td class="px-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-medium leading-normal">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
+<span class="truncate">Interessato</span>
+</span>
+</td>
+<td class="px-2 text-on-surface-variant leading-none">
+<div class="text-[11px] font-medium">22/02/2025</div>
+<div class="text-[10px] opacity-75 mt-0.5">10:00</div>
+</td>
+<td class="px-2 text-on-surface leading-none font-medium">
+<div class="text-[11px]">22/02/2025</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">10:00</div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Footer della Griglia -->
+<div class="w-full px-4 py-2.5 bg-surface-container-low flex items-center justify-between text-xs text-on-surface-variant select-none">
+<div class="flex items-center gap-3">
+<span class="font-medium text-on-surface">1 - 42 di 42 record</span>
+<span class="h-3 w-px bg-surface-container-highest"></span>
+<div class="flex items-center gap-1.5">
+<span class="px-1.5 py-0.5 rounded bg-primary-container text-on-primary-container font-semibold text-[11px]">2 selezionati</span>
+<button class="text-primary hover:underline font-medium text-[11px] ml-1">Deseleziona tutti</button>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5">
+<span>Righe per pagina:</span>
+<div class="flex items-center gap-0.5 px-2 py-1 rounded bg-surface-container-lowest shadow-sm font-semibold text-on-surface cursor-pointer">
+<span>50</span>
+<span class="material-symbols-outlined text-[14px]">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-medium text-on-surface">Pagina 1 di 1</span>
+<div class="flex items-center gap-0.5">
+<button class="w-6 h-6 rounded flex items-center justify-center text-on-surface-variant/40 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[16px]">first_page</span>
+</button>
+<button class="w-6 h-6 rounded flex items-center justify-center text-on-surface-variant/40 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="w-6 h-6 rounded flex items-center justify-center text-on-surface-variant/40 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+<button class="w-6 h-6 rounded flex items-center justify-center text-on-surface-variant/40 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[16px]">last_page</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>
