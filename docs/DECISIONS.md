@@ -115,3 +115,10 @@ features would let the demo show a table that nothing in the pipeline computed.
 ## Plan v2 decisions (recorded 2026-11-19)
 
 Q1 CRM becomes the shell; ML screens move under `/previsioni`. Q2 slim committed DB for serving, full DB local for training. Q3 GitHub Pages for the free showcase (done); Vercel Hobby still preferred for previews + serverless once a token exists. Q4 both stories in the pitch. Handover: `docs/NEXT_SESSION.md`.
+
+## T12 — CRM schema (recorded 2026-11-19)
+
+- The CRM entities live in a `crm_` namespace in `data/crm_schema.sql`: `crm_companies`, `crm_contacts`, `crm_company_contacts`, `crm_initiatives`, `crm_leads`, `crm_activities`, `crm_lead_statuses`. `api/migrations/apply.py` applies them once per database and records the version in `crm_schema_migrations`; `api/tests/test_crm_schema.py` snapshots every non-CRM table before and after to prove the ML schema is untouched.
+- `crm_leads` is in T12 even though B1's name list stops at five entities: B2's rules — configurable status table, `UNIQUE(Contatto, Iniziativa)`, closing date, owner default — have no target otherwise, and the ML `leads` table has a closed enum and must stay untouched. The two lead tables are deliberately separate, not synced.
+- `Manifestazione di Interesse` (spec §3.5), `Servizio` (spec §3.7) and the reference catalogues (province, macro sectors, sectors, tipologie, fonti, posizioni) are not in B1. Their columns are TEXT so no catalogue is invented while spec §16.2 is open; the lanes that need them add them.
+- Owner/team columns are TEXT: there is no users/teams table yet, so the spec's owner defaults and RBAC (§10) remain a documented gap rather than stub tables.
