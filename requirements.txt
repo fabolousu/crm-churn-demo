@@ -1,36 +1,9 @@
-# Dependencies for the demo. Lanes append their own; keep this list minimal.
-# Lane A / B1 used the standard library only, so this started with the test runner.
+# Runtime-only dependencies for the Vercel serverless function (api/index.py).
+# The function serves /api/health and /api/pipeline from a precomputed slim DB;
+# it does NOT import the ML stack (numpy, pandas, lightgbm, shap, etc.).
 #
-# Lane B2 (ml/train.py, ml/explain.py) adds the modelling stack:
-#   lightgbm     the lead-win classifier (native NaN handling; no imputation)
-#   shap         TreeSHAP contributions behind drivers_json and the explainer
-#   pandas       reading lead_features / writing scores in one batch
-#   numpy        metrics and array plumbing
-#   scikit-learn roc_auc_score, the AUC both the metrics and the gate are stated in
-#   joblib       ml/artifacts/model.joblib
-#   pyarrow      the parquet engine for ml/artifacts/shap_sample.parquet; pandas needs one,
-#                and pinning it here is what makes the committed artifact readable on CI
-
-pytest>=8.0
-
-lightgbm>=4.3
-shap>=0.45
-pandas>=2.2
-numpy>=1.26
-scikit-learn>=1.4
-joblib>=1.3
-pyarrow>=15.0
-
-# Lane C (api/app.py + contract tests) adds the service stack:
-#   fastapi      the HTTP layer; Pydantic models mirror api/openapi.yaml component-for-component
-#   uvicorn      the ASGI server the demo runs behind
-#   httpx        FastAPI's TestClient transport, so the contract tests exercise real requests
-#   jsonschema   validates every response against api/openapi.yaml (no hand-written field lists)
-#   pyyaml       reads the OpenAPI contract; it is a YAML file
+# For local development and CI, install requirements-dev.txt instead:
+#   pip install -r requirements-dev.txt
 
 fastapi>=0.110.1
 pydantic>=2.0,<3
-uvicorn>=0.29
-httpx>=0.27
-jsonschema>=4.21
-pyyaml>=6.0

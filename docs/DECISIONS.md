@@ -115,3 +115,7 @@ features would let the demo show a table that nothing in the pipeline computed.
 ## Plan v2 decisions (recorded 2026-11-19)
 
 Q1 CRM becomes the shell; ML screens move under `/previsioni`. Q2 slim committed DB for serving, full DB local for training. Q3 GitHub Pages for the free showcase (done); Vercel Hobby still preferred for previews + serverless once a token exists. Q4 both stories in the pitch. Handover: `docs/NEXT_SESSION.md`.
+
+## T16 vendor fallback (recorded 2026-11-19)
+
+T16 (Vercel serverless API lane) was initially assigned to the Gemini 3.8 Flash model. That run died with no files and no message; a probe of the session returned only session-init output with zero authored content. Per the documented "Gemini lanes re-runnable on Anthropic" limitation in `docs/ORCHESTRATION.md`, the lane was re-run on Anthropic Claude Sonnet (claude-sonnet-4-6). This is recorded here rather than silently accepted: the authoring model changed mid-lane, and CodeRabbit remains the independent primary reviewer for all code introduced in this lane (it did not participate in authorship). The deliverables — `api/serverless.py`, `api/index.py`, `scripts/build_slim_db.py`, `api/tests/test_serverless.py`, and the dependency split — were written entirely in the Anthropic fallback run.
