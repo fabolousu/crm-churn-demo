@@ -29,15 +29,7 @@ jobs:
             exit 0
           fi
 
-          host=${DEPLOYMENT_URL#https://}
-          host=${host%%/*}
-          case "$host" in
-            crm-churn-demo.vercel.app|crm-churn-demo-*-promos6.vercel.app) ;;
-            *)
-              echo "::notice::Deployment host '$host' is not a project host; skipping."
-              exit 0
-              ;;
-          esac
+          host=$(python3 ./scripts/validate_deployment_url.py "$DEPLOYMENT_URL") || { echo "::notice::Deployment URL is not an approved project HTTPS URL; skipping."; exit 0; }
 
           if [ "$host" != "crm-churn-demo.vercel.app" ] && [ -z "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
             echo "::notice::Preview deployment detected but VERCEL_AUTOMATION_BYPASS_SECRET is not set. Skipping."

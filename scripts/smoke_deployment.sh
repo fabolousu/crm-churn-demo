@@ -17,22 +17,16 @@ BASE_URL=${BASE_URL%/}
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
 # The bypass secret is only ever sent to this project's own Vercel hosts. A deployment
-# status can carry an attacker-supplied URL, so validate before the first request.
+# status can carry an attacker-supplied URL, so validate it (scheme, credentials,
+# query, fragment, hostname) before the first request.
 if [ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
-  if [[ "$BASE_URL" != https://* ]]; then
-    echo "FAIL: refusing to send the bypass secret over a non-HTTPS URL: $BASE_URL"
+  if ! python3 "$SCRIPT_DIR/validate_deployment_url.py" "$BASE_URL" >/dev/null; then
+    echo "FAIL: refusing to send the bypass secret to an unapproved URL: $BASE_URL"
     exit 1
   fi
-  HOST=${BASE_URL#https://}
-  HOST=${HOST%%/*}
-  case "$HOST" in
-    crm-churn-demo.vercel.app|crm-churn-demo-*-promos6.vercel.app) ;;
-    *)
-      echo "FAIL: refusing to send the bypass secret to an unapproved host: $HOST"
-      exit 1
-      ;;
-  esac
 fi
 
 echo "Testing $BASE_URL..."
