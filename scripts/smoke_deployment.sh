@@ -13,8 +13,27 @@ fi
 # Remove trailing slash
 BASE_URL=${BASE_URL%/}
 
-# Always clean up the response files, including on a failed attempt.
-trap 'rm -f response.json pipeline.json' EXIT
+# Response files live in a per-invocation directory; never touch caller files.
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+# The bypass secret is only ever sent to this project's own Vercel hosts. A deployment
+# status can carry an attacker-supplied URL, so validate before the first request.
+if [ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
+  if [[ "$BASE_URL" != https://* ]]; then
+    echo "FAIL: refusing to send the bypass secret over a non-HTTPS URL: $BASE_URL"
+    exit 1
+  fi
+  HOST=${BASE_URL#https://}
+  HOST=${HOST%%/*}
+  case "$HOST" in
+    crm-churn-demo.vercel.app|crm-churn-demo-*-promos6.vercel.app) ;;
+    *)
+      echo "FAIL: refusing to send the bypass secret to an unapproved host: $HOST"
+      exit 1
+      ;;
+  esac
+fi
 
 echo "Testing $BASE_URL..."
 
@@ -29,9 +48,9 @@ run_curl() {
     
     # Check if bypass secret is set
     if [ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
-      response=$(curl -sS --max-time 20 -w "%{http_code}" -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" -o response.json "$url") || response="000"
+      response=$(curl -sS --max-time 20 -w "%{http_code}" -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" -o "$TMP_DIR/response.json" "$url") || response="000"
     else
-      response=$(curl -sS --max-time 20 -w "%{http_code}" -o response.json "$url") || response="000"
+      response=$(curl -sS --max-time 20 -w "%{http_code}" -o "$TMP_DIR/response.json" "$url") || response="000"
     fi
     
     if [ "$response" -eq 200 ]; then
@@ -52,7 +71,7 @@ if ! run_curl "$BASE_URL/"; then
   echo "FAIL: GET / failed"
   exit 1
 fi
-if ! grep -q 'id="root"' response.json; then
+if ! grep -q 'id="root"' "$TMP_DIR/response.json"; then
   echo "FAIL: Root page does not contain id='root'"
   exit 1
 fi
@@ -65,7 +84,7 @@ if ! run_curl "$BASE_URL/api/health"; then
   exit 1
 fi
 # Use python3 to verify JSON status
-status=$(python3 -c "import json, sys; print(json.load(sys.stdin).get('status'))" < response.json)
+status=$(python3 -c "import json, sys; print(json.load(sys.stdin).get('status'))" < "$TMP_DIR/response.json")
 echo "Status: $status"
 if [[ "$status" != "ok" && "$status" != "degraded" ]]; then
   echo "FAIL: Invalid status: $status"
@@ -79,8 +98,8 @@ if ! run_curl "$BASE_URL/api/pipeline?limit=1"; then
   echo "FAIL: GET /api/pipeline?limit=1 failed"
   exit 1
 fi
-total=$(python3 -c "import json, sys; print(json.load(sys.stdin).get('total'))" < response.json)
-items_len=$(python3 -c "import json, sys; print(len(json.load(sys.stdin).get('items')))" < response.json)
+total=$(python3 -c "import json, sys; print(json.load(sys.stdin).get('total'))" < "$TMP_DIR/response.json")
+items_len=$(python3 -c "import json, sys; print(len(json.load(sys.stdin).get('items')))" < "$TMP_DIR/response.json")
 
 if [ "$total" -gt 0 ] && [ "$items_len" -eq 1 ]; then
   echo "PASS: /api/pipeline?limit=1"

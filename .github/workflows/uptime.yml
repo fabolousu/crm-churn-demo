@@ -9,6 +9,11 @@ permissions:
   contents: read
   issues: write
 
+# Serialize runs so an older success cannot close an issue a newer failure created.
+concurrency:
+  group: uptime-monitor
+  cancel-in-progress: false
+
 jobs:
   uptime:
     runs-on: ubuntu-latest
