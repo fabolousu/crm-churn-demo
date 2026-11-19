@@ -61,8 +61,8 @@ The main checkout is on `lane/t16-cleanup` and clean. `lane/d8-d9-ops` is checke
 the worktree `C:\Users\pilad\OneDrive\Documenti\deepseek-harness\default-workspace\wt-d8-d9`.
 Older worktrees `wt-b2-training`, `wt-c-api`, `wt-d-ui` exist from previous sessions.
 
-`HANDOFF.md` is currently **untracked**. Commit it on a docs branch
-(`[skip ci]` is appropriate for a docs-only commit) — do not fold it into #11 or #12.
+`HANDOFF.md` is committed on `lane/handoff-doc` (PR #13, docs-only, `[skip ci]`); it is
+not part of #11 or #12. Merge it independently at any time.
 
 ### Open PRs — all MERGEABLE
 
