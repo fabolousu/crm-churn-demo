@@ -23,7 +23,13 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 # status can carry an attacker-supplied URL, so validate it (scheme, credentials,
 # query, fragment, hostname) before the first request.
 if [ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
-  if ! python3 "$SCRIPT_DIR/validate_deployment_url.py" "$BASE_URL" >/dev/null; then
+  validation=0
+  python3 "$SCRIPT_DIR/validate_deployment_url.py" "$BASE_URL" >/dev/null || validation=$?
+  if [ "$validation" -eq 2 ]; then
+    echo "FAIL: cannot verify that this preview belongs to the project (VERCEL_TOKEN missing or API unreachable): $BASE_URL"
+    exit 1
+  fi
+  if [ "$validation" -ne 0 ]; then
     echo "FAIL: refusing to send the bypass secret to an unapproved URL: $BASE_URL"
     exit 1
   fi

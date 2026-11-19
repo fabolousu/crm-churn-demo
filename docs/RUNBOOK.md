@@ -121,7 +121,7 @@ find it before the room does.
 
 ## Deploy, smoke, roll back
 
-- **Pre-merge**: Open the PR preview, then run the smoke script against it (`./scripts/smoke_deployment.sh <preview-url>`). If the preview is protected by Vercel Authentication, export `VERCEL_AUTOMATION_BYPASS_SECRET` first; the script sends it as the bypass header.
+- **Pre-merge**: Open the PR preview, then run `./scripts/smoke_deployment.sh <preview-url>`. For a Vercel-Authentication-protected preview, export both `VERCEL_AUTOMATION_BYPASS_SECRET` (sent as the bypass header) and `VERCEL_TOKEN` (used to prove the deployment belongs to this Vercel project; it must have access to the project). Production smoke needs neither variable.
 - **After merge**: The automated job `deployment-smoke.yml` will smoke test production. If the uptime monitor fails, a GitHub issue titled `Uptime alert: production API` will be created with the failing URL/status. Check the issue status to see if it has been resolved automatically.
 - **Rollback**: Vercel Dashboard → Deployments → Select previous production deployment → Promote/Rollback, or run `vercel rollback <url>`.
 - **Last-known-good deployment**: `dpl_Fv2TG1iXNRLqQX6CkC1usyLzsr73` (production at 2026-11-19 20:01, the T16 merge). Promote/roll back to it if a later deploy misbehaves.

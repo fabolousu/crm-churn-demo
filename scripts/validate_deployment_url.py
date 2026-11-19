@@ -26,10 +26,11 @@ PREVIEW_SUFFIX = "-promos6.vercel.app"
 VERCEL_API = "https://api.vercel.com/v13/deployments/"
 
 
-def _project_owns(host: str) -> bool:
+def _project_owns(host: str) -> bool | None:
+    """True/False for ownership, None when the check itself could not run."""
     token = os.environ.get("VERCEL_TOKEN")
     if not token:
-        return False
+        return None
     request = urllib.request.Request(
         VERCEL_API + urllib.parse.quote(host, safe=""),
         headers={"Authorization": f"Bearer {token}"},
@@ -38,33 +39,36 @@ def _project_owns(host: str) -> bool:
         with urllib.request.urlopen(request, timeout=15) as response:
             payload = json.load(response)
     except Exception:
-        return False
+        return None
     return payload.get("projectId") == PROJECT_ID
 
 
-def validate(raw: str) -> str | None:
+def validate(raw: str) -> tuple[int, str | None]:
+    """Return (exit_code, host). 0 allowed, 1 unrelated/unapproved, 2 verification failed."""
     parsed = urllib.parse.urlsplit(raw)
     host = (parsed.hostname or "").lower()
     if parsed.scheme != "https" or parsed.username or parsed.password:
-        return None
+        return 1, None
     if parsed.query or parsed.fragment:
-        return None
+        return 1, None
     if host == PROJECT_HOST:
-        return host
+        return 0, host
     if not (host.startswith(PREVIEW_PREFIX) and host.endswith(PREVIEW_SUFFIX)):
-        return None
-    return host if _project_owns(host) else None
+        return 1, None
+    owned = _project_owns(host)
+    if owned is None:
+        return 2, None
+    return (0, host) if owned else (1, None)
 
 
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
         print("usage: validate_deployment_url.py <url>", file=sys.stderr)
         return 2
-    host = validate(argv[1])
-    if host is None:
-        return 1
-    print(host)
-    return 0
+    code, host = validate(argv[1])
+    if code == 0 and host is not None:
+        print(host)
+    return code
 
 
 if __name__ == "__main__":

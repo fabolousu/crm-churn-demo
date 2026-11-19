@@ -30,7 +30,16 @@ jobs:
             exit 0
           fi
 
-          host=$(python3 ./scripts/validate_deployment_url.py "$DEPLOYMENT_URL") || { echo "::notice::Deployment URL is not an approved project HTTPS URL; skipping."; exit 0; }
+          validation=0
+          host=$(python3 ./scripts/validate_deployment_url.py "$DEPLOYMENT_URL") || validation=$?
+          if [ "$validation" -eq 2 ]; then
+            echo "::error::Cannot verify the deployment belongs to this project (VERCEL_TOKEN missing or Vercel API unreachable)."
+            exit 1
+          fi
+          if [ "$validation" -ne 0 ]; then
+            echo "::notice::Deployment URL is not an approved project HTTPS URL; skipping."
+            exit 0
+          fi
 
           if [ "$host" != "crm-churn-demo.vercel.app" ] && [ -z "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
             echo "::notice::Preview deployment detected but VERCEL_AUTOMATION_BYPASS_SECRET is not set. Skipping."
