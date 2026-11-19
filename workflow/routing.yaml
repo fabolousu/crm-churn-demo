@@ -120,6 +120,66 @@ tasks:
     parallel_group: 5
     why: "writing quality is the deliverable"
 
+  - id: T12-crm-schema
+    scope: "api/migrations/, data/crm_schema.sql"
+    agent: crm-backend
+    model: anthropic
+    tier: reasoning
+    reviewer: verifier
+    gate: "migration applies; all pre-existing tests stay green; ML tables untouched"
+    parallel_group: 1
+    why: "irreversible shape; every CRM lane codes against it"
+
+  - id: T13-crm-rules
+    scope: "api/crm/, api/tests/test_crm_rules.py"
+    agent: crm-backend
+    model: anthropic
+    tier: workhorse
+    reviewer: verifier
+    gate: "spec section 15.1 acceptance tests for status/uniqueness/auto-link pass"
+    parallel_group: 2
+    why: "business rules whose intent tests do not capture"
+
+  - id: T14-seed
+    scope: "data/crm_seed.py, data/tests/test_crm_seed.py"
+    agent: data-seeder
+    model: deepseek
+    tier: bulk
+    reviewer: verifier
+    gate: "deterministic from seed; row counts asserted; schema-valid"
+    parallel_group: 2
+    why: "mechanical generation, fully diffable"
+
+  - id: T15-crm-ui
+    scope: "web/src/crm/"
+    agent: crm-frontend
+    model: anthropic
+    tier: workhorse
+    reviewer: verifier
+    gate: "build passes; every P0 inventory row has a component"
+    parallel_group: 3
+    why: "taste and executive legibility"
+
+  - id: T16-vercel
+    scope: "vercel.json, api/index.py, scripts/build_slim_db.py"
+    agent: vercel-engineer
+    model: google
+    tier: workhorse
+    reviewer: pr-reviewer
+    gate: "preview deploy serves /api/health and one end-to-end request"
+    parallel_group: 3
+    why: "infrastructure config, verifiable by the deploy itself"
+
+  - id: T17-verify
+    scope: "docs/VERIFICATION_REPORT.md"
+    agent: verifier
+    model: google
+    tier: workhorse
+    reviewer: human
+    gate: "every claim checked against a commit or test run, not a lane summary"
+    parallel_group: 4
+    why: "independent family from the authors it audits"
+
 escalation:
   - trigger: "gate fails once"
     action: "same agent retries with the failure output attached"
