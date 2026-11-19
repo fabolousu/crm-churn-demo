@@ -27,6 +27,29 @@ import { usePipeline } from "../state/PipelineProvider";
 
 const CALIBRATION_DOMAIN: [number, number] = [0, 0.7];
 
+/** Decorative calibration point: a plain circle, not an unlabelled role="img" SVG. */
+function CalibrationDot({
+  cx,
+  cy,
+  fill,
+}: {
+  cx?: number;
+  cy?: number;
+  fill?: string;
+}) {
+  if (cx === undefined || cy === undefined) return <g />;
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={4.5}
+      fill={fill ?? "#0F6B5C"}
+      stroke="#FFFFFF"
+      strokeWidth={1.5}
+    />
+  );
+}
+
 export default function PortfolioPage() {
   const { portfolio, health, pipeline } = usePipeline();
   const prevalence =
@@ -356,7 +379,12 @@ export default function PortfolioPage() {
               title="Does 34% mean 34%?"
               hint="Predicted win rate against what actually happened, in ten decile bins."
             />
-            <div className="h-[290px] w-full">
+            <div
+              className="h-[290px] w-full"
+              role="img"
+              aria-label="Calibration chart: predicted win rate against the rate actually observed, in ten decile bins. Points close to the diagonal mean the model is calibrated."
+            >
+              <div aria-hidden="true" className="h-full w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart
                   margin={{ top: 8, right: 18, bottom: 8, left: 0 }}
@@ -403,10 +431,12 @@ export default function PortfolioPage() {
                     fillOpacity={0.85}
                     stroke="#FFFFFF"
                     strokeWidth={1.5}
+                    shape={<CalibrationDot />}
                     isAnimationActive={false}
                   />
                 </ScatterChart>
               </ResponsiveContainer>
+              </div>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] text-muted">
               <span className="inline-flex items-center gap-1.5">

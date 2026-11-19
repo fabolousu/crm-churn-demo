@@ -688,7 +688,7 @@ function QueueSnapshot({
               <span
                 className={cn(
                   "w-6 font-display text-[13px] tabular-nums",
-                  acted ? "text-accent" : "text-muted/70",
+                  acted ? "text-accent" : "text-muted",
                 )}
               >
                 #{rank}

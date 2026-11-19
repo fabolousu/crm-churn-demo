@@ -54,7 +54,7 @@ export default function RegionFilter({
             <span
               className={cn(
                 "ml-2 text-[10px] tabular-nums",
-                active ? "text-paper/55" : "text-muted/70",
+                active ? "text-paper/55" : "text-muted",
               )}
             >
               {option.count.toLocaleString("en-GB")}

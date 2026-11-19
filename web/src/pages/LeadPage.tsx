@@ -338,7 +338,7 @@ export default function LeadPage() {
                     className="flex h-full flex-col p-5"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-display text-[13px] text-muted/70">
+                      <span className="font-display text-[13px] text-muted">
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <span
