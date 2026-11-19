@@ -17,3 +17,5 @@ reports/
 Thumbs.db
 .tmp/
 web/dist/
+.vercel
+.env*
