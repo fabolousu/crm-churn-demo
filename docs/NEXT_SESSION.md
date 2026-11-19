@@ -1,5 +1,9 @@
 # Start here — handover for the next session
 
+> **Read [`docs/MIGRATION_SPEC.md`](MIGRATION_SPEC.md) first.** It supersedes this file as the
+> entry point: it carries the product context, the review hierarchy (CodeRabbit is the primary
+> reviewer), the team roster, every gate, the environment quirks and the first-hour sequence.
+
 Written at `bacfa18`. The next session starts with **no memory of the conversation that
 produced this repo**, so everything load-bearing is in files.
 

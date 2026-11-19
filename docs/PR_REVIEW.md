@@ -9,6 +9,19 @@ one tool that claims to catch everything is one tool that can be argued with.
 | **2. Line-level** | CodeRabbit (GitHub app) | The diff | Findings at `major` or above (`coderabbit review --agent --gate major`) |
 | **3. Judgement** | `pr-reviewer` agent, then a human | The diff **and** the contract | Contract violations, hollow tests, demo impact, scope creep |
 
+## Authority order (do not invert)
+
+1. **CodeRabbit is the primary reviewer.** Its CLI exit code (`tools/review.ps1`) is the
+   blocking gate on the exact commit to be merged. Exit `2` blocks; exit `1` means the review
+   was incomplete and also blocks; exit `3` means unavailable and blocks too.
+2. **The `pr-reviewer` agent triages.** It reads CodeRabbit's findings, separates real
+   defects from noise, assigns them, re-runs the gate — and posts `--comment` or
+   `--request-changes`. It never approves, and it does not outrank the tool.
+3. **The human approves and merges.** The only approval that counts.
+
+CodeRabbit's autofix must stay off: it once authored a commit into a PR branch, which makes
+the reviewer an author and voids its independence.
+
 ## Why the third layer is a separate agent
 
 CodeRabbit reads the diff. It cannot know that `tickets_90d` must exclude rows after the
