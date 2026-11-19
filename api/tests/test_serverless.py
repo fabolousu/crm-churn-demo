@@ -1,4 +1,4 @@
-"""Tests for ``api/serverless.py`` — the slim Vercel serverless entry point.
+"""Tests for ``serverless/app.py`` — the slim Vercel serverless entry point.
 
 Uses a temporary SQLite database with the real schema, a small set of planted rows,
 and a precomputed ``lead_leverage`` table so the full ML stack is never imported here.
@@ -237,11 +237,11 @@ def api(slim_db: Path) -> TestClient:
     """TestClient with CRM_DB_PATH pointing at the temp DB.
 
     Sets ``CRM_DB_PATH`` in ``os.environ`` directly (module scope; no monkeypatch).
-    ``api.serverless._db_path()`` reads the env var at call time, so there is no
+    ``serverless.app._db_path()`` reads the env var at call time, so there is no
     need to reload the module.
     """
     os.environ["CRM_DB_PATH"] = str(slim_db)
-    from api.serverless import app as serverless_app
+    from serverless.app import app as serverless_app
     return TestClient(serverless_app)
 
 
@@ -278,7 +278,7 @@ def test_health_degraded_on_missing_db(tmp_path: Path, monkeypatch: pytest.Monke
     """When the DB does not exist, /api/health returns 200 with status=degraded."""
     monkeypatch.setenv("CRM_DB_PATH", str(tmp_path / "nonexistent.db"))
     # _db_path() reads the env var at call time, so we just create a fresh TestClient.
-    from api.serverless import app as serverless_app
+    from serverless.app import app as serverless_app
     client = TestClient(serverless_app)
     response = client.get("/api/health")
     assert response.status_code == 200
@@ -438,3 +438,45 @@ def test_pipeline_empty_region_returns_zero(api: TestClient) -> None:
     body = api.get("/api/pipeline", params={"region": "isole"}).json()
     assert body["total"] == 0
     assert body["items"] == []
+
+
+# ---------------------------------------------------------------------------
+# D7 guardrails: validation, surface reductions, headers
+# ---------------------------------------------------------------------------
+
+
+def test_pipeline_limit_below_min_is_422(api: TestClient) -> None:
+    assert api.get("/api/pipeline", params={"limit": 0}).status_code == 422
+
+
+def test_pipeline_min_probability_out_of_range_is_422(api: TestClient) -> None:
+    assert api.get("/api/pipeline", params={"min_probability": 1.5}).status_code == 422
+
+
+def test_pipeline_unknown_region_is_422(api: TestClient) -> None:
+    assert api.get("/api/pipeline", params={"region": "atlantide"}).status_code == 422
+
+
+def test_generated_docs_are_not_exposed(api: TestClient) -> None:
+    assert api.get("/docs").status_code == 404
+    assert api.get("/openapi.json").status_code == 404
+
+
+def test_security_headers_present(api: TestClient) -> None:
+    response = api.get("/api/health")
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["referrer-policy"] == "no-referrer"
+
+
+def test_cors_allows_the_deployed_origin(api: TestClient) -> None:
+    response = api.get(
+        "/api/health", headers={"Origin": "https://crm-churn-demo.vercel.app"}
+    )
+    assert response.headers.get("access-control-allow-origin") == (
+        "https://crm-churn-demo.vercel.app"
+    )
+
+
+def test_cors_rejects_an_unknown_origin(api: TestClient) -> None:
+    response = api.get("/api/health", headers={"Origin": "https://evil.example"})
+    assert "access-control-allow-origin" not in response.headers
