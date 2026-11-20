@@ -5,6 +5,31 @@ supersedes `docs/MIGRATION_SPEC.md` as the *current* state; read both, in this o
 this file first, then `MIGRATION_SPEC.md` for product/history. It is specific on purpose:
 a fresh agent should not have to rediscover any of it.
 
+> **Status update, 2026-11-20 00:58 — the merge step described below is done.** PRs #9,
+> #10, #11 and #12 were merged into `main` (tip `562e877`) in the recommended order. §0–§4
+> keep the pre-merge narrative for context; the current facts are:
+>
+> - `main` is `562e877`. CI is green, GitHub Pages deployed, production healthy.
+> - Verified after the merges: `/api/health` → `status=ok`; `/api/pipeline?limit=2` →
+>   `total=2000`, `total_expected_value=77095687.31`; `/`, `/portfolio`, `/queue` → 200.
+>   The `uptime.yml` dispatch run succeeded. The production `deployment_status` smoke run
+>   passed; the three "skipped" runs on `main` are the pending/in_progress transitions,
+>   which the job-level `if` is meant to skip.
+> - Local `pytest` on merged `main`: **191 passed**. On a Linux sandbox it needs
+>   `SQLITE_TMPDIR="$PWD/.tmp"`; without it 12 generator tests error with
+>   `sqlite3.OperationalError: unable to open database file`, because SQLite's on-disk temp
+>   files under `/tmp` are blocked by confinement — the code is fine (CI passes).
+> - Web: CI `web build` green. `pnpm --dir web check:ui` is **not** wired into CI and was
+>   not runnable in this session (no pnpm/Chrome); the D1 gate passed on #10 pre-merge.
+> - That session ran on Linux with **no** `pwsh`, `vercel` CLI, CodeRabbit CLI or Vercel
+>   token, so the CodeRabbit CLI gate and the D9 bypass-secret work stayed blocked. Use
+>   the Windows box for those.
+> - `docs/DECISIONS.md` now holds the sections in the order the handoff prescribed:
+>   T12, D7, D8/D9.
+> - Still open: T13, T14, T15, T17 (Gemini), `VERCEL_AUTOMATION_BYPASS_SECRET`, the
+>   CodeRabbit paid key, the two #12 minors + the #9 `NOT NULL` minor, and the dead
+>   `api/app.py` Vercel function.
+
 ---
 
 ## 0. First five minutes
