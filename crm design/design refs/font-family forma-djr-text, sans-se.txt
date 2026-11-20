@@ -1,0 +1,31 @@
+font-family: forma-djr-text, sans-serif;
+font-size: 18px;
+font-weight: 400;
+line-height: 27px;
+color: #005eb8;
+
+
+font-family: forma-djr-text, sans-serif;
+font-size: 14px;
+font-weight: 700;
+line-height: 18px;
+color: #005eb8;
+
+font-family: PowerGrotesk, sans-serif;
+font-size: 60px;
+font-weight: 500;
+line-height: 66px;
+color: #fff;
+
+
+font-family: PowerGrotesk, sans-serif;
+font-size: 60px;
+font-weight: 500;
+line-height: 66px;
+color: #fff;
+
+font-family: forma-djr-micro;
+font-size: 18px;
+font-weight: 700;
+line-height: 20px;
+color: #19242e;

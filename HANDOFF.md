@@ -309,7 +309,7 @@ Never commit it or paste it into chat.
 | `docs/RUNBOOK.md` | Demo run, deploy/smoke/rollback, last-known-good |
 | `docs/MIGRATION_SPEC.md` | Original handover; setup/env facts |
 | `docs/UI_FEATURE_INVENTORY.md` | P0/P1/P2 rows and gaps |
-| `crm design/CRM_Sales_Module_Rebuild_Spec.md` | 509-line functional spec |
+| `crm design/design refs/CRM_Sales_Module_Rebuild_Spec.md` | 509-line functional spec |
 
 ---
 
