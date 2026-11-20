@@ -5,11 +5,12 @@
     "id": "assets/11537345874869338597",
     "displayName": "Promos Sales Fresh",
     "theme": {
-      "bodyFont": "INTER",
-      "headlineFont": "INTER",
+      "bodyFont": "DM_SANS",
+      "headlineFont": "DM_SANS",
+      "labelFont": "DM_SANS",
       "colorMode": "LIGHT",
-      "customColor": "#1F8A4C",
-      "roundness": "ROUND_EIGHT"
+      "customColor": "#005EB8",
+      "roundness": "ROUND_FOUR"
     }
   },
   "screens": [
