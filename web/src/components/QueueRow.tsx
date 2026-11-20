@@ -30,7 +30,7 @@ export default function QueueRow({
 
   return (
     <Link
-      to={`/leads/${item.lead_id}`}
+      to={`/previsioni/leads/${item.lead_id}`}
       className="group grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-x-4 gap-y-4 rounded-2xl border border-line bg-surface px-4 py-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent/35 hover:shadow-[0_18px_40px_-26px_rgba(20,24,31,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 md:grid-cols-[2.25rem_minmax(0,1.45fr)_minmax(0,1.02fr)_152px_116px_1rem] md:items-center md:gap-5 md:px-5 md:py-5"
     >
       <div

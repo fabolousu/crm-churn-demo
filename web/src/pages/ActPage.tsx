@@ -135,7 +135,7 @@ export default function ActPage() {
 
   useEffect(() => {
     if (!leadId && defaultActLeadId) {
-      navigate(`/act/${defaultActLeadId}`, { replace: true });
+      navigate(`/previsioni/act/${defaultActLeadId}`, { replace: true });
     }
   }, [leadId, defaultActLeadId, navigate]);
 
@@ -170,7 +170,7 @@ export default function ActPage() {
           <select
             id="lead-fallback"
             defaultValue=""
-            onChange={(event) => navigate(`/act/${event.target.value}`)}
+            onChange={(event) => navigate(`/previsioni/act/${event.target.value}`)}
             className="mt-2 w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-[13px] text-ink focus:outline-none focus:ring-2 focus:ring-accent/30"
           >
             <option value="" disabled>
@@ -182,7 +182,7 @@ export default function ActPage() {
               </option>
             ))}
           </select>
-          <Link to="/" className={buttonSecondary + " mt-5"}>
+          <Link to="/previsioni" className={buttonSecondary + " mt-5"}>
             <ArrowLeftIcon className="h-4 w-4" />
             Back to the queue
           </Link>
@@ -270,7 +270,7 @@ export default function ActPage() {
         title="Close the loop"
         subtitle="Log what you did. The same model re-scores the initiative, and the queue re-ranks in front of you."
         actions={
-          <Link to={`/leads/${selected.lead_id}`} className={buttonSecondary}>
+          <Link to={`/previsioni/leads/${selected.lead_id}`} className={buttonSecondary}>
             <ArrowLeftIcon className="h-4 w-4" />
             Back to the lead
           </Link>
@@ -338,7 +338,7 @@ export default function ActPage() {
             <select
               id="lead-picker"
               value={selected.lead_id}
-              onChange={(event) => navigate(`/act/${event.target.value}`)}
+              onChange={(event) => navigate(`/previsioni/act/${event.target.value}`)}
               className="mt-1.5 w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-[12px] text-ink focus:outline-none focus:ring-2 focus:ring-accent/30"
             >
               {ranked.map(({ item, rank }) => (
@@ -445,7 +445,7 @@ export default function ActPage() {
               ) : null}
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
-                <Link to={`/leads/${outcome.leadId}`} className={buttonPrimary}>
+                <Link to={`/previsioni/leads/${outcome.leadId}`} className={buttonPrimary}>
                   Open the updated lead
                   <ArrowUpRightIcon className="h-4 w-4" />
                 </Link>

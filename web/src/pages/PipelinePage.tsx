@@ -81,7 +81,7 @@ export default function PipelinePage() {
         title="What's worth a meeting today"
         subtitle="Open initiatives ranked by expected value — probability × proposed ARR. Not a list of records: a queue ordered by the work that pays."
         actions={
-          <Link to="/portfolio" className={buttonSecondary}>
+          <Link to="/previsioni/portfolio" className={buttonSecondary}>
             <GridIcon className="h-4 w-4" />
             Portfolio view
           </Link>
@@ -229,7 +229,7 @@ export default function PipelinePage() {
           points, so the tail is the point.
         </p>
         <Link
-          to="/act"
+          to="/previsioni/act"
           className="inline-flex items-center gap-1.5 font-medium text-accent hover:text-accent-deep"
         >
           Act on the next call

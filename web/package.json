@@ -9,7 +9,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "fixtures": "node scripts/build-fixtures.mjs",
-    "check:ui": "node scripts/check-ui.mjs"
+    "check:ui": "node scripts/check-ui.mjs",
+    "check:crm": "node scripts/check-crm.mjs"
   },
   "dependencies": {
     "react": "18.3.1",
