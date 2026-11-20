@@ -44,6 +44,7 @@ The core user is the **initiative owner** (`Referente dell'iniziativa`, also cal
 - **Global search** (`Cerca`) across all entities.
 - Icons: Ideas/assistant (lightbulb), **Quick create** (`+`), **Advanced find/filter** (funnel), **Settings** (gear: opens personal options, see §11), **Help** (`?`), user avatar (initials).
 - Optional toggle `Prova il nuovo aspetto` ("Try the new look", a UI theme switch).
+- **Gear menu items [from screenshots]:** `Impostazioni di personalizzazione`, `Impostazioni avanzate`, `Informazioni`, `Privacy e cookie`, `Condizioni di licenza`. (M13)
 
 ### 2.2 Left navigation (sitemap)
 The menu is collapsible (hamburger). Groups appear in this order:
@@ -64,9 +65,14 @@ Every entity list page has the same layout.
 - `Modifica colonne` (edit columns), `Modifica filtri` (edit filters), and a quick search box `Cerca in questa vista` / `Filtra per parola chiave`.
 - **Grid:** row checkboxes with a select-all checkbox, sortable column headers with a per-column menu (§7.4), clickable lookup cells that open related records, double-click on the primary column to open a record, and horizontal scroll.
 - **Footer:** record range and count (`1 - 50 di 1230`; above 5,000 it shows `5000+`), pagination (first, prev, `Pagina N`, next). Page size is 50.
+- **Extra grid features [from screenshots]:** an A to Z jump bar below the grid, a hierarchy column (where applicable), cells with clickable `mailto:` and `tel:` links, and an empty state "Nessun dato disponibile" with the footer reading `0 - 0 di 0`. (M10)
+- **New-look command bar additions [from screenshots]:** a `Mostra come ⌄` selector (grid or other layouts), a `Condividi ⌄` button pinned to the right, and submenus under `Esporta in Excel` and `Importa da Excel`. (M11)
 
 ### 2.4 Standard record form
-- **Command bar:** back, `Salva` (save), `Salva e chiudi` (save & close), `+ Nuovo`, `Disattiva` (deactivate), `Aggiorna`, `Verifica l'accesso` (check access), `Assegna`, `Processo` (business process), `Flusso`, `Condividi`, `Invia link tramite messaggio`, overflow menu.
+- **Command bar [from screenshots]:** the exact command bar varies by entity and save state (C2).
+  - **Lead (saved):** back, `Salva`, `Salva e chiudi`, `+ Nuovo`, `Disattiva`, `Aggiorna`, `Verifica l'accesso`, `Assegna`, `Processo`, `Flusso`, `Condividi`, `Invia link tramite messaggio`, overflow menu.
+  - **Contact and Company (saved):** `Salva`, `Salva e chiudi`, `Nuovo`, `Disattiva`, `Invia link`, `Aggiorna`, `Verifica l'accesso`. No `Assegna`, no `Condividi`, no `Processo`.
+  - **New unsaved record (any entity):** `Salva`, `Salva e chiudi`, `Nuovo`, `Flusso` only.
 - **Header:** entity icon/initials, record title, save state (`Salvataggio completato` = saved, `Non salvato` = unsaved), entity type label, and 2–4 **header fields** (e.g. `Stato lavorazione`, `Proprietario`). These are editable through a flyout opened by the chevron next to the owner.
 - **Tabs** (entity-specific), sections, fields. A red asterisk `*` marks required fields and a lock icon marks read-only fields.
 - **Quick-view panels** ("Preview Azienda", "Preview Contatto") show read-only data from the related record.
@@ -86,14 +92,14 @@ Tabs: `Generale`, `Dettagli`, `Contatti`, `Sales`, `Dati amministrativi`, `Eleme
 | Field (IT) | Type | Req. | Notes |
 |---|---|---|---|
 | `Denominazione` | text | ✔ | Company name (primary field) |
-| `Codice Fiscale` | text | ✔ | Italian tax code. Read-only after creation [inferred from lock icon] |
+| `Codice Fiscale` | text | ✔ | Italian tax code. Read-only after creation (IC, lock icon confirmed) [from screenshots]. Also shown in the header (M7) |
 | `Partita IVA` | text | | VAT number |
-| `Provincia` | lookup(Province) | ✔ | Shown in the header. The manual also mentions variants `Provincia (indirizzo)` and `Provincia (RI)` (from the business register) |
+| `Provincia` | lookup(Province) | ✔ | Shown in the header. Two lookup variants exist (`Provincia` and `Provincia (RI)` from the business register), and `Provincia (indirizzo)` is a plain text field [from screenshots] (M7) |
 | `1° Macro Settore di attività` | lookup(MacroSector) | ✔ | e.g. *Agroalimentare, Commercio, Energia e ambiente, Beni strumentali, Servizi alle imprese, Sistema persona, Salute e scienze della vita, Edilizia, Turismo, Altro* |
 | `1° Settore di attività` | lookup/choice(Sector) | ✔ | Depends on the macro sector, e.g. *Aziende agricole/Vivai, Distribuzione* |
 | `2° Macro Settore` | lookup(MacroSector) | | |
 | `2° Settore di attività` | lookup/choice(Sector) | | e.g. *Energie rinnovabili, Solare* |
-| `Tipologia` | choice | | e.g. *Impresa* |
+| `Tipologia` (likely "Tipologia soggetto": the grid header is truncated to `Tipologia s...`, confirm with stakeholders) [from screenshots] (C6) | choice | | Values seen: *Impresa*, *Privato* |
 | `Maturità anagrafica` | choice | | **Prospect / Cliente / Ex-cliente** (shown in the header) |
 | `Principali aree o Paesi di Export` | multichoice | | |
 | `Principali aree o Paesi di Import` | multichoice | | |
@@ -102,6 +108,8 @@ Tabs: `Generale`, `Dettagli`, `Contatti`, `Sales`, `Dati amministrativi`, `Eleme
 | `Fatturazione pregressa` | bool | | Previous invoicing (Sì/No) |
 | `Proprietario` | user/team | ✔ | Default owner is the team *Team Anagrafiche Promos* |
 | Address fields | text | | [inferred] |
+
+Form sections on the `Generale` tab [from screenshots]: `INFORMAZIONI SULL'AZIENDA`, `SETTORI DI ATTIVITÀ` (M7).
 
 Sub-grids: **Company–Contact relationships** (`Contatti` tab) and **Leads** (`Sales` tab; columns: Argomento, Anagrafica interesse, Contatto, Stato lavorazione, Data creazione, Data chiusura, Proprietario).
 
@@ -113,18 +121,21 @@ Tabs: `Generale`, `Dettagli`, `Sales`, `Dati amministrativi`, `Elementi correlat
 | `Nome` | text | ✔ | First name |
 | `Cognome` | text | ✔ | Last name |
 | `Nome completo` | text (computed) | | Primary display field |
-| `E-mail` | email | ✔ | Read-only/locked in the form. Has a "send e-mail" icon |
-| `E-mail validata` | bool | | Whether the e-mail has been verified |
+| `E-mail` | email | ✔ | Read-only/locked in the form. Has a "send e-mail" icon. Also shown in the header [from screenshots] (M5) |
+| `E-mail validata` | bool | | Whether the e-mail has been verified. Locked in the form [from screenshots] (M5) |
 | `Codice fiscale` | text | | Personal tax code |
 | `Telefono` | phone | ✔ | Has a click-to-call icon |
 | `Cellulare` | phone | | |
 | `Fax` | phone | | |
 | `Nazionalità` | choice | | e.g. *Italiana* |
-| `Maturità anagrafica` | choice | | Prospect / Cliente |
-| `Completezza anagrafica` | choice (computed) | | **Completa / Parziale** (record completeness) [inferred: computed from filled fields] |
-| `Proprietario` | user/team | | |
+| `Maturità anagrafica` | choice | | Prospect / Cliente. Shown in the header [from screenshots] (M5) |
+| `Completezza anagrafica` | choice (computed) | | **Completa / Parziale** (record completeness) [inferred: computed from filled fields]. Shown in the header [from screenshots] (M5) |
+| `Proprietario` | user/team | | Shown in the header. Default owner is the team *Team Anagrafiche Promos* [from screenshots] (M5) |
+| `Fonte` | choice | | Source channel on the Contact (implied by personal view names) [from screenshots] (M15) |
 
-Sub-grids: **Relazioni Aziende** (Company, Company tax code, Province (company), Job position), **Leads** (`Sales` tab).
+Header fields (order) [from screenshots]: `Maturità anagrafica`, `E-mail`, `Completezza anagrafica`, `Proprietario` (M5).
+
+Sub-grids: **Relazioni Aziende** (Company, Company tax code, Province (company), Job position); on the `Generale` tab this is labelled `RELAZIONI AZIENDE` [from screenshots] (M5). **Leads** on the `Sales` tab with columns [from screenshots]: `Argomento` ↑, `Anagrafica interesse`, `Azienda`, `Stato lavorazione`, `Data creazione` ↓, `Data chiusura`, `Proprietario` (M6).
 
 ### 3.3 Company–Contact relationship — `Relazione Azienda Contatto`
 A many-to-many join entity with attributes. A contact can belong to several companies, and the same person can appear as a sole trader and as an employee.
@@ -148,7 +159,7 @@ The display name follows the pattern **`Iniziativa - <name>`**.
 | `Iniziativa` | text | Name, e.g. "Missione imprenditoriale in Svezia - Wine" |
 | `Voucher` | bool | Sì/No |
 | `Tipologia` | choice | e.g. *Missione, Convegno/Webinar, Ricerca partner, Corso, Servizio* |
-| `Linea di attività` | choice | **Outgoing, Incoming, Prima assistenza** |
+| `Linea di attività` | lookup(LineaAttività) | Renders as a link in the grid, so it is a **lookup**, not a choice [from screenshots] (C3). Values seen: **Outgoing, Incoming, Prima assistenza** |
 | `Data inizio` | date | |
 | `Data fine` | date | [inferred, from view "Tutti i lead con iniziative con date"] |
 | `Stato iniziativa` | choice | e.g. *Aperta*, Chiusa [inferred] |
@@ -156,11 +167,13 @@ The display name follows the pattern **`Iniziativa - <name>`**.
 | `2° Referente` | user | Secondary owner |
 | `Proprietario` | user | |
 
+Header: only `Proprietario` is displayed as a header field [from screenshots] (M8).
+
 Sub-grids:
 - `Manifestazioni Interesse`.
-- `Lead` (view `Tutti i Lead da Anagr. Interesse`; columns: Argomento, Contatto, E-mail (contatto), Telefono, Azienda, 1° Macro settore, Provincia, Stato lavorazione, Data creazione, Data chiusura, Proprietario). Actions: `+ Nuovo elemento Lead`, `Aggiorna`, and in the `⋮` menu: Flusso, Esegui report, Modelli di Excel, **Esporta Lead**, Guarda record associati.
+- `Lead` (view `Tutti i Lead da Anagr. Interesse`; columns: Argomento, Contatto, E-mail (contatto), Telefono, Azienda, 1° Macro settore, Provincia, Stato lavorazione, Data creazione, Data chiusura, Proprietario). Actions: `+ Nuovo elemento Lead`, `Aggiorna`, and in the `⋮` menu: `Flusso`, `Esegui report`, `Modelli di Excel`, **`Esporta Lead`**, `Guarda record associati`. The entries `Flusso`, `Esegui report`, `Modelli di Excel` and `Esporta Lead` each open a submenu [from screenshots] (M8).
 
-Default list view: `Anagrafiche Iniziative con codici` (Voucher, Codice, Iniziativa, Tipologia, Linea di attività, Data inizio ↓, Stato iniziativa, 1° Referente, 2° Referente).
+Default list view: `Anagrafiche Iniziative con codici` (Voucher, Codice, `Iniziativa` ↑, Tipologia, Linea di attività, `Data inizio` ↓, Stato iniziativa, 1° Referente, 2° Referente). Two sort keys: `Iniziativa` ascending then `Data inizio` descending [from screenshots] (C4).
 
 ### 3.5 Expression of interest — `Manifestazione di Interesse`
 | Field | Type | Notes |
@@ -177,20 +190,24 @@ Default list view: `Anagrafiche Iniziative con codici` (Voucher, Codice, Iniziat
 ### 3.6 Lead — `Lead`
 Tabs: `Generale`, `Dati Amministrativi`, `Elementi correlati`. Header fields: `Stato lavorazione`, `Proprietario`.
 
+Form sections on the `Generale` tab [from screenshots]: `INFORMAZIONI PRINCIPALI`, `INTERESSE`, `DETTAGLI` (which holds `Note migrate`). On a new (unsaved) lead, `Stato lavorazione` also appears in the body of the form, not only in the header (M2).
+
+Conditional fields [from screenshots] (M3): when a lead is created manually (not from an expression of interest), the form shows `Evento di origine` and hides `Manifestazione interesse origine`, `Tipo interesse`, and `Richieste del Contatto/Cliente`.
+
 | Field (IT) | Type | Req. | Notes |
 |---|---|---|---|
 | `Argomento` | text | auto | Topic/title. Auto-generated, e.g. **"Lead da manifestazione interesse per Iniziativa - <Initiative> - <Company> <Contact>"**, "Iscrizione migrata - <date>", "Lead per Iniziativa …" |
 | `Stato lavorazione` | choice | ✔ | See §4 |
 | `Proprietario` | user | ✔ | Defaults to the initiative's 1° Referente (auto-created leads) or the current user (manual leads) |
 | `Descrizione` | longtext | | |
-| `Azienda` | lookup(Azienda) | ✔ (business rule) | **Must always be filled** [explicit]. Auto-filled if the contact belongs to exactly one company (§5.3) |
-| `Contatto` | lookup(Contatto) | ✔ | Required at creation [explicit] |
-| `Anagrafica interesse` | lookup(Iniziativa) | ✔ | The initiative/service |
-| `Manifestazione interesse origine` | lookup(ManifestazioneInteresse) | | Read-only |
+| `Azienda` | lookup(Azienda) | ✔ (business rule) | **Must always be filled** [explicit]. Auto-filled if the contact belongs to exactly one company (§5.3). Locked on saved leads [from screenshots] (M1) |
+| `Contatto` | lookup(Contatto) | ✔ | Required at creation [explicit]. Locked on saved leads [from screenshots] (M1) |
+| `Anagrafica interesse` | lookup(Iniziativa) | ✔ | The initiative/service. Locked on saved leads [from screenshots] (M1) |
+| `Manifestazione interesse origine` | lookup(ManifestazioneInteresse) | | Read-only. Locked on saved leads [from screenshots] (M1) |
 | `Evento di origine` | lookup | | Read-only |
 | `Tipo interesse` | choice | | Read-only, copied from the expression of interest |
 | `Richieste del Contatto/Cliente` | longtext | | Read-only, copied |
-| `Fonte` | choice | | e.g. *Manifestazione di interesse*, Iscrizione evento, Iscrizione InBuyer, Manuale, Migrazione [partly inferred] |
+| `Fonte` | choice | | e.g. *Manifestazione di interesse*, Iscrizione evento, Iscrizione InBuyer, Manuale, Migrazione [partly inferred]. Locked on saved leads [from screenshots] (M1) |
 | `Note migrate` | longtext | | Notes migrated from the legacy CRM (section `DETTAGLI`) |
 | `Data creazione` | datetime | sys | |
 | `Data chiusura` | datetime | auto | Set when the status becomes a closed status [inferred] |
@@ -223,20 +240,22 @@ All activities share: `Oggetto` (subject), `Riferimento` (regarding: a polymorph
 
 ### 4.1 Status catalogue
 
+Dropdown order on the single-record form [from screenshots] (C1): `Nuovo`, `Da contattare`, `In attesa di riscontro`, `Interessato`, `Prefattibilità negativa`, `Nessuna risposta`, `Non interessato`, `Contratto concluso`, `Servizio concluso`, `Iscritto all'evento`.
+
 | Status (IT) | Category | Meaning | Who sets it |
 |---|---|---|---|
 | `Nuovo` | Open | **Default for leads created manually** | System (manual create) |
-| `Interessato` | Open | Default for leads from an **expression of interest** or a **service request**. Also used for manual leads. The owner must check that the interest is real | System (auto) / user |
 | `Da contattare` | Open | The user plans to contact the lead | User |
 | `In attesa di riscontro` | Open | Contacted; waiting for a reply | User |
+| `Interessato` | Open | Default for leads from an **expression of interest** or a **service request**. Also used for manual leads. The owner must check that the interest is real | System (auto) / user |
 | `Prefattibilità negativa` | Closed | The company lacks the requirements | User |
 | `Nessuna risposta` | Closed | Contacted, never answered | User |
 | `Non interessato` | Closed | Final: not interested in *this* initiative (a new lead can still be created for a different one) | User |
-| `Iscritto all'evento` | Closed | Registered for an event, course or service **before** taking part or receiving it. **Auto-set by event registrations** | System / user |
-| `Servizio concluso` | Closed | The service was delivered, or the company **actually attended** the webinar/course. If it did not attend, the lead stays `Iscritto all'evento` | User |
 | `Contratto concluso` | Closed | The company formally joined the initiative (contract signed) | User |
+| `Servizio concluso` | Closed | The service was delivered, or the company **actually attended** the webinar/course. If it did not attend, the lead stays `Iscritto all'evento` | User |
+| `Iscritto all'evento` | Closed | Registered for an event, course or service **before** taking part or receiving it. **Auto-set by event registrations** | System / user |
 
-**Legacy/extra statuses** appear in the bulk-edit dropdown and must also be supported: `Interessato InBuyer` (open: InBuyer platform sign-up), `Concluso` (closed), `Da richiamare` (open: call back), `Perso` (closed: lost). Mark them `is_legacy = true` so admins can hide them from new records.
+**Legacy/extra statuses** appear **only in the bulk-edit dropdown**, after the standard values, and must also be supported [from screenshots] (C1): `Interessato InBuyer` (open: InBuyer platform sign-up), `Concluso` (closed), `Da richiamare` (open: call back), `Perso` (closed: lost). They are **not** offered on the single-record form. Mark them `is_legacy = true` so admins can hide them from new records.
 
 Implement statuses as a **configurable table** (code, label_it, label_en, category open/closed, sort order, is_default_manual, is_default_auto, is_legacy, active), not as a hard-coded enum.
 
@@ -261,7 +280,7 @@ The manual sets no strict transition rules: any status can be chosen from the dr
 ### 5.1 Automatic lead creation (integrations) [explicit]
 1. **From an expression of interest (DEM campaign response / web form):**
    - Create a `Manifestazione di Interesse`, resolving or creating the Contatto and Azienda [inferred].
-   - Automatically create a Lead with `Stato = Interessato`, `Fonte = Manifestazione di interesse`, `Anagrafica interesse = initiative`, `Proprietario = initiative's 1° Referente`. Copy `Tipo interesse` and `Richieste del Contatto/Cliente`, link `Manifestazione interesse origine`, and auto-generate `Argomento`.
+   - Automatically create a Lead with `Stato = Interessato`, `Fonte = Manifestazione di interesse`, `Anagrafica interesse = initiative`, `Proprietario = initiative's 1° Referente`. Copy `Tipo interesse` and `Richieste del Contatto/Cliente` (also copy the same `Richieste del Contatto/Cliente` text into `Descrizione`) [from screenshots] (M4), link `Manifestazione interesse origine`, and auto-generate `Argomento`.
    - **Send a notification e-mail** to the owner from a no-reply address (`crm-noreply@…`). Subject: "Creazione Lead - Interesse per Iniziativa - <name>". Body: "Gent. utente, è stato creato un nuovo Lead a seguito di una manifestazione di interesse…" ("Dear user, a new lead has been created following an expression of interest…"). It must contain a **deep link to the lead record**. The e-mail also appears on the lead timeline as a closed activity.
 2. **From an event registration:** create a Lead with `Stato = Iscritto all'evento` (closed), so it needs no follow-up.
 3. **From an InBuyer platform sign-up:** create a Lead (`Interessato InBuyer` / `Interessato`) that stays open until the owner sets `Servizio concluso`.
@@ -294,8 +313,10 @@ Open the lead, open the header flyout, clear `Proprietario`, type the new user's
 
 ## 6. Timeline (`Sequenza temporale`)
 
-- Present on Lead, Contact, Company and Initiative forms.
+- Present on Lead, Contact, Company and Initiative forms. In the new look the panel is titled `Timeline` [from screenshots] (M9).
 - Header actions: `+` (create a timeline record: **Appuntamento, Attività, E-mail, Telefonata, Nota**), filter (by activity type, status, date), sort/expand, `⋮`.
+- The `+` menu's first entry is `Impegno` (a generic activity) [from screenshots] (M9).
+- Loading state text: "Caricamento sequenza temporale in corso" [from screenshots] (M9).
 - `Cerca sequenza temporale`: search within the timeline.
 - Inline quick note: `Immetti una nota…` with an attachment paperclip.
 - Each item shows the avatar, type icon, author ("E-mail da <user>"), subject, body preview, a status chip (`Chiusi`), and a timestamp with an expand chevron.
@@ -327,9 +348,11 @@ Custom views can be built for **every entity**: Companies, Contacts, Company–C
 | `Lead personali` | owner = current user |
 | `Lead personali chiusi` | owner = current user AND status ∈ closed |
 
-Default columns for the Lead views: Argomento, Contatto, Azienda, (1° Macro Settore), Anagrafica interesse, Proprietario, Stato lavorazione, Data creazione, Data modifica ↓.
+Default columns for the Lead views: Argomento, Contatto, Azienda, (1° Macro Settore), Anagrafica interesse, Proprietario, `Stato lavorazione` ↓, Data creazione, `Data modifica` ↓. Lead views sort on **two keys**: `Stato lavorazione` descending, then `Data modifica` descending [from screenshots] (C4).
 
-Other default views: `Tutti i contatti` (Nome completo ↑, E-mail, Telefono, Nazionalità, Maturità anagrafica, Completezza anagrafica, Data modifica ↓); `Tutte le aziende` (Denominazione ↑, Codice Fiscale, Partita IVA, Provincia, 1° Macro Settore, Tipologia, Maturità); `Tutte le Relazioni Azienda Contatto`; `Anagrafiche Iniziative con codici`.
+Other default views: `Tutti i contatti` (Nome completo ↑, E-mail, Telefono, Nazionalità, Maturità anagrafica, Completezza anagrafica, Data modifica ↓); `Tutte le aziende` (`Denominazione` ↑, Codice Fiscale, Partita IVA, `Provincia` ↑, 1° Macro Settore, Tipologia, Maturità; two sort keys: Denominazione ascending then Provincia ascending) [from screenshots] (C4); `Tutte le Relazioni Azienda Contatto` (sorted by `Azienda` descending) [from screenshots] (C4); `Anagrafiche Iniziative con codici` (see §3.4 for its two-key sort).
+
+**Multi-column sort must be supported by the list engine** [from screenshots] (C4).
 
 ### 7.2 View selector menu
 - Grouped list: **`Visualizzazioni personali`** (personal views, user icon, e.g. "Tutti i lead con iniziative con date") and **`Visualizzazioni di sistema`**. A `Predefinito` badge marks the default.
@@ -344,14 +367,14 @@ Other default views: `Tutti i contatti` (Nome completo ↑, E-mail, Telefono, Na
 - Saved personal views are private to the creator unless shared. They stay valid across platform updates [explicit].
 
 ### 7.3 Edit columns panel (`Modifica colonne`)
-- Side panel `Modifica colonne: <entity>` lists the current columns.
+- Side panel `Modifica colonne: <entity>` lists the current columns. Each current column shows its **data-type icon** [from screenshots] (M17).
 - `+ Aggiungi colonne` opens a picker with two tabs:
   - **Current entity** fields (e.g. "Relazione Azienda Contatto").
-  - **`Elementi correlati`** (related entities): expandable relations such as Autore, Autore modifica, **Azienda (Azienda)**, **Contatto (Contatto)**, Proprietario, Team proprietario, Utente proprietario. Expanding one lists the related entity's fields, labelled `<Field> (<Entity>)`, e.g. `Provincia (Azienda)`, `1° Macro Settore di attività (Azienda)`, `Principali aree o Paesi di Export (Azienda)`.
+  - **`Elementi correlati`** (related entities): expandable relations such as `Autore`, **`Autore (delegato)`**, `Autore modifica`, **`Autore modifica (delegato)`** [from screenshots] (M17), **Azienda (Azienda)**, **Contatto (Contatto)**, Proprietario, Team proprietario, Utente proprietario. Expanding one lists the related entity's fields, labelled `<Field> (<Entity>)`, e.g. `Provincia (Azienda)`, `1° Macro Settore di attività (Azienda)`, `Principali aree o Paesi di Export (Azienda)`.
   - A search box and a type filter (`Tutte` / by data type). Each field shows its type icon.
-  - A selected field **disappears from the picker** and is added to the view. `Chiuso` closes the picker.
+  - A selected field **disappears from the picker** and is added to the view (**appended as the last column**) [from screenshots] (M17). `Chiuso` closes the picker.
 - Columns can be **reordered by drag and drop**. Columns can be removed and resized [inferred].
-- `Reimposta impostazione predefinita` restores the default columns.
+- `Reimposta impostazione predefinita` restores the default columns. It is **disabled while the view is unmodified** [from screenshots] (M17).
 - `Invia domanda` (apply) and `Annullamento` (cancel).
 - **Known quirk [explicit]:** in the source system, filters applied before adding columns are lost. The rebuild **must not** have this bug; keep filters when columns change.
 
@@ -379,6 +402,8 @@ Other default views: `Tutti i contatti` (Nome completo ↑, E-mail, Telefono, Na
 ### 7.7 Charts, dashboards, reports
 - `Mostra grafico` opens a chart pane beside the grid, based on the current view (e.g. leads by status, by owner).
 - `Dashboard` (sitemap) holds personal and system dashboards built from charts and lists. `Apri dashboard` is in the overflow menu.
+- The default system dashboard is named `Dashboard globale` [from screenshots] (M12).
+- Dashboard command bar [from screenshots] (M12): `Salva con nome`, `Nuovo`, `Imposta come predefinito`, `Aggiorna tutto`.
 - `Esegui report` runs predefined reports on the selected records or the view.
 - `Mostra questa visualizzazione` shows an embedded BI visualisation of the view (Power BI equivalent; optional).
 
@@ -432,7 +457,7 @@ Opened from the gear icon (top-right), then `Impostazioni di personalizzazione`.
 
 ### 11.1 E-mail signatures [explicit]
 - `Firme e-mail` lists the user's signatures with the columns `Titolo`, `Valore predefinito` (default yes/no), `Visualizzabile da` (visibility, e.g. *Singolo utente*), `Lingua` (e.g. *Italiano (1040)*), `Proprietario`. Actions: `Nuovo`, `Altre azioni` (delete, set as default…).
-- New signature form: `Titolo` (e.g. "Firma <Nome>"), `Predefinito` Sì/No, and a **rich-text signature editor** that accepts HTML pasted from Gmail. `Salva` / `Salva e chiudi`.
+- New signature form labels [from screenshots] (C5): the primary field is **`Nome *`** on the form (the grid column renders the same field as `Titolo`), e.g. "Firma <Nome>"; the default flag is labelled **`Imposta come predefinito`** with default `No`; a required **`Lingua *`** field appears with default `Italiano (Italia)`. The form includes a **rich-text signature editor** that accepts HTML pasted from Gmail. `Salva` / `Salva e chiudi`.
 - Only **one default** signature per user. Setting a new default clears the previous one.
 
 ### 11.2 Message templates (`Modelli di messaggio`)
@@ -440,6 +465,11 @@ Reusable e-mail templates (personal or shared), optionally with placeholders suc
 
 ### 11.3 Other personal options [inferred]
 Default landing page, records per page (default 50), time zone, date and number formats, UI language, mailbox sync settings, and the default view per entity.
+
+Confirmed and added [from screenshots] (M14):
+- `Record per pagina` default value is **50** (IC).
+- A default landing page setting exists; the **default landing page is role-based** (per user role, not a single global default).
+- `Visualizzazione ricerca avanzata` has two modes: **`Semplice`** and **`Dettagliata`**.
 
 ---
 
@@ -459,10 +489,10 @@ The manual ends with internal and external support contacts. The rebuild should 
 - **Locale:** Italian UI by default, EU date format `dd/mm/yyyy HH:mm`, Europe/Rome time zone, and i18n-ready (all labels in resource files).
 - **Scale:** contacts and relationships above 5,000 records (counts display "5000+"); about 1,200 initiatives; leads in the thousands per user group. Lists must paginate on the server and filter and sort efficiently.
 - **Deep links:** every record has a stable URL (`/app/{entity}/{id}`) and every view has one (`/app/{entity}?view={viewId}`).
-- **GDPR:** contact consents (the manual mentions a view "Contatti … + tipo informativa e consenso", i.e. contacts plus privacy-notice type and consent). Add consent fields to the Contact: privacy notice type, consent flags, date. Support data export and erasure for a contact.
+- **GDPR:** contact consents (the manual mentions a view "Contatti … + tipo informativa e consenso", i.e. contacts plus privacy-notice type and consent). Add consent fields to the Contact: privacy notice type, consent flags, date. Support data export and erasure for a contact. Personal view names also imply **consent data on the Company** entity with an **expiry date**, and a `Fonte` field on the Contact [from screenshots] (M15: see also §3.2).
 - **Auditability:** full audit trail on Lead status and owner changes.
 - **Integrations:** inbound webhooks for expressions of interest, event registrations and InBuyer; outbound e-mail with mailbox sync; Excel import/export; automation hooks (`Flusso`).
-- **Migration:** fields `Note migrate` and the topic "Iscrizione migrata" show there was a legacy data migration, so provide a CSV/Excel import that keeps the original creation dates.
+- **Migration:** fields `Note migrate` and the topic "Iscrizione migrata" show there was a legacy data migration, so provide a CSV/Excel import that keeps the original creation dates. Migrated data contains **placeholder contacts labelled "da inserire"** [from screenshots] (M16); the import and data-quality plan must detect and handle them (flag for cleanup, prevent sending e-mails to them, allow later merge/replace).
 
 ---
 
