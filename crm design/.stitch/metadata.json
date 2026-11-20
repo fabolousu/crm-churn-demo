@@ -34,6 +34,34 @@
       "deviceType": "DESKTOP",
       "html": "designs/lead-personali-aperti-v2.html",
       "screenshot": "designs/lead-personali-aperti-v2.png"
+    },
+    {
+      "id": "0444e72a6d5d437a9878b2ad2dfcd8c7",
+      "title": "Lead personali aperti (final)",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti/lead-personali-aperti.html",
+      "screenshot": "designs/lead-personali-aperti/lead-personali-aperti.png"
+    },
+    {
+      "id": "0ce0b786b02742c38cd5ad1f161a9546",
+      "title": "Lead personali aperti - Stato vuoto",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti/empty.html",
+      "screenshot": "designs/lead-personali-aperti/empty.png"
+    },
+    {
+      "id": "4084a4d95eff4b9292b9581dfde12294",
+      "title": "Lead personali aperti - Stato di caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti/loading.html",
+      "screenshot": "designs/lead-personali-aperti/loading.png"
+    },
+    {
+      "id": "cb52a8be727f4e3183621309da0571a1",
+      "title": "Lead personali aperti - Stato di errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti/error.html",
+      "screenshot": "designs/lead-personali-aperti/error.png"
     }
   ]
 }
