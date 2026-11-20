@@ -62,6 +62,34 @@
       "deviceType": "DESKTOP",
       "html": "designs/lead-personali-aperti/error.html",
       "screenshot": "designs/lead-personali-aperti/error.png"
+    },
+    {
+      "id": "54b86fff89254adaa925c1e23752157e",
+      "title": "Scheda Lead (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/scheda-lead.html",
+      "screenshot": "designs/scheda-lead/scheda-lead.png"
+    },
+    {
+      "id": "cc33244b338e4a9e86d6af423db433a0",
+      "title": "Scheda Lead - Timeline vuota",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/empty.html",
+      "screenshot": "designs/scheda-lead/empty.png"
+    },
+    {
+      "id": "f3b55c0769f940a0a2916b05b3b46cf1",
+      "title": "Scheda Lead - Stato di caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/loading.html",
+      "screenshot": "designs/scheda-lead/loading.png"
+    },
+    {
+      "id": "204357fd7ef54895bcd6f5f6630d4e9a",
+      "title": "Scheda Lead - Stato di errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/error.html",
+      "screenshot": "designs/scheda-lead/error.png"
     }
   ]
 }
