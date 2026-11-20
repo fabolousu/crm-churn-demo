@@ -1,3 +1,47 @@
+---
+name: Promos Sales Fresh
+colors:
+  surface: '#FFFFFF'
+  surface-dim: '#EEF2F5'
+  background: '#FFFFFF'
+  on-background: '#19242E'
+  primary: '#005EB8'
+  on-primary: '#FFFFFF'
+  secondary: '#5B6472'
+  outline: '#DBE2E8'
+  outline-variant: '#AFBAC4'
+  error: '#E74C3C'
+typography:
+  page-title:
+    fontFamily: DM Sans
+    fontSize: 15px
+    fontWeight: '600'
+    lineHeight: 20px
+  body-md:
+    fontFamily: DM Sans
+    fontSize: 13px
+    fontWeight: '400'
+    lineHeight: 18px
+  label-md:
+    fontFamily: DM Sans
+    fontSize: 12px
+    fontWeight: '400'
+    lineHeight: 16px
+  table-header:
+    fontFamily: DM Sans
+    fontSize: 11px
+    fontWeight: '700'
+    lineHeight: 15px
+rounded:
+  sm: 0.125rem
+  DEFAULT: 0.25rem
+spacing:
+  space-xs: 0.25rem
+  space-sm: 0.5rem
+  space-md: 1rem
+  space-lg: 1.5rem
+---
+
 # Design System: CRM CCIAA - PROMOS
 
 ---
