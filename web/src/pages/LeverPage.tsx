@@ -210,7 +210,7 @@ export default function LeverPage() {
     return (
       <div>
         <Link
-          to="/"
+          to="/previsioni"
           className="inline-flex items-center gap-2 text-[11.5px] font-medium text-muted transition hover:text-ink"
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
@@ -225,7 +225,7 @@ export default function LeverPage() {
     return (
       <div>
         <Link
-          to="/"
+          to="/previsioni"
           className="inline-flex items-center gap-2 text-[11.5px] font-medium text-muted transition hover:text-ink"
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
@@ -242,7 +242,7 @@ export default function LeverPage() {
   return (
     <div>
       <Link
-        to={`/leads/${lead.id}`}
+        to={`/previsioni/leads/${lead.id}`}
         className="inline-flex items-center gap-2 text-[11.5px] font-medium text-muted transition hover:text-ink"
       >
         <ArrowLeftIcon className="h-3.5 w-3.5" />
@@ -362,7 +362,7 @@ export default function LeverPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             {commitKind ? (
               <Link
-                to={`/act/${lead.id}`}
+                to={`/previsioni/act/${lead.id}`}
                 state={{ kind: commitKind }}
                 className={buttonPrimary}
               >
@@ -407,7 +407,7 @@ export default function LeverPage() {
               </p>
             ) : null}
             <Link
-              to="/?sort=leverage"
+              to="/previsioni?sort=leverage"
               className="mt-2.5 inline-flex items-center gap-1.5 text-[10.5px] font-semibold text-accent transition hover:text-accent-deep"
             >
               See where effort pays off

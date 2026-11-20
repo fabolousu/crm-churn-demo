@@ -16,7 +16,7 @@
  *
  * Environment
  *   CHECK_UI_CHROME         explicit browser executable (default: autodetect Chrome/Edge)
- *   CHECK_UI_MAX_PAGES      total crawl safety cap (default 40)
+ *   CHECK_UI_MAX_PAGES      total crawl safety cap (default 80)
  *   CHECK_UI_PER_TEMPLATE   samples per route template, e.g. /leads/:id (default 5)
  *   CHECK_UI_STRICT=1       fail on every axe impact, not only serious/critical
  *
@@ -43,7 +43,7 @@ const INDEX = path.join(DIST, "index.html");
 const STRICT = process.env.CHECK_UI_STRICT === "1";
 
 function pageLimit() {
-  const raw = process.env.CHECK_UI_MAX_PAGES ?? "40";
+  const raw = process.env.CHECK_UI_MAX_PAGES ?? "80";
   const value = Number(raw);
   if (!Number.isFinite(value) || value < 1) {
     throw new Error(`CHECK_UI_MAX_PAGES must be a positive number, got "${raw}"`);
@@ -62,7 +62,10 @@ function perTemplateLimit() {
 
 /** Collapse record ids so the crawl samples each screen template, not every record. */
 function routeTemplate(route) {
-  return route.replace(/^\/leads\/[^/]+/, "/leads/:id").replace(/^\/act\/[^/]+/, "/act/:id");
+  return route
+    .replace(/^\/lead\/[^/]+/, "/lead/:id")
+    .replace(/^\/previsioni\/leads\/[^/]+/, "/previsioni/leads/:id")
+    .replace(/^\/previsioni\/act\/[^/]+/, "/previsioni/act/:id");
 }
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
@@ -237,7 +240,17 @@ async function main() {
     });
 
     const axePath = axeScriptPath();
-    const queue = ["/", "/act", "/portfolio"];
+    const queue = [
+      "/",
+      "/lead/new",
+      "/aziende",
+      "/contatti",
+      "/iniziative",
+      "/non-incluso?entity=Servizi",
+      "/previsioni",
+      "/previsioni/act",
+      "/previsioni/portfolio",
+    ];
     const seen = new Set();
     const samples = new Map();
     for (const route of queue) samples.set(routeTemplate(route), 1);
@@ -263,7 +276,10 @@ async function main() {
       if (status >= 400) results.broken.push({ route, reason: `HTTP ${status}` });
 
       const bodyText = await page.evaluate(() => document.body?.innerText ?? "");
-      if (route !== "/" && bodyText.includes("That screen is not in the demo")) {
+      const notFound =
+        bodyText.includes("That screen is not in the demo") ||
+        bodyText.includes("Questa schermata non è nella demo");
+      if (route !== "/" && notFound) {
         results.broken.push({ route, reason: "renders the NotFound screen" });
       }
 

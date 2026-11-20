@@ -139,7 +139,7 @@ export default function LeadPage() {
     return (
       <div>
         <Link
-          to="/"
+          to="/previsioni"
           className="inline-flex items-center gap-2 text-[11.5px] font-medium text-muted transition hover:text-ink"
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
@@ -155,7 +155,7 @@ export default function LeadPage() {
             The queue only carries open initiatives. Pick another one from the
             pipeline; the fixtures match the contract's lead list.
           </p>
-          <Link to="/" className={buttonPrimary + " mt-5"}>
+          <Link to="/previsioni" className={buttonPrimary + " mt-5"}>
             Return to the pipeline
           </Link>
         </Card>
@@ -167,7 +167,7 @@ export default function LeadPage() {
     return (
       <div>
         <Link
-          to="/"
+          to="/previsioni"
           className="inline-flex items-center gap-2 text-[11.5px] font-medium text-muted transition hover:text-ink"
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
@@ -187,7 +187,7 @@ export default function LeadPage() {
   return (
     <div>
       <Link
-        to="/"
+        to="/previsioni"
         className="inline-flex items-center gap-2 text-[11.5px] font-medium text-muted transition hover:text-ink"
       >
         <ArrowLeftIcon className="h-3.5 w-3.5" />
@@ -234,11 +234,11 @@ export default function LeadPage() {
           </span>
         ) : (
           <div className="flex flex-wrap gap-2">
-            <Link to={`/leads/${lead.id}/lever`} className={buttonPrimary}>
+            <Link to={`/previsioni/leads/${lead.id}/lever`} className={buttonPrimary}>
               <BoltIcon className="h-4 w-4" />
               Test a lever
             </Link>
-            <Link to={`/act/${lead.id}`} className={buttonSecondary}>
+            <Link to={`/previsioni/act/${lead.id}`} className={buttonSecondary}>
               Log an action
             </Link>
           </div>
@@ -297,7 +297,7 @@ export default function LeadPage() {
 
               {maxLeverage !== null ? (
                 <Link
-                  to={`/leads/${lead.id}/lever`}
+                  to={`/previsioni/leads/${lead.id}/lever`}
                   className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-[11px] font-semibold text-accent-deep transition hover:bg-[#D4E8E0]"
                 >
                   <BoltIcon className="h-3.5 w-3.5" />
@@ -564,7 +564,7 @@ export default function LeadPage() {
 
             {isClosed ? null : (
               <Link
-                to={`/act/${lead.id}`}
+                to={`/previsioni/act/${lead.id}`}
                 className="mt-4 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-accent transition hover:text-accent-deep"
               >
                 Log an action

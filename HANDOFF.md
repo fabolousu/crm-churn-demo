@@ -26,9 +26,18 @@ a fresh agent should not have to rediscover any of it.
 >   the Windows box for those.
 > - `docs/DECISIONS.md` now holds the sections in the order the handoff prescribed:
 >   T12, D7, D8/D9.
-> - Still open: T13, T14, T15, T17 (Gemini), `VERCEL_AUTOMATION_BYPASS_SECRET`, the
+> - Still open: T13, T14, T17 (Gemini), `VERCEL_AUTOMATION_BYPASS_SECRET`, the
 >   CodeRabbit paid key, the two #12 minors + the #9 `NOT NULL` minor, and the dead
 >   `api/app.py` Vercel function.
+
+> **Status update, 2026-11-20 01:45 — the T15 UI lane landed.** The CRM is now the shell
+> at `/`; the five ML screens live under `/previsioni` and the old links redirect. The
+> P0 inventory → component map, the two new gates and the remaining P1/P2 gaps are in
+> `docs/CRM_UI_STATUS.md`. Evidence on this tree: `pytest` **191 passed**; `tsc --noEmit`
+> and `vite build` clean; `pnpm --dir web check:crm` **13/13**; `check:ui`
+> **23 routes / 13 templates / 0 axe violations / 0 broken links**. T17 (independent
+> verification with Gemini) is still outstanding — this is the implementer's record, not
+> the verifier's report.
 
 ---
 

@@ -4,9 +4,9 @@ import { cn } from "./ui";
 type Tab = "overview" | "lever" | "act";
 
 const TABS: Array<{ key: Tab; label: string; href: (id: string) => string }> = [
-  { key: "overview", label: "Overview", href: (id) => `/leads/${id}` },
-  { key: "lever", label: "The lever", href: (id) => `/leads/${id}/lever` },
-  { key: "act", label: "Act", href: (id) => `/act/${id}` },
+  { key: "overview", label: "Overview", href: (id) => `/previsioni/leads/${id}` },
+  { key: "lever", label: "The lever", href: (id) => `/previsioni/leads/${id}/lever` },
+  { key: "act", label: "Act", href: (id) => `/previsioni/act/${id}` },
 ];
 
 export default function LeadTabs({
