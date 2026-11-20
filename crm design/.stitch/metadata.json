@@ -64,14 +64,14 @@
       "screenshot": "designs/lead-personali-aperti/error.png"
     },
     {
-      "id": "54b86fff89254adaa925c1e23752157e",
+      "id": "b9a8187339204f0fa4d2c244348698cd",
       "title": "Scheda Lead (finale)",
       "deviceType": "DESKTOP",
       "html": "designs/scheda-lead/scheda-lead.html",
       "screenshot": "designs/scheda-lead/scheda-lead.png"
     },
     {
-      "id": "cc33244b338e4a9e86d6af423db433a0",
+      "id": "509e3c130acc4fa1a34ad5a94905a7c1",
       "title": "Scheda Lead - Timeline vuota",
       "deviceType": "DESKTOP",
       "html": "designs/scheda-lead/empty.html",
@@ -90,6 +90,13 @@
       "deviceType": "DESKTOP",
       "html": "designs/scheda-lead/error.html",
       "screenshot": "designs/scheda-lead/error.png"
+    },
+    {
+      "id": "a372d58780c8431faea2989d8491e450",
+      "title": "Scheda Lead - Timeline popolata",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/timeline.html",
+      "screenshot": "designs/scheda-lead/timeline.png"
     }
   ]
 }
