@@ -39,3 +39,16 @@ Design system: `assets/d4a66eeb6e2e4771b7ab89cb118b7ddc` (Promos Sales Fresh, cr
 ## Owner approval
 
 Variant 3 approved on 2026-11-20. The two edit rounds were run on my own defect findings; the owner has not yet approved the refined screen or the states. Phase 2 stops here until that approval.
+
+## Re-applied design system (theme pass)
+
+The design system was applied to the four screens to keep the project theme current. Stitch re-issued them with new IDs; the visuals did not change:
+
+| Item | ID after the theme pass |
+|---|---|
+| Final screen | `ada6168dfc4043b19ecea1f3bf76000d` |
+| Empty state | `d995418f12e44733bfc57e49636df00f` |
+| Loading state | `87bd883bb2bc41a582e75cc866377e5f` |
+| Error state | `3d6e2aeb3297464d8f104a9462d7bf7d` |
+
+The four screens now carry DM Sans, `#005EB8` and ROUND_FOUR, and the apply response confirms that theme. The project-level `designTheme` field still reports the original creation values (`INTER`, `#1F8A4C`, `ROUND_EIGHT`). It is not writable: a PATCH to `/v1/projects/{id}` with `design_theme` or `designTheme` returns 200 but leaves the field unchanged, and the MCP `update_project` schema has no such field. Changing it would require a new Stitch project.
