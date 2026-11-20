@@ -125,6 +125,27 @@
       "deviceType": "DESKTOP",
       "html": "designs/previsioni-pipeline/error.html",
       "screenshot": "designs/previsioni-pipeline/error.png"
+    },
+    {
+      "id": "a8dc3e2547a841848d8017329526b783",
+      "title": "Lead 360 (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-360/lead-360.html",
+      "screenshot": "designs/lead-360/lead-360.png"
+    },
+    {
+      "id": "0419d69b755342548b41d74d512a1157",
+      "title": "Lead 360 - Caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-360/loading.html",
+      "screenshot": "designs/lead-360/loading.png"
+    },
+    {
+      "id": "7f5bee2bbe33423fa236599843f1a583",
+      "title": "Lead 360 - Errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-360/error.html",
+      "screenshot": "designs/lead-360/error.png"
     }
   ]
 }
