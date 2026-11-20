@@ -21,7 +21,7 @@ with SHAP drivers, and ranks the pipeline by **where effort actually pays off**.
 Two things coexist:
 
 1. **The CRM** — designed in `crm design/`, specified in
-   `crm design/CRM_Sales_Module_Rebuild_Spec.md` (509 lines), visualised in three Stitch
+   `crm design/design refs/CRM_Sales_Module_Rebuild_Spec.md` (509 lines), visualised in three Stitch
    screens. This is the product shell.
 2. **The ML module** — five screens (queue, lead 360, lever, act, portfolio) that already
    work end to end. They become `/previsioni` inside the CRM shell.

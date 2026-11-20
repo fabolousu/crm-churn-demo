@@ -7,7 +7,7 @@ every win probability.
 **Status:** merged at `c2a981d` (2026-11-20). The CRM shell, the lead list and the lead
 record are live; the five ML screens live under `/previsioni`. The detailed P0 row-by-row
 mapping is in [`CRM_UI_STATUS.md`](CRM_UI_STATUS.md); the functional source of truth is
-`crm design/CRM_Sales_Module_Rebuild_Spec.md`; the priority list is
+`crm design/design refs/CRM_Sales_Module_Rebuild_Spec.md`; the priority list is
 [`UI_FEATURE_INVENTORY.md`](UI_FEATURE_INVENTORY.md).
 
 **Where it runs**

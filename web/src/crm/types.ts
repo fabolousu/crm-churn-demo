@@ -1,4 +1,4 @@
-// CRM domain types — the P0 slice of `crm design/CRM_Sales_Module_Rebuild_Spec.md`.
+// CRM domain types — the P0 slice of `crm design/design refs/CRM_Sales_Module_Rebuild_Spec.md`.
 // The ML module has its own types in `web/src/lib/types.ts`; the two are deliberately
 // separate, exactly as the `crm_` SQL namespace is separate from the ML tables.
 
