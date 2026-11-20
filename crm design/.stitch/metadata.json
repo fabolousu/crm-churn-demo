@@ -97,6 +97,34 @@
       "deviceType": "DESKTOP",
       "html": "designs/scheda-lead/timeline.html",
       "screenshot": "designs/scheda-lead/timeline.png"
+    },
+    {
+      "id": "3dc7283ff58a417cae4c78ccac9d7802",
+      "title": "Previsioni Pipeline (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/previsioni-pipeline/pipeline.html",
+      "screenshot": "designs/previsioni-pipeline/pipeline.png"
+    },
+    {
+      "id": "9cc51f16b1c843e5a93f9f46238b90b1",
+      "title": "Previsioni Pipeline - Stato vuoto",
+      "deviceType": "DESKTOP",
+      "html": "designs/previsioni-pipeline/empty.html",
+      "screenshot": "designs/previsioni-pipeline/empty.png"
+    },
+    {
+      "id": "2779bcc3424046308dc0a4d2948d3af4",
+      "title": "Previsioni Pipeline - Caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/previsioni-pipeline/loading.html",
+      "screenshot": "designs/previsioni-pipeline/loading.png"
+    },
+    {
+      "id": "ee19b0302ede48d5ab5940bba6dfd848",
+      "title": "Previsioni Pipeline - Errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/previsioni-pipeline/error.html",
+      "screenshot": "designs/previsioni-pipeline/error.png"
     }
   ]
 }
