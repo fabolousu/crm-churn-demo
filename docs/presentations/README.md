@@ -3,30 +3,27 @@
 `CRM_CCIAA_PROMOS_presentazione.pdf` is the management presentation for the platform.
 
 **Language:** Italian, for the Promos Italia commercial direction.
-**Format:** A4 landscape, 20 pages, 5.7 MB.
+**Format:** A4 landscape, 18 pages, 3.6 MB.
 
 ## Contents
 
 | Pages | Section |
 |---|---|
 | 1 | Cover |
-| 2 | In one page: what it is, who it serves, what changes |
-| 3 | The current CRM: what hurts |
-| 4 | The comparison, row by row |
-| 5 | The platform in seven screens |
-| 6-7 | Lead list and Scheda Lead |
-| 8 | Previsioni, the loop |
-| 9-13 | Pipeline, Lead 360, Lever, Act, Portfolio |
-| 14 | The integrated AI: metrics and declared limits |
-| 15 | Why it is better, in six points |
-| 16-18 | Tutorial in ten steps, with screenshots |
-| 19 | Access links and quality gates |
-| 20 | Next steps |
+| 2 | In one page: what it is, who it serves, what changes, KPI |
+| 3 | The current CRM: five pain points, each with its effect |
+| 4 | The answer in five moves: Pipeline, Lead 360, Leva, Azione, Portfolio, with screenshots and arrows |
+| 5 | The comparison, row by row |
+| 6-12 | The seven screens, each with four numbered callouts and an "In pratica" band |
+| 13 | The AI in four numbers, with the Dati, Modello, Decisione diagram |
+| 14-16 | Tutorial in ten numbered steps, with screenshots and the weekly routine |
+| 17 | Why it is better, in six points |
+| 18 | Next steps and access links |
 
 ## Sources
 
 - Features and routes: `docs/SITE_REQUIREMENTS_AND_FEATURES.md`
-- Design system and never-list: `crm design/DESIGN.md`
+- Design system: `crm design/DESIGN.md`
 - Screens: live captures of the app at `https://crm-churn-demo.vercel.app`
 - Metrics: `ml/artifacts/metrics.json` (model `lead-win-lgbm-v1`)
 
