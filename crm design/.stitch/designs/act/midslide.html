@@ -72,36 +72,9 @@
 </div>
 <!-- Dynamic Visual Track -->
 <div class="col-span-12 lg:col-span-7 flex flex-col justify-center px-2">
-<div class="relative w-full h-8 flex items-center">
-<!-- Base 0-100% Track -->
-<div class="w-full h-2 rounded bg-surface-container-highest relative overflow-hidden">
-<!-- Highlight band from 60% to current marker 69% -->
-<div class="absolute left-[60%] w-[9%] top-0 bottom-0 bg-primary-fixed"></div>
-</div>
-<!-- Ghost Marker @ 60% -->
-<div class="absolute left-[60%] -translate-x-1/2 flex flex-col items-center">
-<div class="w-3.5 h-3.5 rounded-full bg-surface" style="outline: 3px solid #94A3B8;"></div>
-</div>
-<!-- Moving Indicator @ ~69% without intermediate percentage display -->
-<div class="absolute left-[69%] -translate-x-1/2 flex flex-col items-center">
-<div class="w-3.5 h-3.5 rounded-full bg-primary-container relative">
-<div class="absolute -inset-1 rounded-full bg-primary-fixed-dim opacity-40 animate-ping"></div>
-</div>
-</div>
-</div>
+<div class="relative w-full h-8 flex items-center"><div class="absolute left-[60%] -translate-x-1/2 text-center whitespace-nowrap"><span class="block font-page-title text-body-md text-on-surface font-semibold">Prima 60%</span></div></div>
 <!-- Positional & Progress Captions -->
-<div class="relative w-full h-8">
-<!-- Ghost Label Info -->
-<div class="absolute left-[60%] -translate-x-1/2 text-center whitespace-nowrap">
-<span class="block font-page-title text-body-md text-on-surface font-semibold">Prima 60%</span>
-<span class="block font-label-md text-[11px] text-secondary">Posizione #7</span>
-</div>
-<!-- Moving Label (strictly no number/percentage) -->
-<div class="absolute left-[69%] -translate-x-1/2 text-center whitespace-nowrap">
-<span class="block font-table-header text-table-header text-primary font-bold tracking-tight">In transizione...</span>
-<span class="block font-label-md text-[11px] text-primary font-semibold">Posizione #3</span>
-</div>
-</div>
+<div class="relative w-full h-8"><div class="absolute left-[60%] -translate-x-1/2 text-center whitespace-nowrap"><span class="block font-page-title text-body-md text-on-surface font-semibold">Prima 60%</span></div></div>
 <!-- Centered Subtitle Note -->
 <div class="text-center mt-1">
 <span class="font-label-md text-label-md text-secondary italic">Anteprima visiva, non una previsione</span>

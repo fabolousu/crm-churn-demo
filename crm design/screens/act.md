@@ -6,8 +6,8 @@ Phase 2, screen 6 of 7. Checked against the never-list in `crm design/DESIGN.md`
 
 | Item | Stitch screen ID | File |
 |---|---|---|
-| Final screen (owner picked Variant 1, one edit round) | `cc9355579e2a425c8b186f552fdb643d` | `designs/act/act.png` |
-| Preview in progress (mid slide) | `b8fc30e26b11449a83d525e20fc493a8` | `designs/act/midslide.png` |
+| Final screen (owner picked Variant 1, one edit round) | `561cae0231ae4588a3f63f24574a58ab` | `designs/act/act.png` |
+| Preview in progress (mid slide) | `24dd05b5d7b8461aa84b9f7b8796195b` | `designs/act/midslide.png` |
 | Loading state | `2fb5fe70e80d45b594b53f5ade8f21ae` | `designs/act/loading.png` |
 | Error state | `cb8f4231e7324d68ab77b790233a84ac` | `designs/act/error.png` |
 | Chosen variant before edits | `2b0e4ae5310740c0afaea20be432a347` | Variant 1, Top Cockpit |
@@ -18,8 +18,9 @@ Design system: `assets/d4a66eeb6e2e4771b7ab89cb118b7ddc`.
 
 The impact strip now has a horizontal 0 to 100 track with two fixed markers:
 
-- a grey ghost marker at 60%, labelled `Prima 60%` and `Posizione #7`;
-- a solid blue marker at 78%, labelled `Dopo 78%` and `Posizione #3`;
+- a grey ghost marker at 60%, labelled `Prima 60%`;
+- a solid blue marker at 78%, labelled `Dopo 78%`;
+- no position labels under the track: the rank change lives only in the `Avanza di 4 posizioni` badge;
 - the band between them filled light blue `#CBE4FB`;
 - a play button `Anteprima` that runs the slide once;
 - the caption `Anteprima visiva, non una previsione`.
@@ -46,6 +47,7 @@ The mid-slide screen shows the moving marker between the two points with no inte
 3. Removed the invented `efficacia storica del touchpoint` note.
 4. Replaced the boxed before and after percentages with the slide component.
 5. Inset the commit bar from the viewport edge.
+6. Removed the `Posizione #7` and `Posizione #3` lines under the track. The two labels `Prima 60%` and `Dopo 78%` sit on one baseline without overlapping, and the rank change is only in the badge.
 
 ## Carried to implementation
 
