@@ -195,6 +195,27 @@
       "deviceType": "DESKTOP",
       "html": "designs/act/error.html",
       "screenshot": "designs/act/error.png"
+    },
+    {
+      "id": "fe282bbc38d04fc58321be597a930aa7",
+      "title": "Previsioni Portfolio (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/portfolio/portfolio.html",
+      "screenshot": "designs/portfolio/portfolio.png"
+    },
+    {
+      "id": "83ea772e89a74cfab59a743ab1c18b6b",
+      "title": "Previsioni Portfolio - Caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/portfolio/loading.html",
+      "screenshot": "designs/portfolio/loading.png"
+    },
+    {
+      "id": "b0bd6d4f28b64408a23d34c492006a80",
+      "title": "Previsioni Portfolio - Errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/portfolio/error.html",
+      "screenshot": "designs/portfolio/error.png"
     }
   ]
 }
