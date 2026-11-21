@@ -49,6 +49,46 @@ export function driverLabel(label: string): string {
   return DRIVER_LABELS[label] ?? label;
 }
 
+const DRIVER_VALUE_MAP: Record<string, string> = {
+  "no response yet": "nessuna risposta",
+  "no discount": "nessuno sconto",
+  "no meetings yet": "nessun incontro",
+  "Partner lead": "Lead da partner",
+  "Referral lead": "Lead da segnalazione",
+};
+
+export function counterfactualExplanation(text: string): string {
+  return text
+    .replace(/^Applying an executive sponsor meeting/, "Applicando un incontro con sponsor esecutivo")
+    .replace(/^Applying a discovery meeting/, "Applicando una sessione di discovery")
+    .replace(/^Applying a (\d+)% discount/, "Applicando uno sconto del $1%")
+    .replace(/\(\+1 meeting, \+5 NPS\)/, "(+1 incontro, +5 NPS)")
+    .replace(/\(\+1 meeting\)/, "(+1 incontro)")
+    .replace(
+      /moves this initiative from ([\d.]+)% to ([\d.]+)% \(([+-][\d.]+) points\)/,
+      "porta l'iniziativa da $1% a $2% ($3 punti)",
+    )
+    .replace(/re-scored by the same model\./, "ricalcolato dallo stesso modello.")
+    .replace(/(\d)\.(\d)/g, "$1,$2");
+}
+
+export function driverValue(value: string): string {
+  const mapped = DRIVER_VALUE_MAP[value];
+  if (mapped) return mapped;
+  return value
+    .replace(/^(\d+(?:[.,]\d+)?) hours to first response$/, "$1 ore alla prima risposta")
+    .replace(/^(\d+(?:[.,]\d+)?) days to first response$/, "$1 giorni alla prima risposta")
+    .replace(/^(\d+) minutes to first response$/, "$1 minuti alla prima risposta")
+    .replace(/^(\d+) initiatives lost before$/, "$1 iniziative perse in precedenza")
+    .replace(/^(\d+) initiatives won before$/, "$1 iniziative vinte in precedenza")
+    .replace(/^(\d+) support tickets in 90 days$/, "$1 ticket di assistenza in 90 giorni")
+    .replace(/^(\d+) meetings so far$/, "$1 incontri finora")
+    .replace(/^([\d.]+)% discount$/, "$1% di sconto")
+    .replace(/^NPS (\d+)$/, "NPS $1")
+    .replace(/^rep wins (\d+)% of initiatives$/, "il referente vince il $1% delle iniziative")
+    .replace(/^€([\d.,]+) proposed ARR$/, "€$1 di ARR proposto");
+}
+
 export function formatEUR(value: number, fractionDigits = 0): string {
   const number = new Intl.NumberFormat("it-IT", {
     maximumFractionDigits: fractionDigits,
