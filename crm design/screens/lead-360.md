@@ -6,7 +6,7 @@ Phase 2, screen 4 of 7. Checked against the never-list in `crm design/DESIGN.md`
 
 | Item | Stitch screen ID | File |
 |---|---|---|
-| Final screen (owner picked Variant 2, two edit rounds) | `a8dc3e2547a841848d8017329526b783` | `designs/lead-360/lead-360.png` |
+| Final screen (owner picked Variant 2, two edit rounds) | `a0a7ba7292e6465c850fd6f8070948a0` | `designs/lead-360/lead-360.png` |
 | Loading state | `0419d69b755342548b41d74d512a1157` | `designs/lead-360/loading.png` |
 | Error state | `7f5bee2bbe33423fa236599843f1a583` | `designs/lead-360/error.png` |
 | Chosen variant before edits | `5bf9012ddb184018bba822da5c024572` | Variant 2, Hero Affiancato |
@@ -36,10 +36,11 @@ Design system: `assets/d4a66eeb6e2e4771b7ab89cb118b7ddc`.
 6. Title uses `Moretti Componenti S.a.s. · Missione Svezia - Wine`.
 7. **Wheel UX:** the dial is about 300px, `60%` is 56px, and the `28,66%` prevalence moved out of the ring into a legend below it, with the `+31,3 punti` difference. No text sits on the arc, and the end labels `0%` and `100%` have room.
 8. Removed the light blue box that repeated the `+31,3 punti` difference under the values.
+9. **Threshold marker:** the `28,66%` line on the dial is now a 4px ink stroke with a 6px dot at the arc and a `28.66%` flag outside the ring, matching the legend swatch. It is no longer a hairline.
 
 ## Carried to implementation
 
-1. The dial mark at 28,66% is a tick with the value in the legend, not a label on the arc. Keep that pairing.
+1. The marker label uses a dot (`28.66%`) while the legend uses the Italian comma (`28,66%`). The implementation must format both with the Italian locale.
 2. The model panel keeps the real artifacts: `lead-win-lgbm-v1`, AUC 0.773, calibration error 0.0104, scored 18/11/2026 16:10.
 3. The driver points (`+14,2`, `+6,8`, `-3,1`) are design examples. The implementation must compute them from the SHAP values.
 4. The company facts (`Giorni apertura 150`, `Stato dormienza Attivo`) come from the ML dataset and are real for this record in the demo.
