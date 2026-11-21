@@ -20,7 +20,7 @@ export default function RegionFilter({
     label: string;
     count: number;
   }> = [
-    { value: "all", label: "All regions", count: total },
+    { value: "all", label: "Tutte le regioni", count: total },
     ...REGIONS.map((region) => ({
       value: region as RegionFilterValue,
       label: regionLabel(region),
@@ -33,7 +33,7 @@ export default function RegionFilter({
     <div
       className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible"
       role="group"
-      aria-label="Filter by region"
+      aria-label="Filtra per regione"
     >
       {options.map((option) => {
         const active = selected === option.value;

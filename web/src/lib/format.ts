@@ -17,20 +17,20 @@ const REGION_LABELS: Record<Region, string> = {
 };
 
 const SOURCE_LABELS: Record<Source, string> = {
-  inbound: "Inbound",
-  outbound: "Outbound",
-  referral: "Referral",
+  inbound: "In entrata",
+  outbound: "In uscita",
+  referral: "Segnalazione",
   partner: "Partner",
-  event: "Event",
+  event: "Evento",
 };
 
 const STATUS_LABELS: Record<LeadStatus, string> = {
-  new: "New",
-  contacted: "Contacted",
-  qualified: "Qualified",
-  proposal: "Proposal",
-  won: "Won",
-  lost: "Lost",
+  new: "Nuovo",
+  contacted: "Contattato",
+  qualified: "Qualificato",
+  proposal: "Proposta",
+  won: "Vinta",
+  lost: "Persa",
 };
 
 export const regionLabel = (r: Region) => REGION_LABELS[r];
@@ -40,13 +40,21 @@ export const sourceLabel = (s: Source) => SOURCE_LABELS[s];
 export const statusLabel = (s: string) =>
   STATUS_LABELS[s as LeadStatus] ?? s;
 
+const DRIVER_LABELS: Record<string, string> = {
+  "Proposed ARR": "ARR proposto",
+  "Referral partner": "Partner segnalatore",
+};
+
+export function driverLabel(label: string): string {
+  return DRIVER_LABELS[label] ?? label;
+}
+
 export function formatEUR(value: number, fractionDigits = 0): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "EUR",
+  const number = new Intl.NumberFormat("it-IT", {
     maximumFractionDigits: fractionDigits,
     minimumFractionDigits: fractionDigits,
   }).format(value);
+  return `€${number}`;
 }
 
 // Intl's en-GB compact notation renders "€205.2m" and "€122.4k" in lower case.
@@ -56,7 +64,7 @@ export function formatEURCompact(value: number): string {
   const abs = Math.abs(value);
   const compact = (divisor: number, suffix: string) => {
     const scaled = abs / divisor;
-    return `${sign}€${scaled.toFixed(1).replace(/\.0$/, "")}${suffix}`;
+    return `${sign}€${scaled.toFixed(1).replace(/\.0$/, "").replace(".", ",")}${suffix}`;
   };
 
   if (abs >= 1_000_000_000) return compact(1_000_000_000, "B");
@@ -66,7 +74,7 @@ export function formatEURCompact(value: number): string {
 }
 
 export function formatPercent(value: number, fractionDigits = 0): string {
-  return new Intl.NumberFormat("en-GB", {
+  return new Intl.NumberFormat("it-IT", {
     style: "percent",
     maximumFractionDigits: fractionDigits,
     minimumFractionDigits: fractionDigits,
@@ -76,7 +84,7 @@ export function formatPercent(value: number, fractionDigits = 0): string {
 export function formatPoints(value: number, digits = 1): string {
   const pts = value * 100;
   const sign = pts > 0 ? "+" : pts < 0 ? "−" : "";
-  return `${sign}${Math.abs(pts).toFixed(digits)} pts`;
+  return `${sign}${Math.abs(pts).toFixed(digits).replace(".", ",")} pt`;
 }
 
 export function formatSignedEUR(value: number): string {
@@ -85,7 +93,7 @@ export function formatSignedEUR(value: number): string {
 }
 
 export function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat("it-IT", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -93,7 +101,7 @@ export function formatDate(iso: string): string {
 }
 
 export function formatDateTime(iso: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat("it-IT", {
     day: "numeric",
     month: "short",
     hour: "2-digit",
@@ -103,12 +111,12 @@ export function formatDateTime(iso: string): string {
 }
 
 const LOST_REASON_LABELS: Record<string, string> = {
-  price: "price",
-  no_budget: "no budget",
-  competitor: "competitor",
-  no_fit: "no fit",
-  timing: "timing",
-  silent: "went silent",
+  price: "prezzo",
+  no_budget: "budget assente",
+  competitor: "concorrente",
+  no_fit: "non adatto",
+  timing: "tempi",
+  silent: "nessuna risposta",
 };
 
 export function lostReasonLabel(reason: string | null): string {
@@ -117,10 +125,10 @@ export function lostReasonLabel(reason: string | null): string {
 }
 
 const ACTION_KIND_LABELS: Record<string, string> = {
-  call: "Call",
-  exec_sponsor_meeting: "Executive sponsor meeting",
-  discovery_meeting: "Discovery meeting",
-  discount_review: "Discount review",
+  call: "Telefonata",
+  exec_sponsor_meeting: "Incontro con sponsor esecutivo",
+  discovery_meeting: "Sessione di discovery",
+  discount_review: "Revisione sconto",
 };
 
 export function actionKindLabel(kind: string): string {

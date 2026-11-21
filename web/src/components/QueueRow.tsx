@@ -6,8 +6,10 @@ import {
   formatOrdinal,
   formatPercent,
   formatPoints,
+  driverLabel,
   regionLabel,
   sourceLabel,
+  statusLabel,
 } from "../lib/format";
 import {
   BoltIcon,
@@ -31,7 +33,7 @@ export default function QueueRow({
   return (
     <Link
       to={`/previsioni/leads/${item.lead_id}`}
-      className="group grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-x-4 gap-y-4 rounded-2xl border border-line bg-surface px-4 py-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent/35 hover:shadow-[0_18px_40px_-26px_rgba(20,24,31,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 md:grid-cols-[2.25rem_minmax(0,1.45fr)_minmax(0,1.02fr)_152px_116px_1rem] md:items-center md:gap-5 md:px-5 md:py-5"
+      className="group grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-x-4 gap-y-4 rounded-[4px] border border-line bg-surface px-4 py-3 transition duration-150 hover:border-accent/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 md:grid-cols-[2.25rem_minmax(0,1.45fr)_minmax(0,1.02fr)_152px_116px_1rem] md:items-center md:gap-5 md:px-5 md:py-5"
     >
       <div
         className={cn(
@@ -55,7 +57,7 @@ export default function QueueRow({
         </div>
         <p className="mt-1.5 truncate text-[11.5px] text-muted">
           {regionLabel(item.region)} · {sourceLabel(item.source)} ·{" "}
-          {item.days_open} days open · {item.status}
+          {item.days_open} giorni aperta · {statusLabel(item.status)}
         </p>
       </div>
 
@@ -76,17 +78,17 @@ export default function QueueRow({
         </span>
         <div className="min-w-0">
           <p className="text-[9.5px] font-semibold uppercase tracking-[0.13em] text-muted">
-            {item.top_driver.label}
+            {driverLabel(item.top_driver.label)}
           </p>
           <p className="mt-0.5 text-[12.5px] leading-snug text-ink/80">
-            {item.top_driver.value}
+            {item.top_driver.value.replace(/proposed ARR/i, "ARR proposto")}
           </p>
         </div>
       </div>
 
       <div className="min-w-0">
         <p className="text-[9.5px] font-semibold uppercase tracking-[0.13em] text-muted md:hidden">
-          Win probability
+          Probabilità
         </p>
         <div className="mt-0.5 flex items-baseline gap-2 md:mt-0">
           <span className="font-display text-[26px] leading-none tabular-nums text-ink">
@@ -103,7 +105,7 @@ export default function QueueRow({
           {typeof item.max_leverage === "number" ? (
             <span
               className="inline-flex items-center gap-1 text-[9.5px] text-muted"
-              title="Largest achievable probability lift across the three counterfactual levers"
+              title="Il maggiore incremento di probabilità tra le tre leve"
             >
               <BoltIcon className="h-2.5 w-2.5 text-accent" />
               Leverage{" "}
@@ -117,14 +119,14 @@ export default function QueueRow({
 
       <div className="min-w-0 md:text-right">
         <p className="text-[9.5px] font-semibold uppercase tracking-[0.13em] text-muted">
-          <span className="md:hidden">Value · </span>
-          <span className="hidden md:inline">Proposed ARR</span>
+          <span className="md:hidden">Valore · </span>
+          <span className="hidden md:inline">ARR proposto</span>
         </p>
         <p className="mt-1 text-[14px] font-semibold tabular-nums text-ink">
           {formatEUR(item.amount_arr)}
         </p>
         <p className="mt-0.5 text-[11px] tabular-nums text-muted">
-          {formatEURCompact(item.expected_value)} expected
+          {formatEURCompact(item.expected_value)} atteso
         </p>
       </div>
 

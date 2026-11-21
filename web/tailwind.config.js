@@ -4,15 +4,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: "#F6F4EF",
+        paper: "#FFFFFF",
         surface: "#FFFFFF",
-        ink: "#14181F",
+        ink: "#19242E",
         muted: "#5B6472",
-        line: "#E5E0D6",
+        line: "#DBE2E8",
         accent: {
-          DEFAULT: "#0F6B5C",
-          soft: "#E3EFEA",
-          deep: "#0A4A40",
+          DEFAULT: "#005EB8",
+          soft: "#CBE4FB",
+          deep: "#00499D",
         },
         brand: {
           DEFAULT: "#005EB8",
