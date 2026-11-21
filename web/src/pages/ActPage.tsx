@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   Link,
   useLocation,
@@ -23,6 +23,7 @@ import {
   cn,
   InlineNotice,
   PageHeader,
+  ProbabilityTransition,
   SectionHeading,
 } from "../components/ui";
 import { bandForProbability } from "../lib/bands";
@@ -132,6 +133,15 @@ export default function ActPage() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const bannerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!outcome) return;
+    setBannerDismissed(false);
+    const frame = requestAnimationFrame(() => bannerRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [outcome]);
 
   useEffect(() => {
     if (!leadId && defaultActLeadId) {
@@ -351,6 +361,34 @@ export default function ActPage() {
         </div>
       </Card>
 
+      {outcome && !bannerDismissed ? (
+        <div
+          ref={bannerRef}
+          role="status"
+          aria-live="polite"
+          tabIndex={-1}
+          data-testid="action-success-banner"
+          className="mt-6 flex flex-wrap items-center gap-3 rounded-[4px] border border-[#A9C7FF] bg-[#F2F7FC] px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        >
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#CBE4FB] text-[#00499D]">
+            <CheckIcon className="h-4 w-4" />
+          </span>
+          <p className="min-w-0 flex-1 text-[12.5px] font-medium text-ink">
+            Azione registrata con successo. Il modello ha aggiornato il punteggio.
+          </p>
+          <span className="text-[12px] font-semibold tabular-nums text-[#00499D]">
+            {formatPoints(outcome.response.delta)}
+          </span>
+          <button
+            type="button"
+            onClick={() => setBannerDismissed(true)}
+            className="rounded-[4px] px-2 py-1 text-[11.5px] font-medium text-muted hover:bg-[#EEF2F5] hover:text-ink"
+          >
+            Chiudi
+          </button>
+        </div>
+      ) : null}
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)]">
         <div className="space-y-5">
           {outcome ? (
@@ -421,6 +459,15 @@ export default function ActPage() {
                     {moved ? `da #${outcome.before.rank}` : "posizione invariata"}
                   </p>
                 </div>
+              </div>
+
+              <div className="mt-6">
+                <ProbabilityTransition
+                  from={outcome.before.probability}
+                  to={outcome.after.probability}
+                  fromLabel="Prima"
+                  toLabel="Dopo"
+                />
               </div>
 
               {outcome.response.delta === 0 ? (
