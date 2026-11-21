@@ -77,13 +77,13 @@ export default function PipelinePage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Pipeline · 18 November 2026"
-        title="What's worth a meeting today"
-        subtitle="Open initiatives ranked by expected value — probability × proposed ARR. Not a list of records: a queue ordered by the work that pays."
+        eyebrow="Pipeline · Previsioni AI"
+        title="Iniziative per valore atteso"
+        subtitle="Coda delle opportunità ordinate per valore atteso: probabilità moltiplicata per ARR proposto."
         actions={
           <Link to="/previsioni/portfolio" className={buttonSecondary}>
             <GridIcon className="h-4 w-4" />
-            Portfolio view
+            Vista Portfolio
           </Link>
         }
       />
@@ -91,34 +91,30 @@ export default function PipelinePage() {
       <Card className="grid grid-cols-2 gap-6 p-6 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-line lg:p-0">
         <div className="lg:px-6 lg:py-6">
           <Stat
-            label="Expected pipeline value"
+            label="Valore atteso pipeline"
             value={formatEURCompact(pipeline.total_expected_value)}
-            hint={`across ${pipeline.total.toLocaleString("en-GB")} open initiatives`}
+            hint={`su ${pipeline.total.toLocaleString("it-IT")} iniziative aperte`}
           />
         </div>
         <div className="lg:px-6 lg:py-6">
           <Stat
-            label="Open pipeline"
-            value={openArr !== null ? formatEURCompact(openArr) : "—"}
-            hint={
-              atRisk !== null
-                ? `${formatEURCompact(atRisk)} at risk`
-                : "open ARR not in the pipeline payload"
-            }
+            label="Valore a rischio"
+            value={atRisk !== null ? formatEURCompact(atRisk) : "—"}
+            hint="ARR non atteso"
           />
         </div>
         <div className="lg:px-6 lg:py-6">
           <Stat
-            label="Win rate"
+            label="Tasso di conversione storico"
             value={formatPercent(prevalence, 2)}
-            hint="labelled prevalence, five regions"
+            hint="prevalenza sulle iniziative chiuse"
           />
         </div>
         <div className="lg:px-6 lg:py-6">
           <Stat
-            label="Median best lever"
-            value={formatPoints(LEVERAGE_BOOK.median, 2)}
-            hint={`90th percentile ${formatPoints(LEVERAGE_BOOK.p90, 2)}`}
+            label="Iniziative aperte"
+            value={pipeline.total.toLocaleString("it-IT")}
+            hint="cinque macro-regioni"
           />
         </div>
       </Card>
@@ -133,14 +129,14 @@ export default function PipelinePage() {
 
         <div className="flex items-center gap-2.5">
           <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
-            Sort
+            Ordina per
           </span>
           <div className="inline-flex rounded-lg border border-line bg-surface p-0.5">
             {(
               [
-                ["expected_value", "Expected value"],
-                ["at_risk", "Value at risk"],
-                ["leverage", "Leverage"],
+                ["expected_value", "Valore atteso"],
+                ["at_risk", "Valore a rischio"],
+                ["leverage", "Leva massima"],
               ] as const
             ).map(([key, label]) => (
               <button
@@ -165,28 +161,28 @@ export default function PipelinePage() {
       <div className="mt-5 flex flex-wrap items-baseline justify-between gap-2">
         <p className="text-[11.5px] text-muted">
           {region === "all"
-            ? `Showing ${items.length} of ${pipeline.total.toLocaleString("en-GB")} open initiatives`
-            : `${items.length} shown · ${regionOpenLeads.toLocaleString("en-GB")} open in ${regionLabel(region)}`}
+            ? `Mostrate ${items.length} di ${pipeline.total.toLocaleString("it-IT")} iniziative`
+            : `${items.length} mostrate · ${regionOpenLeads.toLocaleString("it-IT")} aperte in ${regionLabel(region)}`}
           <span className="mx-2 text-line">/</span>
           <span className="font-medium text-ink">
-            {formatEUR(viewValue)} expected in view
+            {formatEUR(viewValue)} attesi nella vista
           </span>
         </p>
         <p className="text-[11.5px] text-muted">
           {sort === "at_risk"
-            ? "Sorted by value at risk — (1 − probability) × proposed ARR"
+            ? "Ordinate per valore a rischio: (1 − probabilità) × ARR proposto"
             : sort === "leverage"
-              ? "Sorted by max leverage — the largest lift across the three levers"
-              : "Sorted by expected value — probability × proposed ARR"}
+              ? "Ordinate per leva massima: il maggiore incremento tra le tre leve"
+              : "Ordinate per valore atteso: probabilità × ARR proposto"}
         </p>
       </div>
 
       <div className="mt-3 hidden grid-cols-[2.25rem_minmax(0,1.45fr)_minmax(0,1.02fr)_152px_116px_1rem] gap-5 px-5 pb-2 text-[9.5px] font-semibold uppercase tracking-[0.14em] text-muted md:grid">
         <span />
-        <span>Initiative</span>
-        <span>Strongest driver</span>
-        <span>Win probability</span>
-        <span className="text-right">Value</span>
+        <span>Iniziativa</span>
+        <span>Fattore principale</span>
+        <span>Probabilità</span>
+        <span className="text-right">Valore</span>
         <span />
       </div>
 
@@ -198,10 +194,10 @@ export default function PipelinePage() {
             rank={index + 1}
             badge={
               sort === "at_risk"
-                ? "Most at risk"
+                ? "Più a rischio"
                 : sort === "leverage"
-                  ? "Most leverage"
-                  : "Top of queue"
+                  ? "Più leva"
+                  : "In cima alla coda"
             }
           />
         ))}
@@ -209,30 +205,29 @@ export default function PipelinePage() {
 
       <div className="mt-8 grid gap-4 border-t border-line pt-5 text-[10.5px] leading-relaxed text-muted md:grid-cols-[1fr_1fr_auto]">
         <p>
-          Probability bands follow the model: low below 20%, medium below 40%,
-          high below 60%, and the contract's critical band (shown as{" "}
-          <span className="font-medium text-ink">Top</span>) at 60% or above.
-          They are win-probability bands, not risk ratings; the UI re-bands
-          every re-score from the same cut-points.
+          Le fasce di probabilità seguono il modello: bassa sotto il 20%, media
+          sotto il 40%, alta sotto il 60%, critica (mostrata come{" "}
+          <span className="font-medium text-ink">Top</span>) dal 60% in su.
+          Sono fasce di probabilità di conversione, non giudizi di rischio.
         </p>
         <p>
-          Leverage is the contract's <code>max_leverage</code>: the largest
-          achievable probability lift across the three levers. The book median is{" "}
+          La leva è il <code>max_leverage</code> del contratto: il maggiore
+          incremento di probabilità tra le tre leve. La mediana del libro è{" "}
           <span className="font-medium text-ink">
             {formatPoints(LEVERAGE_BOOK.median, 2)}
           </span>
-          ; the 90th percentile is{" "}
+          ; il 90° percentile è{" "}
           <span className="font-medium text-ink">
             {formatPoints(LEVERAGE_BOOK.p90, 2)}
           </span>
-          . Sort by it to see where effort pays off — the median is only +0.43
-          points, so the tail is the point.
+          . Ordina per leva per vedere dove lo sforzo paga: la mediana è solo
+          +0,43 punti, quindi la coda è il punto.
         </p>
         <Link
           to="/previsioni/act"
           className="inline-flex items-center gap-1.5 font-medium text-accent hover:text-accent-deep"
         >
-          Act on the next call
+          Registra la prossima azione
           <ArrowUpRightIcon className="h-3.5 w-3.5" />
         </Link>
       </div>

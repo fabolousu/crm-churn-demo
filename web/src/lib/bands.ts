@@ -23,8 +23,8 @@ type BandStyle = {
 
 export const BAND_STYLES: Record<Band, BandStyle> = {
   low: {
-    label: "Low",
-    short: "Low",
+    label: "Bassa",
+    short: "Bassa",
     dot: "bg-[#98A2B3]",
     pill: "bg-[#F2F4F7] text-[#475467] ring-[#D0D5DD]",
     bar: "bg-[#98A2B3]",
@@ -32,8 +32,8 @@ export const BAND_STYLES: Record<Band, BandStyle> = {
     hex: "#98A2B3",
   },
   medium: {
-    label: "Medium",
-    short: "Medium",
+    label: "Media",
+    short: "Media",
     dot: "bg-copper",
     pill: "bg-[#FDF1E3] text-[#8A3A06] ring-[#F5D0A9]",
     bar: "bg-copper",
@@ -41,13 +41,13 @@ export const BAND_STYLES: Record<Band, BandStyle> = {
     hex: "#B4693A",
   },
   high: {
-    label: "High",
-    short: "High",
+    label: "Alta",
+    short: "Alta",
     dot: "bg-accent",
-    pill: "bg-[#E3EFEA] text-[#0A4A40] ring-[#BFDCD2]",
+    pill: "bg-[#CBE4FB] text-[#00499D] ring-[#A9C7FF]",
     bar: "bg-accent",
     text: "text-accent-deep",
-    hex: "#0F6B5C",
+    hex: "#005EB8",
   },
   critical: {
     // The contract calls the highest probability band "critical"; on screen
@@ -58,6 +58,6 @@ export const BAND_STYLES: Record<Band, BandStyle> = {
     pill: "bg-accent text-paper ring-accent-deep",
     bar: "bg-accent-deep",
     text: "text-accent-deep",
-    hex: "#0A4A40",
+    hex: "#00499D",
   },
 };
