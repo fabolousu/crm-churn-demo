@@ -27,22 +27,22 @@ export default function EntityListPage({ entity }: { entity: EntityKind }) {
     <div>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-[20px] font-semibold tracking-tight text-ink">{meta.title}</h1>
+          <h1 className="text-[20px] font-semibold tracking-tight text-[#19242E]">{meta.title}</h1>
           <p className="mt-0.5 text-[12px] text-muted">
             {meta.count(rowCount)} · dati dimostrativi deterministici
           </p>
         </div>
-        <span className="rounded-full border border-line bg-surface px-2.5 py-1 text-[10.5px] font-medium text-muted">
+        <span className="rounded-full border border-[#DBE2E8] bg-surface px-2.5 py-1 text-[10.5px] font-medium text-muted">
           Predefinito
         </span>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-surface shadow-card">
+      <div className="overflow-x-auto rounded-[4px] border border-[#DBE2E8] bg-surface shadow-none">
         <table className="w-full border-collapse text-left">
           {entity === "aziende" ? (
             <>
               <thead>
-                <tr className="border-b border-line bg-[#F7F7F5] text-[10px] uppercase tracking-[0.08em] text-muted">
+                <tr className="border-b border-[#DBE2E8] bg-[#FFFFFF] text-[10px] uppercase tracking-[0.08em] text-muted">
                   <th scope="col" className="px-4 py-2.5 font-semibold">Denominazione</th>
                   <th scope="col" className="px-4 py-2.5 font-semibold">Codice Fiscale</th>
                   <th scope="col" className="px-4 py-2.5 font-semibold">Partita IVA</th>
@@ -53,8 +53,8 @@ export default function EntityListPage({ entity }: { entity: EntityKind }) {
               </thead>
               <tbody>
                 {crm.companies.map((company) => (
-                  <tr key={company.id} className="border-b border-line/70 text-[12.5px] hover:bg-[#FAFAF7]">
-                    <td className="px-4 py-2.5 font-medium text-ink">{company.name}</td>
+                  <tr key={company.id} className="border-b border-[#DBE2E8]/70 text-[12.5px] hover:bg-[#F7FAFD]">
+                    <td className="px-4 py-2.5 font-medium text-[#19242E]">{company.name}</td>
                     <td className="px-4 py-2.5 text-muted tabular-nums">{company.taxCode}</td>
                     <td className="px-4 py-2.5 text-muted tabular-nums">{company.vat}</td>
                     <td className="px-4 py-2.5 text-muted">{company.province}</td>
@@ -69,7 +69,7 @@ export default function EntityListPage({ entity }: { entity: EntityKind }) {
           {entity === "contatti" ? (
             <>
               <thead>
-                <tr className="border-b border-line bg-[#F7F7F5] text-[10px] uppercase tracking-[0.08em] text-muted">
+                <tr className="border-b border-[#DBE2E8] bg-[#FFFFFF] text-[10px] uppercase tracking-[0.08em] text-muted">
                   <th scope="col" className="px-4 py-2.5 font-semibold">Nome completo</th>
                   <th scope="col" className="px-4 py-2.5 font-semibold">E-mail</th>
                   <th scope="col" className="px-4 py-2.5 font-semibold">Telefono</th>
@@ -79,8 +79,8 @@ export default function EntityListPage({ entity }: { entity: EntityKind }) {
               </thead>
               <tbody>
                 {crm.contacts.map((contact) => (
-                  <tr key={contact.id} className="border-b border-line/70 text-[12.5px] hover:bg-[#FAFAF7]">
-                    <td className="px-4 py-2.5 font-medium text-ink">{contact.fullName}</td>
+                  <tr key={contact.id} className="border-b border-[#DBE2E8]/70 text-[12.5px] hover:bg-[#F7FAFD]">
+                    <td className="px-4 py-2.5 font-medium text-[#19242E]">{contact.fullName}</td>
                     <td className="px-4 py-2.5 text-muted">{contact.email}</td>
                     <td className="px-4 py-2.5 text-muted tabular-nums">{contact.phone}</td>
                     <td className="px-4 py-2.5 text-muted">{contact.maturity}</td>
@@ -99,7 +99,7 @@ export default function EntityListPage({ entity }: { entity: EntityKind }) {
           {entity === "iniziative" ? (
             <>
               <thead>
-                <tr className="border-b border-line bg-[#F7F7F5] text-[10px] uppercase tracking-[0.08em] text-muted">
+                <tr className="border-b border-[#DBE2E8] bg-[#FFFFFF] text-[10px] uppercase tracking-[0.08em] text-muted">
                   <th scope="col" className="px-4 py-2.5 font-semibold">Codice</th>
                   <th scope="col" className="px-4 py-2.5 font-semibold">Nome</th>
                   <th scope="col" className="px-4 py-2.5 font-semibold">1° Referente</th>
@@ -108,9 +108,9 @@ export default function EntityListPage({ entity }: { entity: EntityKind }) {
               </thead>
               <tbody>
                 {crm.initiatives.map((initiative) => (
-                  <tr key={initiative.id} className="border-b border-line/70 text-[12.5px] hover:bg-[#FAFAF7]">
+                  <tr key={initiative.id} className="border-b border-[#DBE2E8]/70 text-[12.5px] hover:bg-[#F7FAFD]">
                     <td className="px-4 py-2.5 font-mono text-[11.5px] text-muted">{initiative.code}</td>
-                    <td className="px-4 py-2.5 font-medium text-ink">{initiative.name}</td>
+                    <td className="px-4 py-2.5 font-medium text-[#19242E]">{initiative.name}</td>
                     <td className="px-4 py-2.5 text-muted">
                       {crm.ownerById(initiative.referenteId)?.name}
                     </td>

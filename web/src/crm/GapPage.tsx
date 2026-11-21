@@ -55,7 +55,7 @@ export default function GapPage() {
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
         Fuori dal percorso demo · {gap.priority}
       </p>
-      <h1 className="mt-2 text-[26px] font-semibold tracking-tight text-ink">{gap.title}</h1>
+      <h1 className="mt-2 text-[26px] font-semibold tracking-tight text-[#19242E]">{gap.title}</h1>
       <p className="mt-3 text-[13.5px] leading-relaxed text-muted">{gap.next}</p>
       <p className="mt-4 text-[12px] leading-relaxed text-muted">
         La demo P0 copre la shell, <strong>Lead personali aperti</strong>, <strong>Scheda Lead</strong> e il
@@ -65,13 +65,13 @@ export default function GapPage() {
       <div className="mt-6 flex gap-2">
         <Link
           to="/"
-          className="inline-flex h-9 items-center rounded-md bg-[#176B3B] px-4 text-[13px] font-semibold text-white hover:bg-[#14562F]"
+          className="inline-flex h-9 items-center rounded-[4px] bg-[#00499D] px-4 text-[13px] font-semibold text-white hover:bg-[#003A7A]"
         >
           Torna ai lead
         </Link>
         <Link
           to="/previsioni"
-          className="inline-flex h-9 items-center rounded-md border border-line px-4 text-[13px] font-medium text-ink hover:bg-ink/[0.03]"
+          className="inline-flex h-9 items-center rounded-[4px] border border-[#DBE2E8] px-4 text-[13px] font-medium text-[#19242E] hover:bg-ink/[0.03]"
         >
           Apri Previsioni
         </Link>

@@ -64,7 +64,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="flex items-center gap-1.5 text-[11.5px] font-medium text-ink">
+      <span className="flex items-center gap-1.5 text-[11.5px] font-medium text-[#19242E]">
         {label}
         {required ? (
           <span className="text-[#B42318]" aria-label="campo obbligatorio">
@@ -84,7 +84,7 @@ function Field({
 }
 
 const inputClass =
-  "h-9 w-full rounded-md border border-line bg-surface px-2.5 text-[13px] text-ink focus:border-[#176B3B]/40 focus:outline-none focus:ring-2 focus:ring-[#1F8A4C]/20 disabled:bg-[#F4F2ED] disabled:text-muted";
+  "h-9 w-full rounded-[4px] border border-[#DBE2E8] bg-surface px-2.5 text-[13px] text-[#19242E] focus:border-[#00499D]/40 focus:outline-none focus:ring-2 focus:ring-[#005EB8]/20 disabled:bg-[#F4F2ED] disabled:text-muted";
 
 export default function LeadFormPage() {
   const crm = useCrm();
@@ -265,14 +265,14 @@ export default function LeadFormPage() {
         <Link
           to="/"
           aria-label="Torna alla lista"
-          className="mr-1 inline-flex h-8 w-8 items-center justify-center rounded-md text-[#4C5563] hover:bg-ink/[0.05] hover:text-ink"
+          className="mr-1 inline-flex h-8 w-8 items-center justify-center rounded-[4px] text-[#4C5563] hover:bg-[#EEF2F5] hover:text-[#19242E]"
         >
           <ArrowLeftIcon className="h-4 w-4" />
         </Link>
         <CommandButton label="Salva" icon={<SaveIcon className="h-4 w-4" />} onClick={() => save(false)} primary testId="record-save" />
         <CommandButton label="Salva e chiudi" onClick={() => save(true)} />
         <span className="mx-1 h-5 w-px bg-line" aria-hidden="true" />
-        <Link to="/lead/new" className="inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[12px] font-medium text-ink/75 hover:bg-ink/[0.05] hover:text-ink">
+        <Link to="/lead/new" className="inline-flex h-8 items-center gap-1.5 rounded-[4px] px-2.5 text-[12px] font-medium text-[#19242E]/75 hover:bg-[#EEF2F5] hover:text-[#19242E]">
           <PlusIcon className="h-4 w-4" /> Nuovo
         </Link>
         <CommandButton label="Aggiorna" onClick={() => setNotice("Dati aggiornati.")} />
@@ -282,26 +282,26 @@ export default function LeadFormPage() {
         <CommandButton label="Segui" icon={<StarIcon className="h-4 w-4" />} />
         <CommandButton label="Altre azioni" icon={<DotsIcon className="h-4 w-4" />} showIconOnly />
         <span className="ml-auto inline-flex items-center gap-1 text-[11.5px] text-muted">
-          <button type="button" disabled aria-label="Record precedente" className="rounded p-1 text-ink/25">
+          <button type="button" disabled aria-label="Record precedente" className="rounded p-1 text-[#19242E]/25">
             <ChevronLeftIcon className="h-4 w-4" />
           </button>
           <span>
             Lead <span className="tabular-nums">{recordIndex}</span> di{" "}
             <span className="tabular-nums">{crm.leads.length}</span>
           </span>
-          <button type="button" disabled aria-label="Record successivo" className="rounded p-1 text-ink/25">
+          <button type="button" disabled aria-label="Record successivo" className="rounded p-1 text-[#19242E]/25">
             <ChevronRightIcon className="h-4 w-4" />
           </button>
         </span>
       </div>
 
-      <div className="rounded-xl border border-line bg-surface shadow-card">
-        <div className="relative flex flex-wrap items-start gap-4 border-b border-line px-5 py-4">
-          <span className="mt-0.5 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[#E7F4EC] text-[#176B3B]">
+      <div className="rounded-[4px] border border-[#DBE2E8] bg-surface shadow-none">
+        <div className="relative flex flex-wrap items-start gap-4 border-b border-[#DBE2E8] px-5 py-4">
+          <span className="mt-0.5 inline-flex h-11 w-11 items-center justify-center rounded-[4px] bg-[#CBE4FB] text-[#00499D]">
             <span className="text-[15px] font-semibold">L</span>
           </span>
           <div className="min-w-0 flex-1">
-            <h1 className="max-w-3xl text-[19px] font-semibold leading-snug tracking-tight text-ink">
+            <h1 className="max-w-3xl text-[19px] font-semibold leading-snug tracking-tight text-[#19242E]">
               {draft.argomento ||
                 (isNew ? "Nuovo lead" : "Senza argomento")}
             </h1>
@@ -311,7 +311,7 @@ export default function LeadFormPage() {
               </span>
               <span data-testid="save-state" className="inline-flex items-center gap-1.5">
                 <span
-                  className={`h-1.5 w-1.5 rounded-full ${dirty ? "bg-[#D9A06B]" : "bg-[#176B3B]"}`}
+                  className={`h-1.5 w-1.5 rounded-full ${dirty ? "bg-[#D9A06B]" : "bg-[#00499D]"}`}
                 />
                 {dirty ? "Non salvato" : "Salvataggio completato"}
               </span>
@@ -325,7 +325,7 @@ export default function LeadFormPage() {
             <div className="text-[10px] uppercase tracking-[0.1em] text-muted">
               Stato lavorazione
               <div className="mt-1">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E7F4EC] px-2.5 py-1 text-[12px] font-medium normal-case tracking-normal text-[#176B3B] ring-1 ring-inset ring-[#BFE3CD]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#CBE4FB] px-2.5 py-1 text-[12px] font-medium normal-case tracking-normal text-[#00499D] ring-1 ring-inset ring-[#A9C7FF]">
                   <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
                   {status.labelIt}
                 </span>
@@ -334,10 +334,10 @@ export default function LeadFormPage() {
             <div className="text-[10px] uppercase tracking-[0.1em] text-muted">
               Proprietario
               <div className="mt-1 flex items-center gap-2">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#176B3B] text-[9.5px] font-semibold text-white">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#00499D] text-[9.5px] font-semibold text-white">
                   {owner?.initials}
                 </span>
-                <span className="text-[12.5px] font-medium normal-case tracking-normal text-ink">
+                <span className="text-[12.5px] font-medium normal-case tracking-normal text-[#19242E]">
                   {owner?.name}
                 </span>
                 <button
@@ -345,7 +345,7 @@ export default function LeadFormPage() {
                   onClick={() => setFlyoutOpen((open) => !open)}
                   aria-expanded={flyoutOpen}
                   aria-label="Modifica campi intestazione"
-                  className="rounded p-0.5 text-ink/50 hover:bg-ink/[0.05] hover:text-ink"
+                  className="rounded p-0.5 text-[#19242E]/50 hover:bg-[#EEF2F5] hover:text-[#19242E]"
                 >
                   <ChevronDownIcon className="h-4 w-4" />
                 </button>
@@ -354,7 +354,7 @@ export default function LeadFormPage() {
           </div>
 
           {flyoutOpen ? (
-            <div data-testid="header-flyout" className="absolute right-4 top-[calc(100%-8px)] z-20 w-[320px] rounded-lg border border-line bg-surface p-4 shadow-card">
+            <div data-testid="header-flyout" className="absolute right-4 top-[calc(100%-8px)] z-20 w-[320px] rounded-[4px] border border-[#DBE2E8] bg-surface p-4 shadow-none">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
                   Modifica campi intestazione
@@ -363,12 +363,12 @@ export default function LeadFormPage() {
                   type="button"
                   onClick={() => setFlyoutOpen(false)}
                   aria-label="Chiudi"
-                  className="text-ink/40 hover:text-ink"
+                  className="text-[#19242E]/40 hover:text-[#19242E]"
                 >
                   ✕
                 </button>
               </div>
-              <label className="mt-3 block text-[11.5px] font-medium text-ink">
+              <label className="mt-3 block text-[11.5px] font-medium text-[#19242E]">
                 Stato lavorazione
                 <select
                   data-testid="header-status"
@@ -384,7 +384,7 @@ export default function LeadFormPage() {
                   ))}
                 </select>
               </label>
-              <label className="mt-3 block text-[11.5px] font-medium text-ink">
+              <label className="mt-3 block text-[11.5px] font-medium text-[#19242E]">
                 Proprietario
                 <select
                   data-testid="header-owner"
@@ -403,7 +403,7 @@ export default function LeadFormPage() {
                 <button
                   type="button"
                   onClick={() => setFlyoutOpen(false)}
-                  className="h-8 rounded-md border border-line px-3 text-[12px] font-medium text-ink"
+                  className="h-8 rounded-[4px] border border-[#DBE2E8] px-3 text-[12px] font-medium text-[#19242E]"
                 >
                   Annulla
                 </button>
@@ -411,7 +411,7 @@ export default function LeadFormPage() {
                   type="button"
                   data-testid="header-apply"
                   onClick={applyHeader}
-                  className="h-8 rounded-md bg-[#176B3B] px-3 text-[12px] font-semibold text-white hover:bg-[#14562F]"
+                  className="h-8 rounded-[4px] bg-[#00499D] px-3 text-[12px] font-semibold text-white hover:bg-[#003A7A]"
                 >
                   Salva
                 </button>
@@ -420,7 +420,7 @@ export default function LeadFormPage() {
           ) : null}
         </div>
 
-        <div className="flex gap-1 border-b border-line px-5">
+        <div className="flex gap-1 border-b border-[#DBE2E8] px-5">
           {TABS.map((entry) => (
             <button
               key={entry.id}
@@ -429,8 +429,8 @@ export default function LeadFormPage() {
               aria-current={tab === entry.id ? "page" : undefined}
               className={`relative -mb-px px-3 py-2.5 text-[12.5px] font-medium transition ${
                 tab === entry.id
-                  ? "border-b-2 border-[#176B3B] text-[#176B3B]"
-                  : "border-b-2 border-transparent text-muted hover:text-ink"
+                  ? "border-b-2 border-[#00499D] text-[#00499D]"
+                  : "border-b-2 border-transparent text-muted hover:text-[#19242E]"
               }`}
             >
               {entry.label}
@@ -444,12 +444,12 @@ export default function LeadFormPage() {
         </div>
 
         {error ? (
-          <div data-testid="form-error" role="alert" className="mx-5 mt-4 rounded-md border border-[#F3C6C0] bg-[#FDF2F0] px-3 py-2 text-[12px] text-[#8A1C10]">
+          <div data-testid="form-error" role="alert" className="mx-5 mt-4 rounded-[4px] border border-[#F3C6C0] bg-[#FDF2F0] px-3 py-2 text-[12px] text-[#8A1C10]">
             {error}
           </div>
         ) : null}
         {duplicate ? (
-          <div data-testid="duplicate-warning" className="mx-5 mt-4 rounded-md border border-[#EAD3B0] bg-[#FDF7EC] px-3 py-2 text-[12px] text-[#8A4B08]">
+          <div data-testid="duplicate-warning" className="mx-5 mt-4 rounded-[4px] border border-[#EAD3B0] bg-[#FDF7EC] px-3 py-2 text-[12px] text-[#8A4B08]">
             Attenzione: esiste già un lead per questo contatto e questa iniziativa.{" "}
             <Link to={`/lead/${duplicate.id}`} className="font-semibold underline">
               Apri il lead esistente
@@ -465,8 +465,8 @@ export default function LeadFormPage() {
           <div>
             {tab === "generale" ? (
               <div className="space-y-4">
-                <div className="rounded-lg border border-line">
-                  <p className="border-b border-line px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+                <div className="rounded-[4px] border border-[#DBE2E8]">
+                  <p className="border-b border-[#DBE2E8] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
                     Generale
                   </p>
                   <div className="space-y-3 p-3">
@@ -575,7 +575,7 @@ export default function LeadFormPage() {
                         value={draft.requests}
                         onChange={(event) => update("requests", event.target.value)}
                         rows={3}
-                        className="w-full rounded-md border border-line bg-surface px-2.5 py-2 text-[13px] focus:border-[#176B3B]/40 focus:outline-none focus:ring-2 focus:ring-[#1F8A4C]/20"
+                        className="w-full rounded-[4px] border border-[#DBE2E8] bg-surface px-2.5 py-2 text-[13px] focus:border-[#00499D]/40 focus:outline-none focus:ring-2 focus:ring-[#005EB8]/20"
                       />
                     </Field>
 
@@ -585,7 +585,7 @@ export default function LeadFormPage() {
                         onChange={(event) => update("descrizione", event.target.value)}
                         rows={4}
                         placeholder="Aggiungi una descrizione o nota interna…"
-                        className="w-full rounded-md border border-line bg-surface px-2.5 py-2 text-[13px] focus:border-[#176B3B]/40 focus:outline-none focus:ring-2 focus:ring-[#1F8A4C]/20"
+                        className="w-full rounded-[4px] border border-[#DBE2E8] bg-surface px-2.5 py-2 text-[13px] focus:border-[#00499D]/40 focus:outline-none focus:ring-2 focus:ring-[#005EB8]/20"
                       />
                     </Field>
 
@@ -611,8 +611,8 @@ export default function LeadFormPage() {
             ) : null}
 
             {tab === "amministrativi" ? (
-              <div className="rounded-lg border border-line">
-                <p className="border-b border-line px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+              <div className="rounded-[4px] border border-[#DBE2E8]">
+                <p className="border-b border-[#DBE2E8] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
                   Dati Amministrativi
                 </p>
                 <div className="space-y-3 p-3">
@@ -621,7 +621,7 @@ export default function LeadFormPage() {
                       value={draft.noteMigrate}
                       onChange={(event) => update("noteMigrate", event.target.value)}
                       rows={4}
-                      className="w-full rounded-md border border-line bg-surface px-2.5 py-2 text-[13px] focus:border-[#176B3B]/40 focus:outline-none focus:ring-2 focus:ring-[#1F8A4C]/20"
+                      className="w-full rounded-[4px] border border-[#DBE2E8] bg-surface px-2.5 py-2 text-[13px] focus:border-[#00499D]/40 focus:outline-none focus:ring-2 focus:ring-[#005EB8]/20"
                     />
                   </Field>
                   <Field label="ID lead" locked>
@@ -635,8 +635,8 @@ export default function LeadFormPage() {
             ) : null}
 
             {tab === "correlati" ? (
-              <div className="rounded-lg border border-line">
-                <p className="border-b border-line px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+              <div className="rounded-[4px] border border-[#DBE2E8]">
+                <p className="border-b border-[#DBE2E8] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
                   Elementi correlati
                 </p>
                 {isNew ? (
@@ -661,7 +661,7 @@ export default function LeadFormPage() {
                                 : "•"}
                         </span>
                         <div className="min-w-0">
-                          <p className="text-[12px] font-medium text-ink">
+                          <p className="text-[12px] font-medium text-[#19242E]">
                             {activity.title} · {formatDateTimeIt(activity.at)}
                           </p>
                           <p className="mt-0.5 text-[11.5px] leading-relaxed text-muted">
@@ -677,12 +677,12 @@ export default function LeadFormPage() {
           </div>
 
           <aside className="space-y-4">
-            <div className="rounded-lg border border-line">
-              <p className="border-b border-line px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+            <div className="rounded-[4px] border border-[#DBE2E8]">
+              <p className="border-b border-[#DBE2E8] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
                 Preview Azienda
               </p>
               <div className="space-y-1.5 p-3 text-[12px]">
-                <p className="font-medium text-ink">{company?.name ?? "Nessuna azienda"}</p>
+                <p className="font-medium text-[#19242E]">{company?.name ?? "Nessuna azienda"}</p>
                 <p className="text-muted">{company?.macroSector} · {company?.sector}</p>
                 <p className="text-muted">Provincia: {company?.province ?? "—"}</p>
                 <p className="text-muted">Tipologia: {company?.tipologia ?? "—"}</p>
@@ -690,12 +690,12 @@ export default function LeadFormPage() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-line">
-              <p className="border-b border-line px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+            <div className="rounded-[4px] border border-[#DBE2E8]">
+              <p className="border-b border-[#DBE2E8] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
                 Preview Contatto
               </p>
               <div className="space-y-1.5 p-3 text-[12px]">
-                <p className="font-medium text-ink">{contact?.fullName ?? "Nessun contatto"}</p>
+                <p className="font-medium text-[#19242E]">{contact?.fullName ?? "Nessun contatto"}</p>
                 <p className="break-all text-muted">{contact?.email ?? "—"}</p>
                 <p className="text-muted">{contact?.phone ?? "—"}</p>
                 <p className="text-muted">Maturità: {contact?.maturity ?? "—"}</p>
@@ -705,8 +705,8 @@ export default function LeadFormPage() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-[#BFE3CD] bg-[#F2FAF5] p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#176B3B]">
+            <div className="rounded-[4px] border border-[#A9C7FF] bg-[#F2F7FC] p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#00499D]">
                 Regole attive
               </p>
               <ul className="mt-1.5 space-y-1 text-[11.5px] leading-relaxed text-[#21583A]">
@@ -745,8 +745,8 @@ function CommandButton({
       aria-label={showIconOnly ? label : undefined}
       className={
         primary
-          ? "inline-flex h-8 items-center gap-1.5 rounded-md bg-[#176B3B] px-3 text-[12px] font-semibold text-white hover:bg-[#14562F]"
-          : "inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[12px] font-medium text-ink/75 transition hover:bg-ink/[0.05] hover:text-ink"
+          ? "inline-flex h-8 items-center gap-1.5 rounded-[4px] bg-[#00499D] px-3 text-[12px] font-semibold text-white hover:bg-[#003A7A]"
+          : "inline-flex h-8 items-center gap-1.5 rounded-[4px] px-2.5 text-[12px] font-medium text-[#19242E]/75 transition hover:bg-[#EEF2F5] hover:text-[#19242E]"
       }
     >
       {icon}

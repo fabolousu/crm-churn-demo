@@ -72,7 +72,7 @@ function statusStyle(status: LeadStatusDef): string {
   if (status.category === "closed") return "bg-[#F1EFEA] text-[#5B6472] ring-[#DDD8CE]";
   switch (status.code) {
     case "interessato":
-      return "bg-[#E7F4EC] text-[#176B3B] ring-[#BFE3CD]";
+      return "bg-[#CBE4FB] text-[#00499D] ring-[#A9C7FF]";
     case "da_contattare":
       return "bg-[#FBF1E2] text-[#8A4B08] ring-[#EAD3B0]";
     case "in_attesa_di_riscontro":
@@ -96,10 +96,10 @@ function StatusChip({ status }: { status: LeadStatusDef }) {
 function OwnerBadge({ name, initials }: { name: string; initials: string }) {
   return (
     <span className="inline-flex items-center gap-2">
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#176B3B] text-[9.5px] font-semibold text-white">
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#00499D] text-[9.5px] font-semibold text-white">
         {initials}
       </span>
-      <span className="truncate text-[12.5px] text-ink">{name}</span>
+      <span className="truncate text-[12.5px] text-[#19242E]">{name}</span>
     </span>
   );
 }
@@ -306,7 +306,7 @@ export default function LeadListPage() {
     <div className="flex flex-wrap items-center gap-1">
       <Link
         to="/lead/new"
-        className="mr-1 inline-flex h-8 items-center gap-1.5 rounded-md bg-[#176B3B] px-3 text-[12.5px] font-semibold text-white hover:bg-[#14562F] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A4C]/40"
+        className="mr-1 inline-flex h-8 items-center gap-1.5 rounded-[4px] bg-[#00499D] px-3 text-[12.5px] font-semibold text-white hover:bg-[#003A7A] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#005EB8]/40"
       >
         <span aria-hidden="true">+</span> Nuovo
       </Link>
@@ -334,23 +334,23 @@ export default function LeadListPage() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-line bg-surface shadow-card">
-        <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3">
+      <div className="rounded-[4px] border border-[#DBE2E8] bg-surface shadow-none">
+        <div className="flex flex-wrap items-center gap-3 border-b border-[#DBE2E8] px-4 py-3">
           <div className="relative">
             <button
               type="button"
               onClick={() => setViewOpen((open) => !open)}
               aria-expanded={viewOpen}
-              className="inline-flex items-center gap-2 text-[18px] font-semibold tracking-tight text-ink"
+              className="inline-flex items-center gap-2 text-[18px] font-semibold tracking-tight text-[#19242E]"
             >
               {viewDef.label}
-              <ChevronDownIcon className="h-4 w-4 text-ink/50" />
+              <ChevronDownIcon className="h-4 w-4 text-[#19242E]/50" />
             </button>
-            <span className="ml-2 rounded-full border border-line bg-[#FAFAF7] px-2 py-0.5 text-[10.5px] font-medium text-muted">
+            <span className="ml-2 rounded-full border border-[#DBE2E8] bg-[#F7FAFD] px-2 py-0.5 text-[10.5px] font-medium text-muted">
               Predefinito
             </span>
             {viewOpen ? (
-              <div className="absolute left-0 top-full z-20 mt-2 w-[280px] rounded-lg border border-line bg-surface p-1.5 shadow-card">
+              <div className="absolute left-0 top-full z-20 mt-2 w-[280px] rounded-[4px] border border-[#DBE2E8] bg-surface p-1.5 shadow-none">
                 <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
                   Visualizzazioni di sistema
                 </p>
@@ -364,10 +364,10 @@ export default function LeadListPage() {
                       setSelected([]);
                       setStatusFilter([]);
                     }}
-                    className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-[12.5px] ${
+                    className={`flex w-full items-center justify-between rounded-[4px] px-2 py-1.5 text-left text-[12.5px] ${
                       entry.id === view
-                        ? "bg-[#E7F4EC] text-[#176B3B]"
-                        : "text-ink hover:bg-ink/[0.04]"
+                        ? "bg-[#CBE4FB] text-[#00499D]"
+                        : "text-[#19242E] hover:bg-[#EEF2F5]"
                     }`}
                   >
                     {entry.label}
@@ -380,7 +380,7 @@ export default function LeadListPage() {
 
           <div className="ml-auto flex flex-wrap items-center gap-2">
             <div className="relative">
-              <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-ink/35">
+              <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[#19242E]/35">
                 <SearchIcon className="h-4 w-4" />
               </span>
               <input
@@ -388,14 +388,14 @@ export default function LeadListPage() {
                 onChange={(event) => setQuickFind(event.target.value)}
                 placeholder="Cerca in questa vista"
                 aria-label="Cerca in questa vista"
-                className="h-8 w-[220px] rounded-md border border-line bg-[#FAFAF7] pl-8 pr-2 text-[12.5px] focus:border-[#176B3B]/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F8A4C]/20"
+                className="h-8 w-[220px] rounded-[4px] border border-[#DBE2E8] bg-[#F7FAFD] pl-8 pr-2 text-[12.5px] focus:border-[#00499D]/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#005EB8]/20"
               />
             </div>
             <button
               type="button"
               onClick={() => setColumnsOpen((open) => !open)}
               aria-expanded={columnsOpen}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-line px-2.5 text-[12px] font-medium text-ink hover:bg-ink/[0.03]"
+              className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-[#DBE2E8] px-2.5 text-[12px] font-medium text-[#19242E] hover:bg-ink/[0.03]"
             >
               <ColumnsIcon className="h-4 w-4" /> Modifica colonne
             </button>
@@ -403,7 +403,7 @@ export default function LeadListPage() {
               type="button"
               onClick={() => setFiltersOpen((open) => !open)}
               aria-expanded={filtersOpen}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-line px-2.5 text-[12px] font-medium text-ink hover:bg-ink/[0.03]"
+              className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-[#DBE2E8] px-2.5 text-[12px] font-medium text-[#19242E] hover:bg-ink/[0.03]"
             >
               <FilterLinesIcon className="h-4 w-4" /> Modifica filtri
             </button>
@@ -411,9 +411,9 @@ export default function LeadListPage() {
         </div>
 
         {columnsOpen ? (
-          <div className="flex flex-wrap gap-x-5 gap-y-2 border-b border-line bg-[#FAFAF7] px-4 py-3">
+          <div className="flex flex-wrap gap-x-5 gap-y-2 border-b border-[#DBE2E8] bg-[#F7FAFD] px-4 py-3">
             {COLUMNS.map((column) => (
-              <label key={column.key} className="inline-flex items-center gap-2 text-[12px] text-ink">
+              <label key={column.key} className="inline-flex items-center gap-2 text-[12px] text-[#19242E]">
                 <input
                   type="checkbox"
                   checked={visibleColumns.includes(column.key)}
@@ -424,7 +424,7 @@ export default function LeadListPage() {
                         : [...current, column.key],
                     )
                   }
-                  className="h-3.5 w-3.5 rounded border-line text-[#176B3B] focus:ring-[#1F8A4C]/30"
+                  className="h-3.5 w-3.5 rounded border-[#DBE2E8] text-[#00499D] focus:ring-[#005EB8]/30"
                 />
                 {column.label}
               </label>
@@ -433,14 +433,14 @@ export default function LeadListPage() {
         ) : null}
 
         {filtersOpen ? (
-          <div className="flex flex-wrap items-center gap-4 border-b border-line bg-[#FAFAF7] px-4 py-3">
+          <div className="flex flex-wrap items-center gap-4 border-b border-[#DBE2E8] bg-[#F7FAFD] px-4 py-3">
             <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
               Stato lavorazione
             </span>
             {crm.statuses
               .filter((status) => status.active)
               .map((status) => (
-                <label key={status.code} className="inline-flex items-center gap-2 text-[12px] text-ink">
+                <label key={status.code} className="inline-flex items-center gap-2 text-[12px] text-[#19242E]">
                   <input
                     type="checkbox"
                     checked={statusFilter.includes(status.code)}
@@ -451,7 +451,7 @@ export default function LeadListPage() {
                           : [...current, status.code],
                       )
                     }
-                    className="h-3.5 w-3.5 rounded border-line text-[#176B3B] focus:ring-[#1F8A4C]/30"
+                    className="h-3.5 w-3.5 rounded border-[#DBE2E8] text-[#00499D] focus:ring-[#005EB8]/30"
                   />
                   {status.labelIt}
                 </label>
@@ -459,14 +459,14 @@ export default function LeadListPage() {
             <button
               type="button"
               onClick={() => setStatusFilter([])}
-              className="text-[12px] font-medium text-[#176B3B] hover:underline"
+              className="text-[12px] font-medium text-[#00499D] hover:underline"
             >
               Azzera filtri
             </button>
           </div>
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-2 border-b border-line px-4 py-2.5">
+        <div className="flex flex-wrap items-center gap-2 border-b border-[#DBE2E8] px-4 py-2.5">
           <span className="text-[11px] font-medium text-muted">Stato:</span>
           {statusCounts.map(({ status, count }) => (
             <button
@@ -492,7 +492,7 @@ export default function LeadListPage() {
             <button
               type="button"
               onClick={() => setStatusFilter([])}
-              className="text-[11.5px] font-medium text-[#176B3B] hover:underline"
+              className="text-[11.5px] font-medium text-[#00499D] hover:underline"
             >
               Mostra tutti
             </button>
@@ -502,7 +502,7 @@ export default function LeadListPage() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-line bg-[#F7F7F5] text-[10px] uppercase tracking-[0.08em] text-muted">
+              <tr className="border-b border-[#DBE2E8] bg-[#FFFFFF] text-[10px] uppercase tracking-[0.08em] text-muted">
                 <th scope="col" className="w-9 px-2 py-2.5">
                   <input
                     type="checkbox"
@@ -515,7 +515,7 @@ export default function LeadListPage() {
                           : Array.from(new Set([...current, ...page.map((lead) => lead.id)])),
                       )
                     }
-                    className="h-3.5 w-3.5 rounded border-line text-[#176B3B] focus:ring-[#1F8A4C]/30"
+                    className="h-3.5 w-3.5 rounded border-[#DBE2E8] text-[#00499D] focus:ring-[#005EB8]/30"
                   />
                 </th>
                 {COLUMNS.filter((column) => visibleColumns.includes(column.key)).map((column) => (
@@ -534,7 +534,7 @@ export default function LeadListPage() {
                     <button
                       type="button"
                       onClick={() => toggleSort(column.key)}
-                      className="inline-flex items-center gap-1 uppercase tracking-[0.08em] hover:text-ink"
+                      className="inline-flex items-center gap-1 uppercase tracking-[0.08em] hover:text-[#19242E]"
                     >
                       {column.label}
                       {sort.key === column.key ? (
@@ -556,8 +556,8 @@ export default function LeadListPage() {
                 return (
                   <tr
                     key={lead.id}
-                    className={`border-b border-line/70 text-[12.5px] transition ${
-                      selectedRow ? "bg-[#F0F8F3]" : "hover:bg-[#FAFAF7]"
+                    className={`border-b border-[#DBE2E8]/70 text-[12.5px] transition ${
+                      selectedRow ? "bg-[#EEF4FB]" : "hover:bg-[#F7FAFD]"
                     }`}
                   >
                     <td className="px-2 py-2.5">
@@ -566,7 +566,7 @@ export default function LeadListPage() {
                         aria-label={`Seleziona ${lead.argomento}`}
                         checked={selectedRow}
                         onChange={() => toggleSelected(lead.id)}
-                        className="h-3.5 w-3.5 rounded border-line text-[#176B3B] focus:ring-[#1F8A4C]/30"
+                        className="h-3.5 w-3.5 rounded border-[#DBE2E8] text-[#00499D] focus:ring-[#005EB8]/30"
                       />
                     </td>
                     {visibleColumns.includes("argomento") ? (
@@ -574,7 +574,7 @@ export default function LeadListPage() {
                         <Link
                           to={`/lead/${lead.id}`}
                           onDoubleClick={() => navigate(`/lead/${lead.id}`)}
-                          className="line-clamp-2 font-medium text-ink hover:text-[#176B3B] hover:underline"
+                          className="line-clamp-2 font-medium text-[#19242E] hover:text-[#00499D] hover:underline"
                           title={lead.argomento}
                         >
                           {lead.argomento}
@@ -582,10 +582,10 @@ export default function LeadListPage() {
                       </td>
                     ) : null}
                     {visibleColumns.includes("contatto") ? (
-                      <td className="px-3 py-2.5 text-ink">{contact?.fullName}</td>
+                      <td className="px-3 py-2.5 text-[#19242E]">{contact?.fullName}</td>
                     ) : null}
                     {visibleColumns.includes("azienda") ? (
-                      <td className="px-3 py-2.5 text-ink">
+                      <td className="px-3 py-2.5 text-[#19242E]">
                         <span className="line-clamp-2" title={company?.name}>
                           {company?.name}
                         </span>
@@ -595,7 +595,7 @@ export default function LeadListPage() {
                       <td className="px-3 py-2.5 text-muted">{company?.macroSector}</td>
                     ) : null}
                     {visibleColumns.includes("iniziativa") ? (
-                      <td className="px-3 py-2.5 text-ink">
+                      <td className="px-3 py-2.5 text-[#19242E]">
                         <span className="line-clamp-2" title={initiative?.name}>
                           {initiative?.name}
                         </span>
@@ -651,13 +651,13 @@ export default function LeadListPage() {
             </span>
             {selected.length > 0 ? (
               <span className="inline-flex items-center gap-2">
-                <span className="rounded bg-[#E7F4EC] px-1.5 py-0.5 font-medium text-[#176B3B]">
+                <span className="rounded bg-[#CBE4FB] px-1.5 py-0.5 font-medium text-[#00499D]">
                   {selected.length} selezionati
                 </span>
                 <button
                   type="button"
                   onClick={() => setSelected([])}
-                  className="font-medium text-[#176B3B] hover:underline"
+                  className="font-medium text-[#00499D] hover:underline"
                 >
                   Deseleziona tutti
                 </button>
@@ -671,23 +671,23 @@ export default function LeadListPage() {
                 value={PAGE_SIZE}
                 disabled
                 aria-label="Righe per pagina"
-                className="h-7 rounded border border-line bg-surface px-1.5 text-[12px]"
+                className="h-7 rounded border border-[#DBE2E8] bg-surface px-1.5 text-[12px]"
               >
                 <option value={PAGE_SIZE}>50</option>
               </select>
             </label>
             <span>Pagina 1 di 1</span>
             <div className="flex items-center gap-1">
-              <button type="button" disabled aria-label="Prima pagina" className="rounded p-1 text-ink/30">
+              <button type="button" disabled aria-label="Prima pagina" className="rounded p-1 text-[#19242E]/30">
                 <ChevronLeftIcon className="h-4 w-4" />
               </button>
-              <button type="button" disabled aria-label="Pagina precedente" className="rounded p-1 text-ink/30">
+              <button type="button" disabled aria-label="Pagina precedente" className="rounded p-1 text-[#19242E]/30">
                 <ChevronLeftIcon className="h-4 w-4" />
               </button>
-              <button type="button" disabled aria-label="Pagina successiva" className="rounded p-1 text-ink/30">
+              <button type="button" disabled aria-label="Pagina successiva" className="rounded p-1 text-[#19242E]/30">
                 <ChevronRightIcon className="h-4 w-4" />
               </button>
-              <button type="button" disabled aria-label="Ultima pagina" className="rounded p-1 text-ink/30">
+              <button type="button" disabled aria-label="Ultima pagina" className="rounded p-1 text-[#19242E]/30">
                 <ChevronRightIcon className="h-4 w-4" />
               </button>
             </div>
@@ -704,20 +704,20 @@ export default function LeadListPage() {
           onClick={() => setBulkOpen(false)}
         >
           <div
-            className="w-full max-w-[420px] rounded-xl border border-line bg-surface p-5 shadow-card"
+            className="w-full max-w-[420px] rounded-[4px] border border-[#DBE2E8] bg-surface p-5 shadow-none"
             onClick={(event) => event.stopPropagation()}
           >
-            <h2 className="text-[16px] font-semibold text-ink">Modifica {selected.length} record</h2>
+            <h2 className="text-[16px] font-semibold text-[#19242E]">Modifica {selected.length} record</h2>
             <p className="mt-1 text-[12px] text-muted">
               Vengono scritti solo i campi che cambi. Lo stato chiuso imposta Data chiusura.
             </p>
             <div className="mt-4 space-y-3">
-              <label className="block text-[12px] font-medium text-ink">
+              <label className="block text-[12px] font-medium text-[#19242E]">
                 Stato lavorazione
                 <select
                   value={bulkStatus}
                   onChange={(event) => setBulkStatus(event.target.value)}
-                  className="mt-1 h-9 w-full rounded-md border border-line bg-surface px-2 text-[13px]"
+                  className="mt-1 h-9 w-full rounded-[4px] border border-[#DBE2E8] bg-surface px-2 text-[13px]"
                 >
                   {crm.statuses.map((status) => (
                     <option key={status.code} value={status.code}>
@@ -727,12 +727,12 @@ export default function LeadListPage() {
                   ))}
                 </select>
               </label>
-              <label className="block text-[12px] font-medium text-ink">
+              <label className="block text-[12px] font-medium text-[#19242E]">
                 Proprietario
                 <select
                   value={bulkOwner}
                   onChange={(event) => setBulkOwner(event.target.value)}
-                  className="mt-1 h-9 w-full rounded-md border border-line bg-surface px-2 text-[13px]"
+                  className="mt-1 h-9 w-full rounded-[4px] border border-[#DBE2E8] bg-surface px-2 text-[13px]"
                 >
                   {crm.owners.map((owner) => (
                     <option key={owner.id} value={owner.id}>
@@ -746,7 +746,7 @@ export default function LeadListPage() {
               <button
                 type="button"
                 onClick={() => setBulkOpen(false)}
-                className="h-9 rounded-md border border-line px-3 text-[12.5px] font-medium text-ink"
+                className="h-9 rounded-[4px] border border-[#DBE2E8] px-3 text-[12.5px] font-medium text-[#19242E]"
               >
                 Annulla
               </button>
@@ -759,7 +759,7 @@ export default function LeadListPage() {
                   setSelected([]);
                   setBulkOpen(false);
                 }}
-                className="h-9 rounded-md bg-[#176B3B] px-3 text-[12.5px] font-semibold text-white hover:bg-[#14562F]"
+                className="h-9 rounded-[4px] bg-[#00499D] px-3 text-[12.5px] font-semibold text-white hover:bg-[#003A7A]"
               >
                 Applica
               </button>
@@ -790,7 +790,7 @@ function CommandButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={showIconOnly ? label : undefined}
-      className="inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[12px] font-medium text-ink/75 transition hover:bg-ink/[0.05] hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+      className="inline-flex h-8 items-center gap-1.5 rounded-[4px] px-2.5 text-[12px] font-medium text-[#19242E]/75 transition hover:bg-[#EEF2F5] hover:text-[#19242E] disabled:cursor-not-allowed disabled:opacity-40"
     >
       {icon}
       {showIconOnly ? null : label}
