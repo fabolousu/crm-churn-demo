@@ -37,6 +37,7 @@ import {
   statusLabel,
 } from "../lib/format";
 import { driverNarrative } from "../lib/narratives";
+import { driverLabel, driverValue } from "../lib/format";
 import { winPrevalence } from "../lib/model";
 import { usePipeline } from "../state/PipelineProvider";
 import type { CompanyDetail, LeadDetail } from "../lib/types";
@@ -65,7 +66,7 @@ export default function LeadPage() {
           setError(
             cause instanceof Error
               ? cause.message
-              : "That initiative could not be opened.",
+              : "Impossibile aprire questa iniziativa.",
           );
         }
       });
@@ -143,20 +144,20 @@ export default function LeadPage() {
           className="inline-flex items-center gap-2 text-[11.5px] font-medium text-muted transition hover:text-ink"
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
-          Back to the queue
+          Torna alla coda pipeline
         </Link>
         <PageHeader
           eyebrow="Lead 360"
-          title="That initiative is not in the queue"
+          title="Iniziativa non presente nella coda"
           subtitle={error}
         />
         <Card className="p-6">
           <p className="text-[12.5px] text-muted">
-            The queue only carries open initiatives. Pick another one from the
-            pipeline; the fixtures match the contract's lead list.
+            La coda contiene solo le iniziative aperte. Selezionarne un'altra
+            dalla pipeline - i dati di esempio corrispondono all'elenco lead del contratto.
           </p>
           <Link to="/previsioni" className={buttonPrimary + " mt-5"}>
-            Return to the pipeline
+            Torna alla pipeline
           </Link>
         </Card>
       </div>
@@ -171,13 +172,13 @@ export default function LeadPage() {
           className="inline-flex items-center gap-2 text-[11.5px] font-medium text-muted transition hover:text-ink"
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
-          Back to the queue
+          Torna alla coda pipeline
         </Link>
-        <PageHeader eyebrow="Lead 360" title="Opening the initiative" />
+        <PageHeader eyebrow="Lead 360" title="Caricamento analisi Lead 360 in corso..." />
         <Card className="p-6">
           <p className="text-[12.5px] text-muted">
-            Asking the scoring service for this initiative. The fixture build
-            opens it immediately.
+            Richiesta al servizio di scoring per questa iniziativa. I dati di esempio
+            vengono aperti immediatamente.
           </p>
         </Card>
       </div>
@@ -191,7 +192,7 @@ export default function LeadPage() {
         className="inline-flex items-center gap-2 text-[11.5px] font-medium text-muted transition hover:text-ink"
       >
         <ArrowLeftIcon className="h-3.5 w-3.5" />
-        Back to the queue
+        Torna alla coda pipeline
       </Link>
 
       <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -207,7 +208,7 @@ export default function LeadPage() {
             <span className="text-line">·</span>
             <span className="inline-flex items-center gap-1">
               <UsersIcon className="h-3.5 w-3.5" />
-              {company.employees.toLocaleString("en-GB")} employees
+              {company.employees.toLocaleString("it-IT")} dipendenti
             </span>
             <span className="text-line">·</span>
             <span>{statusLabel(lead.status)}</span>
@@ -215,31 +216,31 @@ export default function LeadPage() {
             <span className="inline-flex items-center gap-1">
               <CalendarIcon className="h-3.5 w-3.5" />
               {isClosed
-                ? `Closed${lead.closed_at ? ` ${formatDate(lead.closed_at)}` : ""}`
+                ? `Chiusa${lead.closed_at ? ` ${formatDate(lead.closed_at)}` : ""}`
                 : daysOpen !== null
-                  ? `${daysOpen} days open`
-                  : "open"}
+                  ? `${daysOpen} giorni aperta`
+                  : "aperta"}
             </span>
             {dormant ? (
-              <span className="rounded-full bg-[#FDECEA] px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.1em] text-risk-high">
-                Dormant
+              <span className="rounded-[4px] bg-[#FDECEA] px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.1em] text-risk-high">
+                Inattiva
               </span>
             ) : null}
           </p>
         </div>
 
         {isClosed ? (
-          <span className="inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-4 py-2.5 text-[12px] font-medium text-muted">
-            Closed initiative · no lever
+          <span className="inline-flex items-center gap-2 rounded-[4px] border border-line bg-surface px-4 py-2.5 text-[12px] font-medium text-muted">
+            Iniziativa chiusa - nessuna leva disponibile
           </span>
         ) : (
           <div className="flex flex-wrap gap-2">
             <Link to={`/previsioni/leads/${lead.id}/lever`} className={buttonPrimary}>
               <BoltIcon className="h-4 w-4" />
-              Test a lever
+              Testa una leva
             </Link>
             <Link to={`/previsioni/act/${lead.id}`} className={buttonSecondary}>
-              Log an action
+              Registra un'azione
             </Link>
           </div>
         )}
@@ -258,28 +259,30 @@ export default function LeadPage() {
             <div className="sm:border-l sm:border-line sm:pl-7">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
-                  Current score
+                  Punteggio corrente
                 </span>
                 <BandPill band={score.band} />
                 {rank ? (
-                  <span className="rounded-full border border-line px-2 py-0.5 text-[10px] font-medium text-muted">
-                    Rank #{rank} by expected value
+                  <span className="rounded-[4px] border border-line px-2 py-0.5 text-[10px] font-medium text-muted">
+                    #{rank} nella coda per valore atteso
                   </span>
                 ) : null}
               </div>
               <p className="mt-3 max-w-md text-[12.5px] leading-relaxed text-muted">
-                About one in three comparable initiatives win. This one sits{" "}
-                {score.probability >= prevalence ? "above" : "below"} the{" "}
-                {formatPercent(prevalence, 2)} portfolio average.{" "}
+                Circa un'iniziativa su tre di questo tipo viene convertita. Questa si
+                colloca{" "}
+                {score.probability >= prevalence ? "al di sopra" : "al di sotto"} della
+                media di portafoglio del{" "}
+                {formatPercent(prevalence, 2)}.{" "}
                 {isClosed
-                  ? "The three drivers below explain the final score; this initiative is closed, so no lever is offered."
-                  : "The three drivers below explain the score, in order of influence — and the lever shows what changing one is worth."}
+                  ? "I tre fattori determinanti spiegano il punteggio finale; l'iniziativa è chiusa, pertanto non è disponibile alcuna leva."
+                  : "I tre fattori determinanti spiegano il punteggio, in ordine di influenza - la leva indica il valore di una modifica."}
               </p>
 
               <div className="mt-5 grid grid-cols-2 gap-5">
                 <div>
                   <p className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-muted">
-                    Expected value
+                    Valore atteso
                   </p>
                   <p className="mt-1 font-display text-[30px] leading-none tabular-nums text-ink">
                     {formatEUR(score.expected_value)}
@@ -287,7 +290,7 @@ export default function LeadPage() {
                 </div>
                 <div>
                   <p className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-muted">
-                    Proposed ARR
+                    ARR proposto
                   </p>
                   <p className="mt-1 font-display text-[30px] leading-none tabular-nums text-ink">
                     {formatEUR(lead.amount_arr ?? 0)}
@@ -298,32 +301,31 @@ export default function LeadPage() {
               {maxLeverage !== null ? (
                 <Link
                   to={`/previsioni/leads/${lead.id}/lever`}
-                  className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-[11px] font-semibold text-accent-deep transition hover:bg-[#D4E8E0]"
+                  className="mt-4 inline-flex items-center gap-2 rounded-[4px] bg-accent-soft px-3 py-1.5 text-[11px] font-semibold text-accent-deep transition hover:bg-[#D4E8E0]"
                 >
                   <BoltIcon className="h-3.5 w-3.5" />
-                  Best committable lever {formatPoints(maxLeverage)} · see the
-                  move
+                  Leva massima {formatPoints(maxLeverage)} - vedi la mossa
                 </Link>
               ) : null}
               {discountUpside !== null && discountUpside > 0 ? (
                 <p className="mt-2 text-[10px] leading-relaxed text-muted">
-                  Discount what-if {formatPoints(discountUpside)} — not
-                  committable, not part of the leverage ranking.
+                  Simulazione sconto {formatPoints(discountUpside)} - non impegnabile,
+                  non inclusa nel calcolo della leva.
                 </p>
               ) : null}
 
               <p className="mt-5 border-t border-line pt-3 text-[10.5px] text-muted">
-                Scored {formatDateTime(score.scored_at)} · {score.model_version} ·
-                nightly batch
+                Punteggio attribuito il {formatDateTime(score.scored_at)} · {score.model_version} ·
+                elaborazione notturna
               </p>
             </div>
           </Card>
 
           <section>
             <SectionHeading
-              label="The three drivers"
-              title={`Why ${formatPercent(score.probability, 0)}?`}
-              hint="Three signals the model actually learned, in order of influence. Each is a business fact, not a model term."
+              label="Tre fattori determinanti"
+              title={`Perché ${formatPercent(score.probability, 0)}?`}
+              hint="Tre segnali effettivamente appresi dal modello, in ordine di influenza. Ciascuno è un dato di business, non un termine tecnico del modello."
             />
             <div className="grid gap-3 lg:grid-cols-3">
               {drivers.map((driver, index) => {
@@ -343,9 +345,9 @@ export default function LeadPage() {
                       </span>
                       <span
                         className={cn(
-                          "inline-flex items-center gap-1 rounded-full px-2 py-1 text-[9.5px] font-semibold uppercase tracking-[0.08em]",
+                          "inline-flex items-center gap-1 rounded-[4px] px-2 py-1 text-[9.5px] font-semibold uppercase tracking-[0.08em]",
                           increases
-                            ? "bg-[#E7F4EC] text-[#05603A]"
+                            ? "bg-[#CBE4FB] text-[#00499D]"
                             : "bg-[#FDECEA] text-[#912018]",
                         )}
                       >
@@ -354,12 +356,12 @@ export default function LeadPage() {
                         ) : (
                           <TrendDownIcon className="h-3 w-3" />
                         )}
-                        {increases ? "Raises the score" : "Lowers the score"}
+                        {increases ? "Aumenta il punteggio" : "Riduce il punteggio"}
                       </span>
                     </div>
 
                     <p className="mt-4 font-display text-[21px] leading-[1.24] text-ink">
-                      {driver.value}
+                      {driverValue(driver.value)}
                     </p>
                     <p className="mt-3 flex-1 text-[11.5px] leading-relaxed text-muted">
                       {driverNarrative(driver.feature)}
@@ -367,13 +369,13 @@ export default function LeadPage() {
 
                     <div className="mt-4 border-t border-line pt-3">
                       <div className="flex items-center justify-between text-[9.5px] font-semibold uppercase tracking-[0.13em] text-muted">
-                        <span>{driver.label}</span>
-                        <span>Influence</span>
+                        <span>{driverLabel(driver.label)}</span>
+                        <span>Influenza</span>
                       </div>
-                      <div className="mt-2 h-1 overflow-hidden rounded-full bg-[#EEE9DF]">
+                      <div className="mt-2 h-1 overflow-hidden rounded-[4px] bg-[#DBE2E8]">
                         <div
                           className={cn(
-                            "h-full rounded-full",
+                            "h-full rounded-[4px]",
                             increases ? "bg-risk-low" : "bg-risk-high",
                           )}
                           style={{ width: `${width}%` }}
@@ -388,9 +390,9 @@ export default function LeadPage() {
 
           <section>
             <SectionHeading
-              label="Company context"
-              title="The initiatives before this one"
-              hint={`${counts.won} won · ${counts.lost} lost · ${formatEUR(lifetimeWon)} lifetime won ARR. The relationship continues only if someone proposes the next initiative.`}
+              label="Contesto aziendale"
+              title="Le iniziative precedenti"
+              hint={`${counts.won} vinte · ${counts.lost} perse · ${formatEUR(lifetimeWon)} ARR vinto nel corso del rapporto. Il rapporto prosegue solo se qualcuno propone la prossima iniziativa.`}
             />
             <Card className="divide-y divide-line">
               {history.map((initiative) => {
@@ -402,13 +404,13 @@ export default function LeadPage() {
                   >
                     <span
                       className={cn(
-                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold",
+                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-[10px] font-semibold",
                         won
-                          ? "bg-[#E7F4EC] text-risk-low"
+                          ? "bg-[#CBE4FB] text-risk-low"
                           : "bg-[#FDECEA] text-risk-high",
                       )}
                     >
-                      {won ? "W" : "L"}
+                      {won ? "V" : "P"}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-[12.5px] font-medium text-ink">
@@ -423,7 +425,7 @@ export default function LeadPage() {
                       <p className="mt-0.5 text-[10.5px] text-muted">
                         {formatDate(initiative.created_at)}
                         {initiative.closed_at
-                          ? ` → ${formatDate(initiative.closed_at)}`
+                          ? ` - ${formatDate(initiative.closed_at)}`
                           : ""}
                       </p>
                     </div>
@@ -440,84 +442,84 @@ export default function LeadPage() {
         <aside className="space-y-4">
           <Card className="p-5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
-              Relationship
+              Rapporto
             </p>
             <h2 className="mt-1.5 font-display text-[21px] text-ink">
               {company.name}
             </h2>
             <dl className="mt-4 divide-y divide-line border-t border-line">
               <MetaRow
-                label="Lifetime won ARR"
+                label="ARR vinto totale"
                 value={formatEUR(lifetimeWon)}
               />
               <MetaRow
-                label="Initiatives"
-                value={`${counts.won} won · ${counts.lost} lost`}
+                label="Iniziative"
+                value={`${counts.won} vinte · ${counts.lost} perse`}
               />
               <MetaRow
-                label="Last initiative"
+                label="Ultima iniziativa"
                 value={
                   lastInitiative
                     ? `${formatDate(lastInitiative.created_at)}${
-                        daysSinceLast !== null ? ` · ${daysSinceLast}d ago` : ""
+                        daysSinceLast !== null ? ` · ${daysSinceLast}g fa` : ""
                       }`
-                    : "None on record"
+                    : "Nessuna registrata"
                 }
               />
               <MetaRow
-                label="Dormancy"
+                label="Stato attività"
                 value={
                   dormant ? (
-                    <span className="font-medium text-risk-high">Dormant</span>
+                    <span className="font-medium text-risk-high">Inattiva</span>
                   ) : (
-                    "Active"
+                    "Attiva"
                   )
                 }
               />
               <MetaRow
-                label="Region"
+                label="Regione"
                 value={regionLabel(company.region)}
               />
             </dl>
             <p className="mt-3 text-[10.5px] leading-relaxed text-muted">
               {isClosed
-                ? "This initiative is closed. The relationship continues only if someone proposes the next initiative."
+                ? "Iniziativa chiusa. Il rapporto prosegue solo se qualcuno propone la prossima iniziativa."
                 : dormant
-                  ? "No new initiative for 180+ days. Dormancy is a symptom of the relationship, not the model target."
-                  : "An initiative is open, so the relationship is active. Dormancy is flagged at 180 days without a new initiative."}
+                  ? "Nessuna nuova iniziativa da oltre 180 giorni. L'inattività è un segnale del rapporto, non l'obiettivo del modello."
+                  : "Un'iniziativa è aperta, quindi il rapporto è attivo. L'inattività viene segnalata dopo 180 giorni senza nuove iniziative."}
             </p>
           </Card>
 
           <Card className="p-5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
-              This initiative
+              Questa iniziativa
             </p>
             <dl className="mt-3 divide-y divide-line border-t border-line">
-              <MetaRow label="Stage" value={statusLabel(lead.status)} />
-              <MetaRow label="Source" value={sourceLabel(lead.source)} />
+              <MetaRow label="Fase" value={statusLabel(lead.status)} />
+              <MetaRow label="Fonte" value={sourceLabel(lead.source)} />
               <MetaRow
-                label={isClosed ? "Closed" : "Days open"}
+                label={isClosed ? "Chiusa il" : "Giorni aperti"}
                 value={
                   isClosed
                     ? lead.closed_at
                       ? formatDate(lead.closed_at)
                       : "—"
-                    : `${daysOpen} days`
+                    : `${daysOpen} giorni`
                 }
               />
               <MetaRow
-                label="Discount"
+                label="Sconto"
                 value={`${(lead.discount_pct ?? 0).toFixed(1)}%`}
               />
               <MetaRow
-                label="Expected value"
+                label="Valore atteso"
                 value={formatEURCompact(score.expected_value)}
               />
             </dl>
             {isClosed ? (
               <p className="mt-3 border-t border-line pt-3 text-[10.5px] leading-relaxed text-muted">
-                Closed initiative. <code>max_leverage</code> is null, so the
-                score has no lever and no action can be logged.
+                Iniziativa chiusa. <code>max_leverage</code> è nullo, quindi
+                il punteggio non ha leva e non è possibile registrare azioni.
               </p>
             ) : null}
           </Card>
@@ -525,9 +527,9 @@ export default function LeadPage() {
           <Card className="p-5">
             <div className="flex items-center justify-between">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
-                Open actions
+                Azioni aperte
               </p>
-              <span className="rounded-full bg-ink/[0.05] px-2 py-0.5 text-[10px] tabular-nums text-muted">
+              <span className="rounded-[4px] bg-ink/[0.05] px-2 py-0.5 text-[10px] tabular-nums text-muted">
                 {detail.open_actions.length}
               </span>
             </div>
@@ -537,7 +539,7 @@ export default function LeadPage() {
                 {detail.open_actions.map((action) => (
                   <div
                     key={action.id}
-                    className="rounded-lg border border-line bg-[#FAF8F3] p-3"
+                    className="rounded-[4px] border border-line bg-[#F7FAFD] p-3"
                   >
                     <p className="text-[11.5px] font-semibold text-ink">
                       {actionKindLabel(action.kind)}
@@ -557,8 +559,8 @@ export default function LeadPage() {
             ) : (
               <p className="mt-3 text-[11.5px] leading-relaxed text-muted">
                 {isClosed
-                  ? "This initiative is closed. Its action history is final."
-                  : "No action open yet. The queue re-ranks the moment one is logged."}
+                  ? "Iniziativa chiusa. La cronologia delle azioni è definitiva."
+                  : "Nessuna azione aperta. La coda si riordina non appena viene registrata un'azione."}
               </p>
             )}
 
@@ -567,16 +569,17 @@ export default function LeadPage() {
                 to={`/previsioni/act/${lead.id}`}
                 className="mt-4 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-accent transition hover:text-accent-deep"
               >
-                Log an action
+                Registra un'azione
                 <ArrowUpRightIcon className="h-3.5 w-3.5" />
               </Link>
             )}
           </Card>
 
           <InlineNotice>
-            Drivers are SHAP values for the features the model actually saw. The
-            stage is shown, but it is not a driver: closed leads are labelled at
-            qualification, so a stage-advance effect is unlearnable.
+            I driver sono valori SHAP relativi alle variabili effettivamente
+            osservate dal modello. La fase è mostrata, ma non è un driver: i lead
+            chiusi vengono etichettati alla qualifica, quindi l'effetto di avanzamento
+            di fase non è apprendibile.
           </InlineNotice>
         </aside>
       </div>

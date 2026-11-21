@@ -4,34 +4,34 @@
 
 const NARRATIVES: Record<string, string> = {
   first_response_hours:
-    "Speed of first reply is the strongest lever the rep controls. Slower than the reference world pulls the score down.",
+    "La rapidità della prima risposta è la leva più forte che il referente controlla. Più lenta del riferimento, abbassa il punteggio.",
   prior_lost_initiatives:
-    "Lost initiatives in the recent history are evidence about this relationship, so they lower the score.",
+    "Le iniziative perse nella storia recente sono un segnale sul rapporto e abbassano il punteggio.",
   prior_won_initiatives:
-    "Initiatives won together are the clearest evidence this company finishes what it starts.",
+    "Le iniziative vinte insieme sono la prova più chiara che l'azienda porta a termine ciò che inizia.",
   days_since_last_initiative:
-    "Long gaps between initiatives are how this relationship decays. Dormancy is a symptom, not the target.",
+    "Le lunghe pause tra le iniziative sono il modo in cui il rapporto si raffredda. L'inattività è un sintomo, non l'obiettivo.",
   meetings_before_scoring:
-    "Meetings held are real engagement. The model rewards time already spent with the buyer.",
+    "Gli incontri svolti sono coinvolgimento reale. Il modello premia il tempo già dedicato al buyer.",
   owner_win_rate_180d:
-    "The assigning rep's recent win rate is part of the score: who runs the initiative matters.",
+    "Il tasso di vincita recente del referente fa parte del punteggio: chi gestisce l'iniziativa conta.",
   amount_arr:
-    "Larger initiatives are harder to close in this world, so size pulls the probability down.",
+    "Le iniziative più grandi sono più difficili da chiudere in questo mondo, quindi la dimensione abbassa la probabilità.",
   discount_pct:
-    "A larger proposed discount is a signal of friction. It lowers the score rather than buying the win.",
+    "Uno sconto proposto più alto è un segnale di attrito. Abbassa il punteggio invece di comprare la vittoria.",
   tickets_90d:
-    "Support friction in the last 90 days is a negative signal about the relationship.",
+    "L'attrito con l'assistenza negli ultimi 90 giorni è un segnale negativo sul rapporto.",
   nps_last:
-    "Relationship health, as last measured, is a positive signal when the NPS is strong.",
+    "La salute del rapporto, all'ultima misura, è un segnale positivo quando l'NPS è alto.",
   source:
-    "Where the initiative came from carries a base-rate effect: referrals and partners convert better than outbound.",
+    "La provenienza dell'iniziativa porta un effetto di tasso base: segnalazioni e partner convertono meglio dell'outbound.",
   region:
-    "Regional base rates differ, and the model carries the region as a feature.",
+    "I tassi base regionali differiscono e il modello tratta la regione come variabile.",
 };
 
 export function driverNarrative(feature: string): string {
   return (
     NARRATIVES[feature] ??
-    "This feature moved the score under the same model that scored every initiative."
+    "Questa variabile ha spostato il punteggio con lo stesso modello che ha valutato ogni iniziativa."
   );
 }

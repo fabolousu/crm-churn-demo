@@ -140,7 +140,7 @@ export function ProbabilityMeter({
 
   return (
     <div
-      className={cn("relative h-1.5 w-full rounded-full bg-[#EEE9DF]", className)}
+      className={cn("relative h-1.5 w-full rounded-full bg-[#DBE2E8]", className)}
       role="presentation"
     >
       <div
@@ -151,7 +151,7 @@ export function ProbabilityMeter({
         <span
           className="absolute top-1/2 h-2.5 w-px -translate-y-1/2 bg-ink/30"
           style={{ left: "28.66%" }}
-          title="Portfolio win rate 28.66%"
+          title="Tasso di vincita portfolio 28,66%"
         />
       ) : null}
     </div>
@@ -201,7 +201,7 @@ export function ProbabilityDial({
         <path
           d={`M ${DIAL_CENTER_X - DIAL_RADIUS} ${DIAL_CENTER_Y} A ${DIAL_RADIUS} ${DIAL_RADIUS} 0 0 1 ${DIAL_CENTER_X + DIAL_RADIUS} ${DIAL_CENTER_Y}`}
           fill="none"
-          stroke="#ECE7DC"
+          stroke="#DBE2E8"
           strokeWidth={compact ? 10 : 12}
           strokeLinecap="round"
         />
@@ -222,8 +222,8 @@ export function ProbabilityDial({
           cx={benchmarkPoint.x}
           cy={benchmarkPoint.y}
           r={compact ? 2.2 : 2.6}
-          fill="#F6F4EF"
-          stroke="#8A8378"
+          fill="#FFFFFF"
+          stroke="#5B6472"
           strokeWidth={1.4}
         />
 
@@ -232,7 +232,7 @@ export function ProbabilityDial({
           cy={activePoint.y}
           r={compact ? 3.2 : 4}
           fill={style.hex}
-          stroke="#F6F4EF"
+          stroke="#FFFFFF"
           strokeWidth={2}
         />
 
@@ -253,7 +253,7 @@ export function ProbabilityDial({
           textAnchor="middle"
           className="fill-muted text-[8.5px] font-medium uppercase tracking-[0.2em]"
         >
-          to win
+          di conversione
         </text>
 
         <text
@@ -274,8 +274,8 @@ export function ProbabilityDial({
         </text>
       </svg>
       <p className="mt-1 flex items-center justify-center gap-1.5 text-[10.5px] text-muted">
-        <span className="h-1.5 w-1.5 rounded-full border border-[#8A8378] bg-paper" />
-        Portfolio win rate {formatPercent(benchmark, 2)}
+        <span className="h-1.5 w-1.5 rounded-full border border-[#5B6472] bg-paper" />
+        Tasso di vincita portfolio {formatPercent(benchmark, 2)}
       </p>
     </div>
   );
@@ -315,7 +315,7 @@ export function InlineNotice({
   return (
     <div
       className={cn(
-        "flex gap-2.5 rounded-lg border border-line/80 bg-[#FAF8F3] px-3.5 py-3 text-[11.5px] leading-relaxed text-muted",
+        "flex gap-2.5 rounded-lg border border-line/80 bg-[#F7FAFD] px-3.5 py-3 text-[11.5px] leading-relaxed text-muted",
         className,
       )}
     >
