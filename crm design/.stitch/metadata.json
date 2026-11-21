@@ -167,6 +167,34 @@
       "deviceType": "DESKTOP",
       "html": "designs/lever/error.html",
       "screenshot": "designs/lever/error.png"
+    },
+    {
+      "id": "cc9355579e2a425c8b186f552fdb643d",
+      "title": "Previsioni Azione (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/act/act.html",
+      "screenshot": "designs/act/act.png"
+    },
+    {
+      "id": "b8fc30e26b11449a83d525e20fc493a8",
+      "title": "Previsioni Azione - Anteprima in corso",
+      "deviceType": "DESKTOP",
+      "html": "designs/act/midslide.html",
+      "screenshot": "designs/act/midslide.png"
+    },
+    {
+      "id": "2fb5fe70e80d45b594b53f5ade8f21ae",
+      "title": "Previsioni Azione - Caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/act/loading.html",
+      "screenshot": "designs/act/loading.png"
+    },
+    {
+      "id": "cb8f4231e7324d68ab77b790233a84ac",
+      "title": "Previsioni Azione - Errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/act/error.html",
+      "screenshot": "designs/act/error.png"
     }
   ]
 }
