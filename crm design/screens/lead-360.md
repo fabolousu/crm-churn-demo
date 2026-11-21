@@ -40,7 +40,7 @@ Design system: `assets/d4a66eeb6e2e4771b7ab89cb118b7ddc`.
 
 ## Carried to implementation
 
-1. The marker label uses a dot (`28.66%`) while the legend uses the Italian comma (`28,66%`). The implementation must format both with the Italian locale.
+1. The marker label and the legend both read `28,66%` with the Italian comma. Keep that formatting.
 2. The model panel keeps the real artifacts: `lead-win-lgbm-v1`, AUC 0.773, calibration error 0.0104, scored 18/11/2026 16:10.
 3. The driver points (`+14,2`, `+6,8`, `-3,1`) are design examples. The implementation must compute them from the SHAP values.
 4. The company facts (`Giorni apertura 150`, `Stato dormienza Attivo`) come from the ML dataset and are real for this record in the demo.
