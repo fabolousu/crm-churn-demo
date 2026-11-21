@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html lang="it"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary-container":"#005eb8","on-error":"#ffffff","inverse-surface":"#2e3037","on-secondary-fixed-variant":"#3e4755","error":"#E74C3C","error-container":"#ffdad6","outline-variant":"#AFBAC4","on-error-container":"#93000a","on-tertiary-fixed-variant":"#793100","secondary-container":"#dae3f4","surface-dim":"#EEF2F5","surface-container":"#ecedf6","on-primary":"#FFFFFF","surface-container-highest":"#e1e2ea","surface-container-low":"#f2f3fb","tertiary-fixed":"#ffdbcb","outline":"#DBE2E8","on-surface-variant":"#424752","background":"#FFFFFF","primary-fixed-dim":"#a9c7ff","inverse-on-surface":"#eff0f8","secondary-fixed":"#dae3f4","inverse-primary":"#a9c7ff","on-tertiary":"#ffffff","surface-container-lowest":"#ffffff","on-primary-fixed-variant":"#00468c","on-background":"#19242E","surface-variant":"#e1e2ea","tertiary-fixed-dim":"#ffb691","on-tertiary-container":"#ffcfb9","on-secondary-fixed":"#131c28","tertiary-container":"#9f4300","primary-fixed":"#d6e3ff","surface-tint":"#005db6","on-tertiary-fixed":"#341100","on-secondary-container":"#5c6573","tertiary":"#793100","surface-container-high":"#e7e8f0","surface":"#FFFFFF","surface-bright":"#f9f9ff","secondary-fixed-dim":"#bec7d7","secondary":"#565f6d","primary":"#00478d","on-primary-container":"#c8daff","on-secondary":"#ffffff","on-primary-fixed":"#001b3d","on-surface":"#191c21"},borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},spacing:{"space-xs":"0.25rem",gutter:"1rem","space-md":"1rem","space-sm":"0.5rem","space-lg":"1.5rem",margin:"1rem"},fontFamily:{"body-md":["DM Sans"],"label-md":["DM Sans"],"table-header":["DM Sans"],"page-title":["DM Sans"]},fontSize:{"body-md":["13px",{lineHeight:"18px",fontWeight:"400"}],"label-md":["12px",{lineHeight:"16px",fontWeight:"400"}],"table-header":["11px",{lineHeight:"15px",fontWeight:"700"}],"page-title":["15px",{lineHeight:"20px",fontWeight:"600"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface min-h-screen"><header class="fixed top-0 left-0 right-0 h-14 bg-surface-container-low border-b border-outline z-50 flex items-center justify-between px-space-md"><div class="flex items-center gap-space-sm min-w-[240px]"><div class="flex flex-col"><div class="flex items-center gap-1.5"><span class="font-page-title text-page-title text-on-surface tracking-tight">PROMOSITALIA</span><span class="text-outline-variant font-label-md text-label-md">|</span><span class="font-label-md text-label-md text-secondary font-medium tracking-tight">CRM CCIAA – PROMOS</span></div><div class="flex"><span class="text-[9px] font-bold text-primary tracking-widest uppercase bg-primary-fixed px-1 rounded-sm">TRADE AGENCY</span></div></div></div><div class="flex-1 max-w-md mx-space-md"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-2 text-on-surface-variant text-[18px] pointer-events-none">search</span><input class="w-full h-8 pl-8 pr-space-sm bg-surface border border-outline rounded-lg text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" placeholder="Cerca in CRM..." type="text"/></div></div><div class="flex items-center gap-space-sm"><button class="flex items-center gap-1 h-8 px-space-sm bg-primary-container text-on-primary text-body-md font-page-title rounded-lg hover:bg-primary transition-colors" type="button"><span class="material-symbols-outlined text-[16px]">add</span><span>Crea</span></button><div class="h-5 w-[1px] bg-outline mx-1"></div><button class="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Filtri" type="button"><span class="material-symbols-outlined text-[18px]">filter_list</span></button><button class="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Impostazioni" type="button"><span class="material-symbols-outlined text-[18px]">settings</span></button><button class="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Guida" type="button"><span class="material-symbols-outlined text-[18px]">help</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-[11px] font-bold tracking-tight select-none">MR</div></div></header><aside class="fixed left-0 top-14 bottom-0 w-60 bg-surface-container-low border-r border-outline z-40 flex flex-col justify-between overflow-y-auto"><div class="py-space-sm"><nav class="flex flex-col"><div class="px-space-md pt-space-sm pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Navigazione</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="home" href="#"><span class="material-symbols-outlined text-[16px]">home</span><span>Home</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="recenti" href="#"><span class="material-symbols-outlined text-[16px]">schedule</span><span>Recenti</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="aggiunti" href="#"><span class="material-symbols-outlined text-[16px]">push_pin</span><span>Aggiunti</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Attività Personali</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[16px]">dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="impegni" href="#"><span class="material-symbols-outlined text-[16px]">event_available</span><span>Impegni</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Clienti</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="aziende" href="#"><span class="material-symbols-outlined text-[16px]">domain</span><span>Aziende</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="contatti" href="#"><span class="material-symbols-outlined text-[16px]">person</span><span>Contatti</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="rel-aziende-contatti" href="#"><span class="material-symbols-outlined text-[16px]">supervised_user_circle</span><span>Rel. Aziende-Contatti</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Interazioni</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="lead" href="#"><span class="material-symbols-outlined text-[16px]">contacts</span><span>Lead</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="manif-interesse" href="#"><span class="material-symbols-outlined text-[16px]">rate_review</span><span>Manif. Interesse</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="servizi" href="#"><span class="material-symbols-outlined text-[16px]">receipt_long</span><span>Servizi</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Entità di Configurazione</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="anagr-iniziative" href="#"><span class="material-symbols-outlined text-[16px]">tune</span><span>Anagr. Iniziative</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Previsioni</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="pipeline" href="#"><span class="material-symbols-outlined text-[16px]">stacked_line_chart</span><span>Pipeline</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="act" href="#"><span class="material-symbols-outlined text-[16px]">insights</span><span>Act</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md bg-secondary-container text-primary font-page-title border-l-2 border-primary-container" data-path="portfolio" href="#"><span class="material-symbols-outlined text-[16px]">pie_chart</span><span>Portfolio</span></a></nav></div><div class="p-space-sm border-t border-outline bg-surface-container-low"><button class="w-full flex items-center justify-between px-space-sm py-1.5 rounded-lg border border-outline bg-surface hover:bg-surface-container transition-colors" type="button"><div class="flex items-center gap-2 min-w-0"><span class="material-symbols-outlined text-[18px] text-primary">work</span><div class="text-left truncate"><span class="block text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Area di lavoro</span><span class="block font-page-title text-body-md text-on-surface truncate">Sales &amp; Trade</span></div></div><span class="material-symbols-outlined text-[16px] text-on-surface-variant">unfold_more</span></button></div></aside><div class="pl-60"><main class="relative pt-14 w-full bg-surface min-h-screen"><div class="flex flex-col w-full p-space-md gap-y-4">
+<!-- Top Bar / Breadcrumb & Header Action Context -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-outline">
+<div class="flex flex-col gap-0.5">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+<span class="uppercase tracking-wider font-bold text-[10px] text-primary">PREVISIONI</span>
+<span class="text-outline-variant">·</span>
+<span class="font-page-title text-[11px] text-on-surface">PORTFOLIO</span>
+<span class="text-outline-variant">/</span>
+<span class="text-secondary text-[11px]">Pipeline Intelligence</span>
+</div>
+<h1 class="font-page-title text-[18px] leading-tight font-bold text-on-surface tracking-tight">Portfolio pipeline</h1>
+<p class="font-body-md text-label-md text-on-surface-variant">Valore, calibrazione e salute del modello su 19.752 iniziative aperte.</p>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-center">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container-low text-secondary text-[11px] font-medium border border-outline">
+<span class="material-symbols-outlined text-[15px] text-on-surface-variant">schedule</span>
+<span>Aggiornato al 18/11/2026 16:10</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1 bg-surface border border-outline hover:bg-surface-container rounded text-body-md font-page-title text-on-surface transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+<span>Torna alla coda</span>
+</button>
+</div>
+</div>
+<!-- Centered Loading Notification -->
+<div class="w-full flex items-center justify-center py-1">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-surface-container-low border border-outline text-[#5B6472] text-[12px] font-medium">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span>Caricamento metriche di portafoglio in corso...</span>
+</div>
+</div>
+<!-- 1. KPI Strip (4 Cards) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+<!-- Card 1 -->
+<div class="bg-surface rounded border border-outline p-3 flex flex-col justify-between">
+<div class="flex items-center justify-between pb-1">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">VALORE TOTALE PIPELINE</span>
+<span class="material-symbols-outlined text-[15px] text-outline-variant">stacked_line_chart</span>
+</div>
+<div class="my-1.5">
+<div class="h-7 w-[120px] bg-surface-dim rounded"></div>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-outline">
+<span class="font-label-md text-[11px] text-on-surface-variant">19.752 iniziative aperte</span>
+<div class="w-8 h-2 bg-surface-dim rounded"></div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface rounded border border-outline p-3 flex flex-col justify-between">
+<div class="flex items-center justify-between pb-1">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">VALORE ATTESO</span>
+<span class="material-symbols-outlined text-[15px] text-outline-variant">payments</span>
+</div>
+<div class="my-1.5">
+<div class="h-7 w-[100px] bg-surface-dim rounded"></div>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-outline">
+<span class="font-label-md text-[11px] text-on-surface-variant">Probabilità × ARR</span>
+<div class="w-6 h-2 bg-surface-dim rounded"></div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface rounded border border-outline p-3 flex flex-col justify-between">
+<div class="flex items-center justify-between pb-1">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">VALORE A RISCHIO</span>
+<span class="material-symbols-outlined text-[15px] text-outline-variant">warning_amber</span>
+</div>
+<div class="my-1.5">
+<div class="h-7 w-[110px] bg-surface-dim rounded"></div>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-outline">
+<span class="font-label-md text-[11px] text-on-surface-variant">ARR non atteso</span>
+<div class="w-7 h-2 bg-surface-dim rounded"></div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface rounded border border-outline p-3 flex flex-col justify-between">
+<div class="flex items-center justify-between pb-1">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">STATO CALIBRAZIONE</span>
+<span class="material-symbols-outlined text-[15px] text-outline-variant">verified</span>
+</div>
+<div class="my-1.5">
+<div class="h-7 w-[90px] bg-surface-dim rounded"></div>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-outline">
+<span class="font-label-md text-[11px] text-on-surface-variant">ECE 0,0104</span>
+<div class="w-10 h-2 bg-surface-dim rounded"></div>
+</div>
+</div>
+</div>
+<!-- 2. Main Two-Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+<!-- Left Column (approx 60% = col-span-7) -->
+<div class="lg:col-span-7 flex flex-col gap-3">
+<!-- Panel: Andamento per regione -->
+<div class="bg-surface border border-outline rounded p-3">
+<div class="flex items-center justify-between pb-2 border-b border-outline">
+<div>
+<h2 class="font-page-title text-[14px] font-bold text-on-surface">Andamento per regione</h2>
+<p class="font-label-md text-[11px] text-on-surface-variant">Distribuzione geografica su 5 macro-aree aggregate.</p>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-[11px] font-table-header text-on-surface-variant uppercase">Aggregazione:</span>
+<div class="h-5 w-14 bg-surface-dim rounded"></div>
+</div>
+</div>
+<!-- Table Skeleton -->
+<div class="w-full overflow-x-auto mt-2">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline bg-surface-container-low text-[10px] font-table-header uppercase text-secondary">
+<th class="py-2 px-2.5">REGIONE</th>
+<th class="py-2 px-2.5 text-right">INIZIATIVE APERTE</th>
+<th class="py-2 px-2.5 text-right">VALORE ATTESO</th>
+<th class="py-2 px-2.5 text-right">TASSO DI VINCITA STIMATO</th>
+<th class="py-2 px-2.5 text-right">QUOTA PORTFOLIO</th>
+</tr>
+</thead>
+<tbody>
+<!-- Row 1: Nord-Ovest -->
+<tr class="border-b border-outline">
+<td class="py-2.5 px-2.5">
+<div class="h-3 w-20 bg-surface-dim rounded"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-12 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-16 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-10 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-12 bg-surface-dim rounded ml-auto"></div>
+</td>
+</tr>
+<!-- Row 2: Nord-Est -->
+<tr class="border-b border-outline">
+<td class="py-2.5 px-2.5">
+<div class="h-3 w-16 bg-surface-dim rounded"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-14 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-14 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-10 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-10 bg-surface-dim rounded ml-auto"></div>
+</td>
+</tr>
+<!-- Row 3: Centro -->
+<tr class="border-b border-outline">
+<td class="py-2.5 px-2.5">
+<div class="h-3 w-14 bg-surface-dim rounded"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-10 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-16 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-8 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-10 bg-surface-dim rounded ml-auto"></div>
+</td>
+</tr>
+<!-- Row 4: Sud e Isole -->
+<tr class="border-b border-outline">
+<td class="py-2.5 px-2.5">
+<div class="h-3 w-24 bg-surface-dim rounded"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-12 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-12 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-10 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-8 bg-surface-dim rounded ml-auto"></div>
+</td>
+</tr>
+<!-- Row 5: Altro/Estero -->
+<tr class="border-b border-outline">
+<td class="py-2.5 px-2.5">
+<div class="h-3 w-16 bg-surface-dim rounded"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-8 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-10 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-8 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<div class="h-3 w-8 bg-surface-dim rounded ml-auto"></div>
+</td>
+</tr>
+<!-- Row 6: Totale row -->
+<tr class="bg-surface-container-low font-bold">
+<td class="py-2 px-2.5">
+<div class="h-3.5 w-14 bg-surface-dim rounded"></div>
+</td>
+<td class="py-2 px-2.5 text-right">
+<div class="h-3.5 w-14 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2 px-2.5 text-right">
+<div class="h-3.5 w-20 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2 px-2.5 text-right">
+<div class="h-3.5 w-12 bg-surface-dim rounded ml-auto"></div>
+</td>
+<td class="py-2 px-2.5 text-right">
+<div class="h-3.5 w-12 bg-surface-dim rounded ml-auto"></div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Section Below Table: Ripartizione -->
+<div class="mt-4 pt-3 border-t border-outline">
+<div class="flex items-center justify-between mb-2">
+<span class="font-table-header text-[11px] uppercase tracking-wider text-secondary">
+              RIPARTIZIONE VALORE ATTESO PER MACRO-AREA
+            </span>
+<div class="w-16 h-2 bg-surface-dim rounded"></div>
+</div>
+<div class="flex flex-col gap-2.5 mt-2">
+<!-- Macro-area 1 -->
+<div class="flex items-center gap-3">
+<div class="w-20 font-label-md text-[11px] text-on-surface-variant">Nord-Ovest</div>
+<div class="flex-1 h-3 bg-surface-dim rounded overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-2/5 rounded"></div>
+</div>
+<div class="w-12 h-3 bg-surface-dim rounded"></div>
+</div>
+<!-- Macro-area 2 -->
+<div class="flex items-center gap-3">
+<div class="w-20 font-label-md text-[11px] text-on-surface-variant">Nord-Est</div>
+<div class="flex-1 h-3 bg-surface-dim rounded overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-1/4 rounded"></div>
+</div>
+<div class="w-12 h-3 bg-surface-dim rounded"></div>
+</div>
+<!-- Macro-area 3 -->
+<div class="flex items-center gap-3">
+<div class="w-20 font-label-md text-[11px] text-on-surface-variant">Centro</div>
+<div class="flex-1 h-3 bg-surface-dim rounded overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-1/5 rounded"></div>
+</div>
+<div class="w-12 h-3 bg-surface-dim rounded"></div>
+</div>
+<!-- Macro-area 4 -->
+<div class="flex items-center gap-3">
+<div class="w-20 font-label-md text-[11px] text-on-surface-variant">Sud e Isole</div>
+<div class="flex-1 h-3 bg-surface-dim rounded overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-[15%] rounded"></div>
+</div>
+<div class="w-12 h-3 bg-surface-dim rounded"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Panel: Note metodologiche e metriche aggregate -->
+<div class="bg-surface border border-outline rounded p-3">
+<div class="flex items-center gap-2 pb-2 border-b border-outline">
+<span class="material-symbols-outlined text-[16px] text-secondary">info</span>
+<h3 class="font-page-title text-[13px] font-bold text-on-surface">Note metodologiche e metriche aggregate</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+<div class="flex flex-col gap-1.5">
+<div class="h-3 w-4/5 bg-surface-dim rounded"></div>
+<div class="h-3 w-full bg-surface-dim rounded"></div>
+<div class="h-3 w-3/4 bg-surface-dim rounded"></div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="h-3 w-5/6 bg-surface-dim rounded"></div>
+<div class="h-3 w-2/3 bg-surface-dim rounded"></div>
+<div class="h-3 w-4/5 bg-surface-dim rounded"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (approx 40% = col-span-5) -->
+<div class="lg:col-span-5 flex flex-col gap-3">
+<!-- Panel: Qualità del modello -->
+<div class="bg-surface border border-outline rounded p-3">
+<div class="flex items-center justify-between pb-2 border-b border-outline">
+<div>
+<h2 class="font-page-title text-[14px] font-bold text-on-surface">Qualità del modello</h2>
+<p class="font-label-md text-[11px] text-on-surface-variant">Validazione holdout vs train</p>
+</div>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface font-mono text-[10px] font-bold border border-outline">
+            lead-win-lgbm-v1
+          </span>
+</div>
+<!-- Box Stato stabilità dati -->
+<div class="mt-3 p-2.5 rounded bg-surface-container-low border border-outline flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-surface-dim"></div>
+<span class="font-body-md text-[12px] text-on-surface font-medium">Stato stabilità dati:</span>
+</div>
+<div class="h-4 w-24 bg-surface-dim rounded"></div>
+</div>
+<!-- Metric Rows -->
+<div class="flex flex-col gap-2 mt-3 pt-1">
+<div class="flex items-center justify-between py-1 border-b border-outline">
+<span class="font-body-md text-label-md text-on-surface-variant">AUC ROC</span>
+<div class="h-3.5 w-14 bg-surface-dim rounded"></div>
+</div>
+<div class="flex items-center justify-between py-1 border-b border-outline">
+<span class="font-body-md text-label-md text-on-surface-variant">Errore di calibrazione (ECE)</span>
+<div class="h-3.5 w-16 bg-surface-dim rounded"></div>
+</div>
+<div class="flex items-center justify-between py-1 border-b border-outline">
+<span class="font-body-md text-label-md text-on-surface-variant">Tasso medio holdout</span>
+<div class="h-3.5 w-12 bg-surface-dim rounded"></div>
+</div>
+<div class="flex items-center justify-between py-1">
+<span class="font-body-md text-label-md text-on-surface-variant">Ultima inferenza batch</span>
+<div class="h-3.5 w-24 bg-surface-dim rounded"></div>
+</div>
+</div>
+</div>
+<!-- Panel: Calibrazione decilica -->
+<div class="bg-surface border border-outline rounded p-3">
+<div class="flex items-center justify-between pb-2 border-b border-outline">
+<div>
+<h2 class="font-page-title text-[14px] font-bold text-on-surface">Calibrazione decilica</h2>
+<p class="font-label-md text-[11px] text-on-surface-variant">Confronto probabilità prevista vs tasso reale osservato.</p>
+</div>
+<div class="w-12 h-3 bg-surface-dim rounded"></div>
+</div>
+<!-- Static Skeleton Graph Area (240px, #F8FAFC) -->
+<div class="mt-3 h-[240px] w-full bg-[#F8FAFC] border border-outline rounded relative p-3 flex flex-col justify-between">
+<!-- Top graph axis indication -->
+<div class="flex justify-between items-center text-[9px] text-on-surface-variant font-mono">
+<span>1.0</span>
+<div class="w-16 h-2 bg-surface-dim rounded"></div>
+</div>
+<!-- Static grid line placeholders -->
+<div class="w-full h-px bg-outline border-dashed"></div>
+<div class="w-full h-px bg-outline"></div>
+<div class="w-full h-px bg-outline border-dashed"></div>
+<div class="w-full h-px bg-outline"></div>
+<!-- Subtle static scatter placeholders -->
+<div class="absolute inset-0 p-6 flex items-center justify-around pointer-events-none opacity-40">
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant self-end mb-4"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant self-end mb-8"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant self-center"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant self-center -mt-6"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant self-start mt-8"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant self-start mt-2"></div>
+</div>
+<!-- Bottom axis -->
+<div class="flex justify-between items-center text-[9px] text-on-surface-variant font-mono pt-1 border-t border-outline">
+<span>0.0</span>
+<span>0.2</span>
+<span>0.4</span>
+<span>0.6</span>
+<span>0.8</span>
+<span>1.0</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-2 pt-2 text-[10px] text-secondary font-label-md">
+<span>Decili ordinati per score</span>
+<div class="w-20 h-2 bg-surface-dim rounded"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Calibration Rule Note -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-2 p-2.5 bg-surface-container-low border border-outline rounded text-label-md font-label-md text-on-surface-variant mt-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-primary">rule</span>
+<span>Regola di calibrazione: Metriche verificate su iniziative chiuse.</span>
+</div>
+<a class="text-primary hover:text-primary-container font-medium inline-flex items-center gap-1 transition-colors" href="#">
+<span>Consulta documentazione modello</span>
+<span class="material-symbols-outlined text-[13px]">open_in_new</span>
+</a>
+</div>
+</div></main></div></body></html>

@@ -2,14 +2,15 @@
   "projectId": "3133723532266431010",
   "title": "CRM Promos - Modulo Sales",
   "designSystem": {
-    "id": "assets/11537345874869338597",
+    "id": "assets/d4a66eeb6e2e4771b7ab89cb118b7ddc",
     "displayName": "Promos Sales Fresh",
     "theme": {
-      "bodyFont": "INTER",
-      "headlineFont": "INTER",
+      "bodyFont": "DM_SANS",
+      "headlineFont": "DM_SANS",
+      "labelFont": "DM_SANS",
       "colorMode": "LIGHT",
-      "customColor": "#1F8A4C",
-      "roundness": "ROUND_EIGHT"
+      "customColor": "#005EB8",
+      "roundness": "ROUND_FOUR"
     }
   },
   "screens": [
@@ -33,6 +34,188 @@
       "deviceType": "DESKTOP",
       "html": "designs/lead-personali-aperti-v2.html",
       "screenshot": "designs/lead-personali-aperti-v2.png"
+    },
+    {
+      "id": "ada6168dfc4043b19ecea1f3bf76000d",
+      "title": "Lead personali aperti (final)",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti/lead-personali-aperti.html",
+      "screenshot": "designs/lead-personali-aperti/lead-personali-aperti.png"
+    },
+    {
+      "id": "d995418f12e44733bfc57e49636df00f",
+      "title": "Lead personali aperti - Stato vuoto",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti/empty.html",
+      "screenshot": "designs/lead-personali-aperti/empty.png"
+    },
+    {
+      "id": "87bd883bb2bc41a582e75cc866377e5f",
+      "title": "Lead personali aperti - Stato di caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti/loading.html",
+      "screenshot": "designs/lead-personali-aperti/loading.png"
+    },
+    {
+      "id": "3d6e2aeb3297464d8f104a9462d7bf7d",
+      "title": "Lead personali aperti - Stato di errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-personali-aperti/error.html",
+      "screenshot": "designs/lead-personali-aperti/error.png"
+    },
+    {
+      "id": "b9a8187339204f0fa4d2c244348698cd",
+      "title": "Scheda Lead (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/scheda-lead.html",
+      "screenshot": "designs/scheda-lead/scheda-lead.png"
+    },
+    {
+      "id": "509e3c130acc4fa1a34ad5a94905a7c1",
+      "title": "Scheda Lead - Timeline vuota",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/empty.html",
+      "screenshot": "designs/scheda-lead/empty.png"
+    },
+    {
+      "id": "f3b55c0769f940a0a2916b05b3b46cf1",
+      "title": "Scheda Lead - Stato di caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/loading.html",
+      "screenshot": "designs/scheda-lead/loading.png"
+    },
+    {
+      "id": "204357fd7ef54895bcd6f5f6630d4e9a",
+      "title": "Scheda Lead - Stato di errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/error.html",
+      "screenshot": "designs/scheda-lead/error.png"
+    },
+    {
+      "id": "a372d58780c8431faea2989d8491e450",
+      "title": "Scheda Lead - Timeline popolata",
+      "deviceType": "DESKTOP",
+      "html": "designs/scheda-lead/timeline.html",
+      "screenshot": "designs/scheda-lead/timeline.png"
+    },
+    {
+      "id": "3dc7283ff58a417cae4c78ccac9d7802",
+      "title": "Previsioni Pipeline (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/previsioni-pipeline/pipeline.html",
+      "screenshot": "designs/previsioni-pipeline/pipeline.png"
+    },
+    {
+      "id": "9cc51f16b1c843e5a93f9f46238b90b1",
+      "title": "Previsioni Pipeline - Stato vuoto",
+      "deviceType": "DESKTOP",
+      "html": "designs/previsioni-pipeline/empty.html",
+      "screenshot": "designs/previsioni-pipeline/empty.png"
+    },
+    {
+      "id": "2779bcc3424046308dc0a4d2948d3af4",
+      "title": "Previsioni Pipeline - Caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/previsioni-pipeline/loading.html",
+      "screenshot": "designs/previsioni-pipeline/loading.png"
+    },
+    {
+      "id": "ee19b0302ede48d5ab5940bba6dfd848",
+      "title": "Previsioni Pipeline - Errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/previsioni-pipeline/error.html",
+      "screenshot": "designs/previsioni-pipeline/error.png"
+    },
+    {
+      "id": "a0a7ba7292e6465c850fd6f8070948a0",
+      "title": "Lead 360 (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-360/lead-360.html",
+      "screenshot": "designs/lead-360/lead-360.png"
+    },
+    {
+      "id": "0419d69b755342548b41d74d512a1157",
+      "title": "Lead 360 - Caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-360/loading.html",
+      "screenshot": "designs/lead-360/loading.png"
+    },
+    {
+      "id": "7f5bee2bbe33423fa236599843f1a583",
+      "title": "Lead 360 - Errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/lead-360/error.html",
+      "screenshot": "designs/lead-360/error.png"
+    },
+    {
+      "id": "4872ea6c331f4922bf53a8bd6c593e57",
+      "title": "Previsioni Leva (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/lever/lever.html",
+      "screenshot": "designs/lever/lever.png"
+    },
+    {
+      "id": "f3203bf0a4ef4c15824a4a8c75ae517b",
+      "title": "Previsioni Leva - Caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/lever/loading.html",
+      "screenshot": "designs/lever/loading.png"
+    },
+    {
+      "id": "a3a1087fa0bd4fb3b7f20c0d6a696e59",
+      "title": "Previsioni Leva - Errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/lever/error.html",
+      "screenshot": "designs/lever/error.png"
+    },
+    {
+      "id": "561cae0231ae4588a3f63f24574a58ab",
+      "title": "Previsioni Azione (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/act/act.html",
+      "screenshot": "designs/act/act.png"
+    },
+    {
+      "id": "24dd05b5d7b8461aa84b9f7b8796195b",
+      "title": "Previsioni Azione - Anteprima in corso",
+      "deviceType": "DESKTOP",
+      "html": "designs/act/midslide.html",
+      "screenshot": "designs/act/midslide.png"
+    },
+    {
+      "id": "2fb5fe70e80d45b594b53f5ade8f21ae",
+      "title": "Previsioni Azione - Caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/act/loading.html",
+      "screenshot": "designs/act/loading.png"
+    },
+    {
+      "id": "cb8f4231e7324d68ab77b790233a84ac",
+      "title": "Previsioni Azione - Errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/act/error.html",
+      "screenshot": "designs/act/error.png"
+    },
+    {
+      "id": "fe282bbc38d04fc58321be597a930aa7",
+      "title": "Previsioni Portfolio (finale)",
+      "deviceType": "DESKTOP",
+      "html": "designs/portfolio/portfolio.html",
+      "screenshot": "designs/portfolio/portfolio.png"
+    },
+    {
+      "id": "83ea772e89a74cfab59a743ab1c18b6b",
+      "title": "Previsioni Portfolio - Caricamento",
+      "deviceType": "DESKTOP",
+      "html": "designs/portfolio/loading.html",
+      "screenshot": "designs/portfolio/loading.png"
+    },
+    {
+      "id": "b0bd6d4f28b64408a23d34c492006a80",
+      "title": "Previsioni Portfolio - Errore",
+      "deviceType": "DESKTOP",
+      "html": "designs/portfolio/error.html",
+      "screenshot": "designs/portfolio/error.png"
     }
   ]
 }

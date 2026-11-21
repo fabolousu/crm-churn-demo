@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html lang="it"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary-container":"#005eb8","on-error":"#ffffff","inverse-surface":"#2e3037","on-secondary-fixed-variant":"#3e4755","error":"#E74C3C","error-container":"#ffdad6","outline-variant":"#AFBAC4","on-error-container":"#93000a","on-tertiary-fixed-variant":"#793100","secondary-container":"#dae3f4","surface-dim":"#EEF2F5","surface-container":"#ecedf6","on-primary":"#FFFFFF","surface-container-highest":"#e1e2ea","surface-container-low":"#f2f3fb","tertiary-fixed":"#ffdbcb","outline":"#DBE2E8","on-surface-variant":"#424752","background":"#FFFFFF","primary-fixed-dim":"#a9c7ff","inverse-on-surface":"#eff0f8","secondary-fixed":"#dae3f4","inverse-primary":"#a9c7ff","on-tertiary":"#ffffff","surface-container-lowest":"#ffffff","on-primary-fixed-variant":"#00468c","on-background":"#19242E","surface-variant":"#e1e2ea","tertiary-fixed-dim":"#ffb691","on-tertiary-container":"#ffcfb9","on-secondary-fixed":"#131c28","tertiary-container":"#9f4300","primary-fixed":"#d6e3ff","surface-tint":"#005db6","on-tertiary-fixed":"#341100","on-secondary-container":"#5c6573","tertiary":"#793100","surface-container-high":"#e7e8f0","surface":"#FFFFFF","surface-bright":"#f9f9ff","secondary-fixed-dim":"#bec7d7","secondary":"#565f6d","primary":"#00478d","on-primary-container":"#c8daff","on-secondary":"#ffffff","on-primary-fixed":"#001b3d","on-surface":"#191c21"},borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},spacing:{"space-xs":"0.25rem",gutter:"1rem","space-md":"1rem","space-sm":"0.5rem","space-lg":"1.5rem",margin:"1rem"},fontFamily:{"body-md":["DM Sans"],"label-md":["DM Sans"],"table-header":["DM Sans"],"page-title":["DM Sans"]},fontSize:{"body-md":["13px",{lineHeight:"18px",fontWeight:"400"}],"label-md":["12px",{lineHeight:"16px",fontWeight:"400"}],"table-header":["11px",{lineHeight:"15px",fontWeight:"700"}],"page-title":["15px",{lineHeight:"20px",fontWeight:"600"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface min-h-screen"><header class="fixed top-0 left-0 right-0 h-14 bg-surface-container-low border-b border-outline z-50 flex items-center justify-between px-space-md"><div class="flex items-center gap-space-sm min-w-[240px]"><div class="flex flex-col"><div class="flex items-center gap-1.5"><span class="font-page-title text-page-title text-on-surface tracking-tight">PROMOSITALIA</span><span class="text-outline-variant font-label-md text-label-md">|</span><span class="font-label-md text-label-md text-secondary font-medium tracking-tight">CRM CCIAA – PROMOS</span></div><div class="flex"><span class="text-[9px] font-bold text-primary tracking-widest uppercase bg-primary-fixed px-1 rounded-sm">TRADE AGENCY</span></div></div></div><div class="flex-1 max-w-md mx-space-md"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-2 text-on-surface-variant text-[18px] pointer-events-none">search</span><input class="w-full h-8 pl-8 pr-space-sm bg-surface border border-outline rounded-lg text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" placeholder="Cerca in CRM..." type="text"/></div></div><div class="flex items-center gap-space-sm"><button class="flex items-center gap-1 h-8 px-space-sm bg-primary-container text-on-primary text-body-md font-page-title rounded-lg hover:bg-primary transition-colors" type="button"><span class="material-symbols-outlined text-[16px]">add</span><span>Crea</span></button><div class="h-5 w-[1px] bg-outline mx-1"></div><button class="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Filtri" type="button"><span class="material-symbols-outlined text-[18px]">filter_list</span></button><button class="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Impostazioni" type="button"><span class="material-symbols-outlined text-[18px]">settings</span></button><button class="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Guida" type="button"><span class="material-symbols-outlined text-[18px]">help</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-[11px] font-bold tracking-tight select-none">MR</div></div></header><aside class="fixed left-0 top-14 bottom-0 w-60 bg-surface-container-low border-r border-outline z-40 flex flex-col justify-between overflow-y-auto"><div class="py-space-sm"><nav class="flex flex-col"><div class="px-space-md pt-space-sm pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Navigazione</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="home" href="#"><span class="material-symbols-outlined text-[16px]">home</span><span>Home</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="recenti" href="#"><span class="material-symbols-outlined text-[16px]">schedule</span><span>Recenti</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="aggiunti" href="#"><span class="material-symbols-outlined text-[16px]">push_pin</span><span>Aggiunti</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Attività Personali</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[16px]">dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="impegni" href="#"><span class="material-symbols-outlined text-[16px]">event_available</span><span>Impegni</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Clienti</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="aziende" href="#"><span class="material-symbols-outlined text-[16px]">domain</span><span>Aziende</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="contatti" href="#"><span class="material-symbols-outlined text-[16px]">person</span><span>Contatti</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="rel-aziende-contatti" href="#"><span class="material-symbols-outlined text-[16px]">supervised_user_circle</span><span>Rel. Aziende-Contatti</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Interazioni</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="lead" href="#"><span class="material-symbols-outlined text-[16px]">contacts</span><span>Lead</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="manif-interesse" href="#"><span class="material-symbols-outlined text-[16px]">rate_review</span><span>Manif. Interesse</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="servizi" href="#"><span class="material-symbols-outlined text-[16px]">receipt_long</span><span>Servizi</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Entità di Configurazione</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="anagr-iniziative" href="#"><span class="material-symbols-outlined text-[16px]">tune</span><span>Anagr. Iniziative</span></a><div class="px-space-md pt-space-md pb-1"><span class="font-table-header text-table-header uppercase text-on-surface-variant tracking-wider">Previsioni</span></div><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="pipeline" href="#"><span class="material-symbols-outlined text-[16px]">stacked_line_chart</span><span>Pipeline</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="act" href="#"><span class="material-symbols-outlined text-[16px]">insights</span><span>Act</span></a><a class="flex items-center gap-2 px-space-md py-1.5 text-body-md font-body-md bg-secondary-container text-primary font-page-title border-l-2 border-primary-container" data-path="portfolio" href="#"><span class="material-symbols-outlined text-[16px]">pie_chart</span><span>Portfolio</span></a></nav></div><div class="p-space-sm border-t border-outline bg-surface-container-low"><button class="w-full flex items-center justify-between px-space-sm py-1.5 rounded-lg border border-outline bg-surface hover:bg-surface-container transition-colors" type="button"><div class="flex items-center gap-2 min-w-0"><span class="material-symbols-outlined text-[18px] text-primary">work</span><div class="text-left truncate"><span class="block text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Area di lavoro</span><span class="block font-page-title text-body-md text-on-surface truncate">Sales &amp; Trade</span></div></div><span class="material-symbols-outlined text-[16px] text-on-surface-variant">unfold_more</span></button></div></aside><div class="pl-60"><main class="relative pt-14 w-full bg-surface min-h-screen"><div class="flex flex-col w-full bg-surface-container-low min-h-full">
+<!-- Page Header -->
+<div class="px-space-md py-space-sm bg-surface flex flex-col md:flex-row md:items-center justify-between gap-space-sm border-b border-outline">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-table-header text-[11px] uppercase tracking-wider text-secondary">Previsioni · Portfolio</span>
+<span class="text-outline-variant text-[11px]">/</span>
+<span class="font-label-md text-label-md text-primary font-medium">Pipeline Intelligence</span>
+</div>
+<h1 class="font-page-title text-[24px] leading-7 font-bold text-on-surface tracking-tight mt-0.5">Portfolio pipeline</h1>
+<p class="font-body-md text-body-md text-secondary mt-0.5">Valore, calibrazione e salute del modello su 19.752 iniziative aperte.</p>
+</div>
+<div class="flex items-center gap-space-md self-start md:self-auto">
+<div class="flex items-center gap-1.5 text-secondary font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">schedule</span>
+<span>Aggiornato al 18/11/2026 16:10</span>
+</div>
+<a class="inline-flex items-center gap-1 px-space-sm py-1 rounded bg-surface hover:bg-surface-container border border-outline text-primary font-body-md text-body-md font-medium transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+<span>Torna alla coda</span>
+</a>
+</div>
+</div>
+<div class="p-space-md flex flex-col gap-space-md">
+<!-- Variant 1: Top Dense Cockpit Strip -->
+<div class="bg-surface border border-outline rounded grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-outline shadow-none">
+<!-- Metric 1 -->
+<div class="p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-2">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">VALORE TOTALE PIPELINE</span>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">account_balance_wallet</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-page-title text-[28px] leading-8 font-semibold text-on-surface tabular-nums">€720,7M</span>
+</div>
+<div class="mt-2 pt-2 border-t border-outline flex items-center justify-between font-label-md text-label-md text-secondary">
+<span>19.752 iniziative aperte</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-2">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">VALORE ATTESO</span>
+<span class="material-symbols-outlined text-[18px] text-primary">target</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-page-title text-[28px] leading-8 font-semibold text-primary tabular-nums">€282M</span>
+</div>
+<div class="mt-2 pt-2 border-t border-outline flex items-center justify-between font-label-md text-label-md text-secondary">
+<span>Probabilità × ARR</span>
+<span class="text-on-surface font-medium tabular-nums">39,1% del lordo</span>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-2">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">VALORE A RISCHIO</span>
+<span class="material-symbols-outlined text-[18px] text-error">warning</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-page-title text-[28px] leading-8 font-semibold text-on-surface tabular-nums">€438,7M</span>
+</div>
+<div class="mt-2 pt-2 border-t border-outline flex items-center justify-between font-label-md text-label-md text-secondary">
+<span>ARR non atteso</span>
+<span class="text-error font-medium tabular-nums">60,9% non convertibile</span>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-2">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">STATO CALIBRAZIONE</span>
+<span class="material-symbols-outlined text-[18px] text-primary-container">verified</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-page-title text-[28px] leading-8 font-semibold text-on-surface">Buona</span>
+</div>
+<div class="mt-2 pt-2 border-t border-outline flex items-center justify-between font-label-md text-label-md text-secondary"><span>ECE 0,0104</span></div>
+</div>
+</div>
+<!-- Main Body: 60/40 Split -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+<!-- Left Column (Business & Regional Allocation) - 60% (7 cols or ~58-60%) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<!-- Regional Table & Bar Breakdown Container -->
+<div class="bg-surface border border-outline rounded p-5 flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline pb-3">
+<div>
+<h2 class="font-page-title text-page-title font-bold text-on-surface">Andamento per regione</h2>
+<p class="font-label-md text-label-md text-secondary">Distribuzione geografica su 5 macro-aree aggregate.</p>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline">
+<th class="py-2 px-3 font-table-header text-table-header uppercase text-secondary">Regione</th>
+<th class="py-2 px-3 font-table-header text-table-header uppercase text-secondary text-right">Iniziative aperte</th>
+<th class="py-2 px-3 font-table-header text-table-header uppercase text-secondary text-right">Valore atteso</th>
+<th class="py-2 px-3 font-table-header text-table-header uppercase text-secondary text-right">Tasso di vincita stimato</th>
+<th class="py-2 px-3 font-table-header text-table-header uppercase text-secondary text-right">Quota portfolio</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline font-body-md text-body-md text-on-surface">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-2.5 px-3 font-medium flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+              Nord-Ovest
+            </td>
+<td class="py-2.5 px-3 text-right tabular-nums">2.281</td>
+<td class="py-2.5 px-3 text-right font-medium tabular-nums text-on-surface">€33,5M</td>
+<td class="py-2.5 px-3 text-right tabular-nums">29,52%</td>
+<td class="py-2.5 px-3 text-right tabular-nums text-secondary">11,9%</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-2.5 px-3 font-medium flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+              Nord-Est
+            </td>
+<td class="py-2.5 px-3 text-right tabular-nums">2.405</td>
+<td class="py-2.5 px-3 text-right font-medium tabular-nums text-on-surface">€36,4M</td>
+<td class="py-2.5 px-3 text-right tabular-nums">30,94%</td>
+<td class="py-2.5 px-3 text-right tabular-nums text-secondary">12,9%</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-2.5 px-3 font-medium flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+              Centro
+            </td>
+<td class="py-2.5 px-3 text-right tabular-nums">3.938</td>
+<td class="py-2.5 px-3 text-right font-medium tabular-nums text-on-surface">€57,9M</td>
+<td class="py-2.5 px-3 text-right tabular-nums">30,02%</td>
+<td class="py-2.5 px-3 text-right tabular-nums text-secondary">20,5%</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-2.5 px-3 font-medium flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+              Sud e Isole
+            </td>
+<td class="py-2.5 px-3 text-right tabular-nums">11.128</td>
+<td class="py-2.5 px-3 text-right font-medium tabular-nums text-on-surface">€154,3M</td>
+<td class="py-2.5 px-3 text-right tabular-nums">27,43%</td>
+<td class="py-2.5 px-3 text-right tabular-nums text-secondary">54,7%</td>
+</tr>
+</tbody>
+<tfoot>
+<tr class="border-t-2 border-outline bg-surface-container-low font-page-title text-body-md text-on-surface">
+<td class="py-2.5 px-3 font-bold">Totale</td>
+<td class="py-2.5 px-3 text-right font-bold tabular-nums">19.752</td>
+<td class="py-2.5 px-3 text-right font-bold tabular-nums text-primary">€282,0M</td>
+<td class="py-2.5 px-3 text-right font-bold tabular-nums">28,66%</td>
+<td class="py-2.5 px-3 text-right font-bold tabular-nums">100,0%</td>
+</tr>
+</tfoot>
+</table>
+</div>
+<!-- Breakdown horizontal bars directly underneath -->
+<div class="pt-2 flex flex-col gap-3 border-t border-outline mt-1">
+<div class="flex items-center justify-between">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">Ripartizione valore atteso per macro-area</span>
+<span class="font-label-md text-label-md text-secondary">Totale normalizzato €282,0M</span>
+</div>
+<div class="space-y-2.5">
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="font-medium text-on-surface">Sud e Isole</span>
+<span class="font-semibold text-on-surface tabular-nums">€154,3M <span class="text-secondary font-normal">(54,7%)</span></span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-sm overflow-hidden flex">
+<div class="bg-primary-container h-full rounded-sm transition-all" style="width: 54.7%;"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="font-medium text-on-surface">Centro</span>
+<span class="font-semibold text-on-surface tabular-nums">€57,9M <span class="text-secondary font-normal">(20,5%)</span></span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-sm overflow-hidden flex">
+<div class="bg-primary-container h-full rounded-sm transition-all" style="width: 20.5%;"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="font-medium text-on-surface">Nord-Est</span>
+<span class="font-semibold text-on-surface tabular-nums">€36,4M <span class="text-secondary font-normal">(12,9%)</span></span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-sm overflow-hidden flex">
+<div class="bg-primary-container h-full rounded-sm transition-all" style="width: 12.9%;"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="font-medium text-on-surface">Nord-Ovest</span>
+<span class="font-semibold text-on-surface tabular-nums">€33,5M <span class="text-secondary font-normal">(11,9%)</span></span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-sm overflow-hidden flex">
+<div class="bg-primary-container h-full rounded-sm transition-all" style="width: 11.9%;"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Note metodologiche e metriche aggregate (bottom of left column) -->
+<div class="bg-surface border border-outline rounded p-5 flex flex-col gap-3">
+<div class="flex items-center gap-2 border-b border-outline pb-2.5">
+<span class="material-symbols-outlined text-[18px] text-primary">info</span>
+<h3 class="font-page-title text-page-title font-bold text-on-surface">Note metodologiche e metriche aggregate</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md pt-1">
+<div class="flex flex-col gap-1">
+<span class="font-page-title text-[12px] font-bold text-on-surface">Valore atteso calcolato</span>
+<p class="font-label-md text-label-md text-secondary leading-relaxed">
+          Prodotto tra probabilità calibrata del modello <span class="font-mono text-on-surface">lead-win-lgbm-v1</span> e ARR proposto per ogni singola iniziativa aperta.
+        </p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-page-title text-[12px] font-bold text-on-surface">Iniziative aperte</span>
+<p class="font-label-md text-label-md text-secondary leading-relaxed">
+          Escluse le posizioni concluse o archiviate; il ranking rispecchia la priorità d'intervento sul campo per massimizzare la conversione reale.
+        </p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-page-title text-[12px] font-bold text-on-surface">Validazione continua</span>
+<p class="font-label-md text-label-md text-secondary leading-relaxed">
+          Test di holdout su cinque macro-regioni con calibrazione decilica unificata. Nessun overfitting geografico riscontrato nei controlli settimanali.
+        </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Modello & Validazione Scientifica) - 40% (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- Qualità del modello Card -->
+<div class="bg-surface border border-outline rounded p-5 flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-outline pb-3">
+<div>
+<h2 class="font-page-title text-page-title font-bold text-on-surface">Qualità del modello</h2>
+<span class="font-label-md text-label-md text-secondary">Validazione holdout vs train</span>
+</div>
+<span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-primary-fixed text-on-primary-fixed border border-outline">lead-win-lgbm-v1</span>
+</div>
+<div class="bg-surface-container-low border border-outline rounded p-3 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+<div class="flex flex-col">
+<span class="font-page-title text-[12px] font-bold text-on-surface">Stato stabilità dati</span>
+<span class="font-label-md text-[11px] text-secondary">Indice PSI 0,171</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-amber-100 text-amber-900 border border-amber-300">Da osservare</span>
+</div>
+<div class="space-y-3 divide-y divide-outline font-body-md text-body-md">
+<div class="pt-2 flex items-center justify-between">
+<div>
+<span class="block font-medium text-on-surface">AUC ROC</span>
+<span class="block font-label-md text-[11px] text-secondary">Tetto latente stimato 0.789</span>
+</div>
+<span class="font-page-title text-[18px] font-bold text-on-surface tabular-nums">0.773</span>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<div>
+<span class="block font-medium text-on-surface">Errore di calibrazione (ECE)</span>
+<span class="block font-label-md text-[11px] text-secondary">Soglia massima target &lt; 0.05</span>
+</div>
+<span class="font-page-title text-[18px] font-bold text-primary tabular-nums">0.0104</span>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<div>
+<span class="block font-medium text-on-surface">Tasso medio holdout</span>
+<span class="block font-label-md text-[11px] text-secondary">Prevalenza set training 27,2%</span>
+</div>
+<span class="font-page-title text-[18px] font-bold text-on-surface tabular-nums">35,1%</span>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<div>
+<span class="block font-medium text-on-surface">Ultima inferenza batch</span>
+</div>
+<span class="font-label-md text-label-md text-secondary font-medium tabular-nums">18 Nov 2026, 16:10</span>
+</div>
+</div>
+</div>
+<!-- Calibrazione decilica Card -->
+<div class="bg-surface border border-outline rounded p-5 flex flex-col gap-3">
+<div class="border-b border-outline pb-2.5">
+<div class="flex items-center justify-between">
+<h2 class="font-page-title text-page-title font-bold text-on-surface">Calibrazione decilica</h2>
+</div>
+<p class="font-label-md text-label-md text-secondary">Confronto probabilità prevista vs tasso reale osservato.</p>
+</div>
+<div class="relative w-full h-[240px] pt-2">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 280 200">
+<line stroke="#DBE2E8" stroke-width="1" x1="30" x2="270" y1="170" y2="170"></line>
+<line stroke="#EEF2F5" stroke-width="1" x1="30" x2="270" y1="135" y2="135"></line>
+<line stroke="#EEF2F5" stroke-width="1" x1="30" x2="270" y1="100" y2="100"></line>
+<line stroke="#EEF2F5" stroke-width="1" x1="30" x2="270" y1="65" y2="65"></line>
+<line stroke="#EEF2F5" stroke-width="1" x1="30" x2="270" y1="30" y2="30"></line>
+<line stroke="#DBE2E8" stroke-width="1" x1="30" x2="30" y1="170" y2="30"></line>
+<line stroke="#EEF2F5" stroke-width="1" x1="90" x2="90" y1="170" y2="30"></line>
+<line stroke="#EEF2F5" stroke-width="1" x1="150" x2="150" y1="170" y2="30"></line>
+<line stroke="#EEF2F5" stroke-width="1" x1="210" x2="210" y1="170" y2="30"></line>
+<line stroke="#EEF2F5" stroke-width="1" x1="270" x2="270" y1="170" y2="30"></line>
+<text fill="#565f6d" font-family="DM Sans" font-size="9" text-anchor="end" x="24" y="173">0%</text>
+<text fill="#565f6d" font-family="DM Sans" font-size="9" text-anchor="end" x="24" y="103">50%</text>
+<text fill="#565f6d" font-family="DM Sans" font-size="9" text-anchor="end" x="24" y="34">100%</text>
+<text fill="#565f6d" font-family="DM Sans" font-size="9" text-anchor="middle" x="30" y="184">0%</text>
+<text fill="#565f6d" font-family="DM Sans" font-size="9" text-anchor="middle" x="150" y="184">50%</text>
+<text fill="#565f6d" font-family="DM Sans" font-size="9" text-anchor="middle" x="270" y="184">100%</text>
+<line stroke="#AFBAC4" stroke-dasharray="4,4" stroke-width="1.5" x1="30" x2="270" y1="170" y2="30"></line>
+<circle cx="54" cy="156.7" fill="#005eb8" r="3.5"></circle>
+<circle cx="78" cy="143.4" fill="#005eb8" r="3.5"></circle>
+<circle cx="102" cy="126.6" fill="#005eb8" r="3.5"></circle>
+<circle cx="126" cy="115.4" fill="#005eb8" r="3.5"></circle>
+<circle cx="150" cy="98.6" fill="#005eb8" r="3.5"></circle>
+<circle cx="174" cy="87.4" fill="#005eb8" r="3.5"></circle>
+<circle cx="198" cy="70.6" fill="#005eb8" r="3.5"></circle>
+<circle cx="222" cy="60.8" fill="#005eb8" r="3.5"></circle>
+<circle cx="246" cy="45.4" fill="#005eb8" r="3.5"></circle>
+<circle cx="270" cy="32.8" fill="#005eb8" r="3.5"></circle>
+</svg>
+</div>
+<div class="flex items-center justify-center gap-4 pt-1 font-label-md text-[11px] text-secondary border-t border-outline">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0 border-t-2 border-dashed border-outline-variant"></span>
+<span>Calibrazione ideale</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span>Decile osservato</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Disclaimer / Documentation Link -->
+<div class="mt-2 py-3 px-4 bg-surface border border-outline rounded flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-secondary">policy</span>
+<span class="font-label-md text-label-md text-secondary">Regola di calibrazione: Metriche verificate su iniziative chiuse.</span>
+</div>
+<a class="font-label-md text-label-md text-primary font-medium hover:underline inline-flex items-center gap-1" href="#">
+<span>Consulta documentazione modello</span>
+<span class="material-symbols-outlined text-[14px]">open_in_new</span>
+</a>
+</div>
+</div>
+</div></main></div></body></html>
