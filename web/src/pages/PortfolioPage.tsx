@@ -184,7 +184,7 @@ export default function PortfolioPage() {
                   className="grid grid-cols-[76px_1fr_52px] items-center gap-3"
                 >
                   <span className="text-[11px] text-ink/80">{region.label}</span>
-                  <div className="relative h-1.5 rounded-[4px] bg-[#DBE2E8]">
+                  <div className="relative h-2 rounded-[4px] bg-[#DBE2E8]">
                     <div
                       className="h-full rounded-[4px] bg-accent/75"
                       style={{ width: `${(region.win_rate / 0.4) * 100}%` }}
@@ -389,7 +389,6 @@ export default function PortfolioPage() {
                 <ScatterChart
                   margin={{ top: 8, right: 18, bottom: 8, left: 0 }}
                 >
-                  <CartesianGrid stroke="#DBE2E8" strokeDasharray="2 4" />
                   <XAxis
                     type="number"
                     dataKey="predicted"

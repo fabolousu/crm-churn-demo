@@ -3,11 +3,12 @@
 // the (Contatto, Anagrafica interesse) uniqueness check live here so the demo behaves
 // like the specified product rather than a mock-up.
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useCrm } from "./store";
 import type { Lead } from "./types";
 import { formatDateTimeIt } from "../lib/i18n";
+import { cn } from "../components/ui";
 import {
   ArrowLeftIcon,
   ChevronDownIcon,
@@ -138,6 +139,13 @@ export default function LeadFormPage() {
   const [flyoutOpen, setFlyoutOpen] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const noticeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (notice.startsWith("Salvataggio") || notice.startsWith("Lead creato")) {
+      noticeRef.current?.focus();
+    }
+  }, [notice]);
 
   const [headerStatus, setHeaderStatus] = useState(initial.statusCode);
   const [headerOwner, setHeaderOwner] = useState(initial.ownerId);
@@ -457,11 +465,25 @@ export default function LeadFormPage() {
             .
           </div>
         ) : null}
-        <p className="px-5 pt-2 text-[11px] text-muted" aria-live="polite">
-          {notice}
-        </p>
+        {notice ? (
+          <div
+            ref={noticeRef}
+            role="status"
+            aria-live="polite"
+            tabIndex={-1}
+            data-testid="form-notice"
+            className={cn(
+              "mx-5 mt-2 rounded-[4px] px-3 py-2 text-[11.5px] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+              notice.startsWith("Salvataggio") || notice.startsWith("Lead creato")
+                ? "border border-[#A9C7FF] bg-[#F2F7FC] font-medium text-[#00499D]"
+                : "text-muted",
+            )}
+          >
+            {notice}
+          </div>
+        ) : null}
 
-        <div className="grid gap-6 px-5 py-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid gap-6 px-5 py-5 lg:grid-cols-[minmax(0,7fr)_minmax(280px,3fr)]">
           <div>
             {tab === "generale" ? (
               <div className="space-y-4">

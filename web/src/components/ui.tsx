@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Band } from "../lib/types";
 import { BAND_STYLES } from "../lib/bands";
 import { formatPercent } from "../lib/format";
@@ -350,6 +350,83 @@ export function MetaRow({
     <div className={cn("flex items-baseline justify-between gap-4 py-2", className)}>
       <dt className="text-[11.5px] text-muted">{label}</dt>
       <dd className="text-right text-[12.5px] font-medium text-ink">{value}</dd>
+    </div>
+  );
+}
+
+
+export function ProbabilityTransition({
+  from,
+  to,
+  fromLabel = "Prima",
+  toLabel = "Dopo",
+  animate = true,
+  className,
+}: {
+  from: number;
+  to: number;
+  fromLabel?: string;
+  toLabel?: string;
+  animate?: boolean;
+  className?: string;
+}) {
+  const clamp = (value: number) => Math.max(0, Math.min(100, value * 100));
+  const fromPct = clamp(from);
+  const toPct = clamp(to);
+  const [position, setPosition] = useState(animate ? fromPct : toPct);
+
+  const run = () => {
+    setPosition(fromPct);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => setPosition(toPct));
+    });
+  };
+
+  useEffect(() => {
+    if (!animate) return;
+    const id = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => setPosition(toPct));
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [animate, toPct]);
+
+  const label = (value: number) => value.toFixed(1).replace(".", ",");
+
+  return (
+    <div className={cn("w-full", className)}>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={run}
+          className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#A9C7FF] bg-[#F2F7FC] px-2.5 py-1 text-[11px] font-medium text-[#00499D] transition hover:bg-[#CBE4FB] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        >
+          <svg viewBox="0 0 8 10" aria-hidden="true" className="h-2.5 w-2.5 fill-current">
+            <path d="M0 0l8 5-8 5z" />
+          </svg>
+          Anteprima
+        </button>
+        <div className="relative h-1.5 flex-1 bg-[#DBE2E8]" aria-hidden="true">
+          <div
+            className="absolute inset-y-0 bg-[#CBE4FB]"
+            style={{
+              left: `${Math.min(fromPct, toPct)}%`,
+              width: `${Math.abs(toPct - fromPct)}%`,
+            }}
+          />
+          <span
+            className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#8B98A5] bg-white"
+            style={{ left: `${fromPct}%` }}
+          />
+          <span
+            className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent transition-[left] duration-700 ease-out motion-reduce:transition-none"
+            style={{ left: `${position}%` }}
+          />
+        </div>
+      </div>
+      <div className="mt-2 flex items-center justify-between text-[10px] text-muted">
+        <span>{fromLabel} {label(fromPct)}%</span>
+        <span>{toLabel} {label(toPct)}%</span>
+      </div>
     </div>
   );
 }
