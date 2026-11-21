@@ -14,6 +14,17 @@ export default {
           soft: "#E3EFEA",
           deep: "#0A4A40",
         },
+        brand: {
+          DEFAULT: "#005EB8",
+          dark: "#00499D",
+          soft: "#CBE4FB",
+          ink: "#19242E",
+          surface: "#EEF2F5",
+          border: "#DBE2E8",
+          strong: "#AFBAC4",
+          green: "#88E771",
+          red: "#E74C3C",
+        },
         copper: "#B4693A",
         risk: {
           low: "#067647",
@@ -24,6 +35,7 @@ export default {
       },
       fontFamily: {
         sans: [
+          "DM Sans",
           "ui-sans-serif",
           "system-ui",
           "-apple-system",
@@ -34,6 +46,7 @@ export default {
           "sans-serif",
         ],
         display: [
+          "DM Sans",
           "Iowan Old Style",
           "Palatino Linotype",
           "Palatino",
