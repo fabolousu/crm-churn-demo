@@ -23,6 +23,7 @@ This is the same semantic configuration in `bookinator` and `crm-churn-demo`. Co
 - Autofix is triggered by `@coderabbitai autofix` in a PR comment, or by the Fix comments checkbox. It does not silently rewrite every review.
 - A bot commit is a normal code change: it needs independent review and tests before merge.
 - Human approval on the PR remains mandatory. CodeRabbit cannot approve or merge on its own.
+- Fix CI failures (`@coderabbitai fix-ci`) is plan-gated on the Team plan. If the plan rejects it, a human or agent applies the minimal CI fix; CodeRabbit still reviews the result.
 
 ## Independence
 
